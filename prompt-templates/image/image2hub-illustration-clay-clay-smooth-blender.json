@@ -1,0 +1,21 @@
+{
+  "id": "image2hub-illustration-clay-clay-smooth-blender",
+  "surface": "image",
+  "title": "Image2 클레이 - Clay Clay Smooth Blender",
+  "summary": "Image2 Hub의 일러스트 / 클레이 카테고리에서 가져온 이미지 생성 스타일입니다. 한국어 텍스트가 필요한 장면은 한국어 라벨과 카피를 사용하도록 조정했습니다.",
+  "category": "Illustration",
+  "tags": [
+    "3d-render",
+    "illustration"
+  ],
+  "model": "gpt-image-2",
+  "aspect": "1:1",
+  "previewImageUrl": "https://image2hub.netlify.app/assets/illustration/clay/clay-smooth-blender.webp",
+  "prompt": "3D illustration, clay style, soft plastic material, toy-like character design,\n\nartistic abstract sculpting, dopamine color palette,\n\nsoft studio lighting, global illumination, soft shadows,\n\npastel base tones with vibrant accents,\n\ncentered composition, single hero object, clean background,\n\nfloating decorative elements,\n\nsticker collage details, UI labels, badges, playful icons (stars, music notes, shapes),\n\nmicro typography, fictional brand text,\n\njoyful, playful, whimsical yet well-designed,\n\neditorial-grade quality, Behance / Awwwards standard.\n\n— Theme: \"SMOOTH\" fruit smoothie blender Use Korean-language copy, labels, captions, titles, and UI text wherever text appears; keep all text readable and culturally natural for Korean users.",
+  "source": {
+    "repo": "houshifang/image",
+    "license": "Unspecified",
+    "author": "Image2 Hub",
+    "url": "https://image2hub.netlify.app/"
+  }
+}

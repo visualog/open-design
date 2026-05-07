@@ -1,0 +1,21 @@
+{
+  "id": "image2hub-kingkong-icons-beauty-cosmetics",
+  "surface": "image",
+  "title": "Image2 홈 카테고리 아이콘 - Icons Beauty Cosmetics",
+  "summary": "Image2 Hub의 앱 / 홈 카테고리 아이콘 카테고리에서 가져온 이미지 생성 스타일입니다. 한국어 텍스트가 필요한 장면은 한국어 라벨과 카피를 사용하도록 조정했습니다.",
+  "category": "App / Web Design",
+  "tags": [
+    "app-showcase",
+    "product"
+  ],
+  "model": "gpt-image-2",
+  "aspect": "9:16",
+  "previewImageUrl": "https://image2hub.netlify.app/assets/kingkong-icons/beauty-cosmetics.webp",
+  "prompt": "Following the standards of a beauty e-commerce app visual designer, design a pink-toned set of homepage king-kong category icons covering 12 beauty categories — lipstick, face powder, eyeshadow, makeup brush, foundation, eyeliner pen, mascara, blush, perfume, face cream, face mask and lip balm. Soft-lit premium texture, white background rounded-corner cards, each tile with a Korean text label. Use Korean-language copy, labels, captions, titles, and UI text wherever text appears; keep all text readable and culturally natural for Korean users.",
+  "source": {
+    "repo": "houshifang/image",
+    "license": "Unspecified",
+    "author": "Image2 Hub",
+    "url": "https://image2hub.netlify.app/"
+  }
+}

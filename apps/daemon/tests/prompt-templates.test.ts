@@ -13,6 +13,8 @@ const promptTemplatesRoot = path.join(repoRoot, 'prompt-templates');
 interface PromptTemplateForTest {
   id: string;
   surface: string;
+  title: string;
+  category: string;
   model?: string;
   previewImageUrl?: string;
   prompt: string;
@@ -34,6 +36,9 @@ const KOREAN_STYLE_TEMPLATE_IDS = [
   'architecture-mood-render-korea',
   'dopamine-3d-cyclist-wheelie-character',
 ] as const;
+
+const IMAGE2_HUB_TEMPLATE_PREFIX = 'image2hub-';
+const HAN_SCRIPT_RE = /[\u3400-\u9fff]/;
 
 const PREVIEW_EXTENSION_BY_ID: Partial<Record<(typeof KOREAN_STYLE_TEMPLATE_IDS)[number], string>> = {
   'dopamine-3d-cyclist-wheelie-character': 'png',
@@ -64,6 +69,27 @@ describe('prompt template registry', () => {
       );
       expect(template.source.repo, `${id} source repo`).toBe('nexu-io/open-design');
       expect(template.source.license, `${id} source license`).toBe('Apache-2.0');
+    }
+  });
+
+  it('imports Image2 Hub image styles with Korean-ready display metadata', async () => {
+    const templates = await listPromptTemplates(promptTemplatesRoot) as PromptTemplateForTest[];
+    const image2HubTemplates = templates.filter((template) =>
+      template.id.startsWith(IMAGE2_HUB_TEMPLATE_PREFIX),
+    );
+
+    expect(image2HubTemplates.length).toBeGreaterThanOrEqual(80);
+
+    for (const template of image2HubTemplates) {
+      expect(template.surface, template.id).toBe('image');
+      expect(template.model, template.id).toBe('gpt-image-2');
+      expect(template.previewImageUrl, template.id).toMatch(
+        /^https:\/\/image2hub\.netlify\.app\/assets\//,
+      );
+      expect(template.source.repo, template.id).toBe('houshifang/image');
+      expect(template.title, template.id).not.toMatch(HAN_SCRIPT_RE);
+      expect(template.category, template.id).not.toMatch(HAN_SCRIPT_RE);
+      expect(template.prompt, template.id).not.toMatch(/\bChinese\b|中文|汉字|漢字/i);
     }
   });
 });

@@ -1,0 +1,21 @@
+{
+  "id": "image2hub-ops-c4d-may-day-island-tent",
+  "surface": "image",
+  "title": "Image2 3D 포스터 - C4D May Day Island Tent",
+  "summary": "Image2 Hub의 운영 / 3D 포스터 카테고리에서 가져온 이미지 생성 스타일입니다. 한국어 텍스트가 필요한 장면은 한국어 라벨과 카피를 사용하도록 조정했습니다.",
+  "category": "Marketing",
+  "tags": [
+    "3d-render",
+    "marketing"
+  ],
+  "model": "gpt-image-2",
+  "aspect": "9:16",
+  "previewImageUrl": "https://image2hub.netlify.app/assets/ops-c4d/may-day-island-tent.webp",
+  "prompt": "Internet operations visual design master standard, Dribbble 3D illustration style poster, C4D style, soft-light rendering, high saturation, abstract art, clean minimalist background, visually cheerful, refined and delicate. Theme: 5/1 Go Camping. Use Korean-language copy, labels, captions, titles, and UI text wherever text appears; keep all text readable and culturally natural for Korean users.",
+  "source": {
+    "repo": "houshifang/image",
+    "license": "Unspecified",
+    "author": "Image2 Hub",
+    "url": "https://image2hub.netlify.app/"
+  }
+}

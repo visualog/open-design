@@ -1,0 +1,22 @@
+{
+  "id": "image2hub-kingkong-icons-food-set-a",
+  "surface": "image",
+  "title": "Image2 홈 카테고리 아이콘 - Icons Food Set A",
+  "summary": "Image2 Hub의 앱 / 홈 카테고리 아이콘 카테고리에서 가져온 이미지 생성 스타일입니다. 한국어 텍스트가 필요한 장면은 한국어 라벨과 카피를 사용하도록 조정했습니다.",
+  "category": "App / Web Design",
+  "tags": [
+    "3d-render",
+    "app-showcase",
+    "product"
+  ],
+  "model": "gpt-image-2",
+  "aspect": "9:16",
+  "previewImageUrl": "https://image2hub.netlify.app/assets/kingkong-icons/food-set-a.webp",
+  "prompt": "Following the standards of a food-delivery app visual designer, design a set of homepage king-kong category icons covering 12 takeaway categories — noodles, burger, cake, baozi (steamed bun), pizza, coffee, fries, salad, yogurt, ice cream, biscuits and milk. Unified clay-style 3D skeuomorphism, round and cute, on white background rounded-corner cards.",
+  "source": {
+    "repo": "houshifang/image",
+    "license": "Unspecified",
+    "author": "Image2 Hub",
+    "url": "https://image2hub.netlify.app/"
+  }
+}
