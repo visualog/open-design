@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1500" role="img" aria-label="K-food menu poster sample">
+  <rect width="1200" height="1500" fill="#fff6e6"/>
+  <rect x="88" y="78" width="1024" height="1344" rx="46" fill="#fffbf2" stroke="#3f2a1f" stroke-width="5"/>
+  <ellipse cx="612" cy="650" rx="360" ry="160" fill="#e8d2b8"/>
+  <ellipse cx="612" cy="610" rx="310" ry="128" fill="#f3ead7" stroke="#3f2a1f" stroke-width="8"/>
+  <path d="M396 592c86-80 350-88 430 6-76 54-334 72-430-6z" fill="#b94b35"/>
+  <path d="M456 550c84 36 218 32 312-4" stroke="#f6d47e" stroke-width="18" stroke-linecap="round"/>
+  <circle cx="532" cy="612" r="34" fill="#fff2c2"/>
+  <circle cx="686" cy="604" r="30" fill="#6f8c55"/>
+  <text x="124" y="220" font-family="Arial, sans-serif" font-size="42" font-weight="700" fill="#b94b35">오늘의 추천</text>
+  <text x="124" y="310" font-family="Arial, sans-serif" font-size="82" font-weight="900" fill="#3f2a1f">매콤 비빔냉면</text>
+  <text x="124" y="386" font-family="Arial, sans-serif" font-size="34" fill="#715743">직화 고기와 계절 반찬 구성</text>
+  <rect x="124" y="1050" width="300" height="84" rx="42" fill="#3f2a1f"/>
+  <text x="174" y="1104" font-family="Arial, sans-serif" font-size="34" font-weight="700" fill="#fff6e6">12,900원</text>
+  <text x="124" y="1218" font-family="Arial, sans-serif" font-size="32" fill="#715743">점심 한정 · 포장 가능 · 매장 식사 가능</text>
+</svg>

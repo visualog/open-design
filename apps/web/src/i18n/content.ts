@@ -459,7 +459,19 @@ const DE_PROMPT_TEMPLATE_CATEGORIES: Record<string, string> = {
   Travel: 'Reise',
 };
 
-const DE_PROMPT_TEMPLATE_IDS_WITH_EN_FALLBACK = [] as const;
+const KOREAN_STYLE_PROMPT_TEMPLATE_IDS = [
+  'architecture-mood-render-korea',
+  'dopamine-3d-cyclist-wheelie-character',
+  'friendly-character-illustration-kakao-style',
+  'k-editorial-magazine-cover',
+  'k-food-menu-poster',
+  'luxury-cosmetic-campaign-visual',
+  'minimal-product-poster-korean-brand',
+  'startup-pitch-hero-visual',
+  'webtoon-key-visual-poster',
+] as const;
+
+const DE_PROMPT_TEMPLATE_IDS_WITH_EN_FALLBACK = KOREAN_STYLE_PROMPT_TEMPLATE_IDS;
 
 const DE_PROMPT_TEMPLATE_TAGS: Record<string, string> = {
   '3d': '3D',
@@ -1002,7 +1014,93 @@ const DE_PROMPT_TEMPLATE_COPY: Record<string, LocalizedPromptTemplateCopy> = {
   },
 };
 
+const KO_PROMPT_TEMPLATE_CATEGORIES: Record<string, string> = {
+  Infographic: '인포그래픽',
+  'Anime / Manga': '애니메이션 / 웹툰',
+  'App / Web Design': '앱 / 웹 디자인',
+  'Game UI': '게임 UI',
+  Illustration: '일러스트레이션',
+  'Profile / Avatar': '프로필 / 아바타',
+  'Social Media Post': '소셜 미디어 게시물',
+  General: '일반',
+};
+
+const KO_PROMPT_TEMPLATE_TAGS: Record<string, string> = {
+  '3d-render': '3D 렌더',
+  anime: '애니메이션',
+  childlike: '친근한',
+  cinematic: '시네마틱',
+  fashion: '패션',
+  food: '푸드',
+  'hand-drawn': '핸드드로잉',
+  illustration: '일러스트',
+  infographic: '인포그래픽',
+  'key-visual': '키비주얼',
+  portrait: '인물',
+  product: '제품',
+  typography: '타이포그래피',
+};
+
+const KO_PROMPT_TEMPLATE_COPY: Record<string, LocalizedPromptTemplateCopy> = {
+  'architecture-mood-render-korea': {
+    title: '한국 공간 무드 렌더',
+    summary:
+      '한국의 카페, 스튜디오, 팝업, 인테리어 제안을 위한 건축 무드 렌더 프롬프트입니다. 재료감과 공간감, 차분한 분위기를 강조합니다.',
+  },
+  'dopamine-3d-cyclist-wheelie-character': {
+    title: '도파민 3D 휠리 캐릭터',
+    summary:
+      '노란 자전거로 휠리를 하는 캐릭터를 과장된 소프트 스컬프처 3D 스타일로 만드는 프롬프트입니다. 통통한 형태, 긴 팔다리, 매트한 촉감, 밝은 도파민 컬러를 강조합니다.',
+  },
+  'friendly-character-illustration-kakao-style': {
+    title: '친근한 캐릭터 일러스트',
+    summary:
+      '온보딩, 커뮤니티, 도움말 화면에 어울리는 부드럽고 접근성 좋은 캐릭터 일러스트 프롬프트입니다.',
+  },
+  'k-editorial-magazine-cover': {
+    title: 'K-에디토리얼 매거진 커버',
+    summary:
+      '한국 매거진 커버 감성의 프롬프트입니다. 세련된 타이포그래피, 자신감 있는 인물 연출, 넉넉한 여백, 프리미엄 인쇄 질감을 조합합니다.',
+  },
+  'k-food-menu-poster': {
+    title: 'K-푸드 메뉴 포스터',
+    summary:
+      '음식점과 카페 홍보에 맞춘 메뉴 포스터 프롬프트입니다. 먹음직스러운 촬영감, 읽기 쉬운 한글 위계, 매장용 레이아웃을 강조합니다.',
+  },
+  'luxury-cosmetic-campaign-visual': {
+    title: '럭셔리 코스메틱 캠페인',
+    summary:
+      '한국 뷰티 브랜드의 신제품 런칭에 어울리는 프리미엄 캠페인 비주얼 프롬프트입니다. 제품 스테이징과 빛, 짧은 홍보 문구를 정교하게 잡습니다.',
+  },
+  'minimal-product-poster-korean-brand': {
+    title: '미니멀 제품 포스터',
+    summary:
+      '한국 브랜드 제품 홍보용 미니멀 포스터 프롬프트입니다. 정확한 제품 조명, 간결한 한글 카피, 차분한 커머셜 완성도를 균형 있게 다룹니다.',
+  },
+  'startup-pitch-hero-visual': {
+    title: '스타트업 피치 히어로 비주얼',
+    summary:
+      '한국 스타트업의 피치덱과 랜딩 페이지에 사용할 히어로 비주얼 프롬프트입니다. 제품 메타포, 데이터 단서, 발표용 신뢰감을 함께 담습니다.',
+  },
+  'webtoon-key-visual-poster': {
+    title: '웹툰 키비주얼 포스터',
+    summary:
+      '웹툰 런칭과 연재 홍보에 어울리는 키비주얼 프롬프트입니다. 캐릭터 중심 구성, 한국어 타이틀, 장르 분위기를 강하게 잡습니다.',
+  },
+};
+
 const LOCALIZED_CONTENT: Partial<Record<Locale, LocalizedContentBundle>> = {
+  ko: {
+    skillCopy: {},
+    skillIdsWithEnFallback: [],
+    designSystemSummaries: {},
+    designSystemCategories: {},
+    designSystemIdsWithEnFallback: [],
+    promptTemplateCategories: KO_PROMPT_TEMPLATE_CATEGORIES,
+    promptTemplateIdsWithEnFallback: [],
+    promptTemplateTags: KO_PROMPT_TEMPLATE_TAGS,
+    promptTemplateCopy: KO_PROMPT_TEMPLATE_COPY,
+  },
   de: {
     skillCopy: DE_SKILL_COPY,
     skillIdsWithEnFallback: DE_SKILL_IDS_WITH_EN_FALLBACK,

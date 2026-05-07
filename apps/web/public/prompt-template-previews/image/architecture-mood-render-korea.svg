@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-label="Korean architecture mood render sample">
+  <rect width="1600" height="900" fill="#ece8df"/>
+  <path d="M132 730h1336V190H132z" fill="#d7d1c5" stroke="#312a23" stroke-width="5"/>
+  <path d="M132 730h1336L1170 884H0z" fill="#b7aa99"/>
+  <path d="M132 190h1336l-230-120H308z" fill="#f8f1e6"/>
+  <rect x="244" y="298" width="290" height="432" fill="#f4eadb" stroke="#312a23" stroke-width="4"/>
+  <rect x="642" y="298" width="290" height="432" fill="#c2c8c0" stroke="#312a23" stroke-width="4"/>
+  <rect x="1040" y="298" width="290" height="432" fill="#eee1cc" stroke="#312a23" stroke-width="4"/>
+  <rect x="242" y="676" width="1090" height="56" fill="#75685b"/>
+  <rect x="704" y="116" width="318" height="70" rx="10" fill="#312a23"/>
+  <text x="738" y="162" font-family="Arial, sans-serif" font-size="30" font-weight="700" fill="#f8f1e6">SEOUL COFFEE BAR</text>
+  <circle cx="454" cy="820" r="18" fill="#312a23"/>
+  <circle cx="1108" cy="820" r="18" fill="#312a23"/>
+  <text x="110" y="110" font-family="Arial, sans-serif" font-size="38" font-weight="700" fill="#312a23">한지 조명 · 스테인리스 · 따뜻한 석재</text>
+</svg>

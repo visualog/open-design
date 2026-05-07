@@ -1,0 +1,25 @@
+{
+  "id": "webtoon-key-visual-poster",
+  "surface": "image",
+  "title": "Webtoon Key Visual Poster",
+  "summary": "A dramatic webtoon-style key visual prompt with character focus, Korean title treatment, and serialized-story poster energy.",
+  "category": "Anime / Manga",
+  "tags": [
+    "anime",
+    "key-visual",
+    "typography"
+  ],
+  "model": "gpt-image-2",
+  "aspect": "3:4",
+  "previewImageUrl": "/prompt-template-previews/image/webtoon-key-visual-poster.svg",
+  "prompt": "Create a Korean webtoon key visual poster for {argument name=\"story\" default=\"a modern fantasy romance set between a rainy Seoul rooftop and a hidden spirit market\"}. Compose one to three main characters with strong silhouettes, expressive faces, and a clear emotional hook. Add a Korean title treatment, short tagline, episode-launch badge, and atmospheric background details that imply the genre. Use polished webtoon cover art, dynamic lighting, clean linework, rich but controlled colors, and a strong thumbnail read for mobile platforms. Avoid copyrighted character likenesses, crowded panels, and illegible title lettering.",
+  "localizedPrompts": {
+    "ko": "{argument name=\"story\" default=\"비 오는 서울 옥상과 숨겨진 영혼 시장을 오가는 현대 판타지 로맨스\"}를 위한 한국 웹툰 키비주얼 포스터를 만듭니다. 강한 실루엣, 표현력 있는 얼굴, 분명한 감정적 훅을 가진 주인공 1~3명을 구성하세요. 한국어 제목 처리, 짧은 태그라인, 에피소드 런칭 배지, 장르를 암시하는 분위기 있는 배경 디테일을 추가합니다. 완성도 높은 웹툰 표지 아트, 역동적인 조명, 깔끔한 선화, 풍부하지만 통제된 색감, 모바일 플랫폼에서 썸네일로도 강하게 읽히는 구성을 사용하세요. 저작권이 있는 캐릭터와 닮은 외형, 복잡한 컷 분할, 읽기 어려운 제목 글자는 피합니다."
+  },
+  "source": {
+    "repo": "nexu-io/open-design",
+    "license": "Apache-2.0",
+    "author": "Open Design",
+    "url": "https://github.com/nexu-io/open-design"
+  }
+}

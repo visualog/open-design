@@ -7,6 +7,26 @@ import type {
 } from '../types';
 import { Icon } from './Icon';
 
+export type PromptTemplatePromptLanguage = 'en' | 'ko';
+
+export function getPromptTemplatePromptViewOptions(
+  detail: PromptTemplateDetail | null,
+): PromptTemplatePromptLanguage[] {
+  if (!detail?.localizedPrompts?.ko?.trim()) return ['en'];
+  return ['en', 'ko'];
+}
+
+export function getPromptTemplatePromptText(
+  detail: PromptTemplateDetail,
+  language: PromptTemplatePromptLanguage,
+): string {
+  if (language === 'ko') {
+    const koPrompt = detail.localizedPrompts?.ko?.trim();
+    if (koPrompt) return koPrompt;
+  }
+  return detail.prompt;
+}
+
 interface Props {
   summary: PromptTemplateSummary;
   onClose: () => void;
@@ -21,6 +41,8 @@ export function PromptTemplatePreviewModal({ summary, onClose }: Props) {
   const [detail, setDetail] = useState<PromptTemplateDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [promptLanguage, setPromptLanguage] =
+    useState<PromptTemplatePromptLanguage>('en');
   // Immersive fullscreen preview state. Layered ABOVE the modal so the
   // user can dive into the asset without losing the prompt context they
   // came from — closing the lightbox restores the modal underneath.
@@ -31,6 +53,7 @@ export function PromptTemplatePreviewModal({ summary, onClose }: Props) {
     setDetail(null);
     setError(null);
     setCopied(false);
+    setPromptLanguage('en');
     setLightboxOpen(false);
     void fetchPromptTemplate(summary.surface, summary.id).then((d) => {
       if (cancelled) return;
@@ -64,7 +87,7 @@ export function PromptTemplatePreviewModal({ summary, onClose }: Props) {
 
   function handleCopy() {
     if (!detail) return;
-    void navigator.clipboard.writeText(detail.prompt).then(() => {
+    void navigator.clipboard.writeText(getPromptTemplatePromptText(detail, promptLanguage)).then(() => {
       setCopied(true);
       window.setTimeout(() => setCopied(false), 2000);
     });
@@ -77,6 +100,12 @@ export function PromptTemplatePreviewModal({ summary, onClose }: Props) {
   const hasAsset = !!(summary.previewVideoUrl || summary.previewImageUrl);
   const fullscreenLabel = t('promptTemplates.openFullscreen');
   const closeFullscreenLabel = t('promptTemplates.closeFullscreen');
+  const promptViewOptions = getPromptTemplatePromptViewOptions(detail);
+  const visiblePrompt = detail
+    ? getPromptTemplatePromptText(detail, promptLanguage)
+    : error
+      ? error
+      : t('common.loading');
 
   return (
     <>
@@ -166,6 +195,30 @@ export function PromptTemplatePreviewModal({ summary, onClose }: Props) {
               <span className="prompt-template-modal-prompt-label">
                 {t('promptTemplates.promptLabel')}
               </span>
+              {promptViewOptions.length > 1 ? (
+                <span
+                  className="prompt-template-language-toggle"
+                  role="group"
+                  aria-label="Prompt language"
+                >
+                  <button
+                    type="button"
+                    className={promptLanguage === 'en' ? 'active' : ''}
+                    aria-pressed={promptLanguage === 'en'}
+                    onClick={() => setPromptLanguage('en')}
+                  >
+                    English
+                  </button>
+                  <button
+                    type="button"
+                    className={promptLanguage === 'ko' ? 'active' : ''}
+                    aria-pressed={promptLanguage === 'ko'}
+                    onClick={() => setPromptLanguage('ko')}
+                  >
+                    한국어
+                  </button>
+                </span>
+              ) : null}
               <button
                 type="button"
                 className="ghost"
@@ -179,11 +232,7 @@ export function PromptTemplatePreviewModal({ summary, onClose }: Props) {
               </button>
             </div>
             <pre className="prompt-template-modal-prompt-body">
-              {detail
-                ? detail.prompt
-                : error
-                  ? error
-                  : t('common.loading')}
+              {visiblePrompt}
             </pre>
           </div>
         </div>

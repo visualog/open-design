@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-label="Startup pitch hero visual sample">
+  <rect width="1600" height="900" fill="#edf2f4"/>
+  <rect x="86" y="78" width="1428" height="744" rx="44" fill="#ffffff" stroke="#18212b" stroke-width="4"/>
+  <text x="142" y="182" font-family="Arial, sans-serif" font-size="42" font-weight="700" fill="#4763ff">AI WORKFLOW</text>
+  <text x="142" y="278" font-family="Arial, sans-serif" font-size="82" font-weight="900" fill="#18212b">작은 팀의 실행력을</text>
+  <text x="142" y="372" font-family="Arial, sans-serif" font-size="82" font-weight="900" fill="#18212b">하나의 흐름으로</text>
+  <text x="148" y="454" font-family="Arial, sans-serif" font-size="34" fill="#5c6875">브리프, 작업, 리뷰, 산출물을 연결하는 운영형 디자인 플랫폼</text>
+  <rect x="970" y="188" width="356" height="418" rx="28" fill="#18212b"/>
+  <rect x="1016" y="248" width="264" height="36" rx="18" fill="#86e7c6"/>
+  <rect x="1016" y="326" width="196" height="28" rx="14" fill="#ffffff"/>
+  <rect x="1016" y="384" width="238" height="28" rx="14" fill="#ffffff"/>
+  <rect x="1016" y="442" width="150" height="28" rx="14" fill="#ffffff"/>
+  <path d="M774 334h120c42 0 76 34 76 76v0c0 42-34 76-76 76H774" fill="none" stroke="#4763ff" stroke-width="12"/>
+  <rect x="142" y="618" width="210" height="102" rx="24" fill="#f1f4ff" stroke="#4763ff" stroke-width="4"/>
+  <text x="180" y="680" font-family="Arial, sans-serif" font-size="34" font-weight="700" fill="#18212b">+42%</text>
+  <rect x="382" y="618" width="210" height="102" rx="24" fill="#effbf6" stroke="#30a17a" stroke-width="4"/>
+  <text x="420" y="680" font-family="Arial, sans-serif" font-size="34" font-weight="700" fill="#18212b">8분</text>
+</svg>

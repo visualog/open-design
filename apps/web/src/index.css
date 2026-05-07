@@ -8681,6 +8681,7 @@ body.entry-resizing { cursor: col-resize; user-select: none; }
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 10px;
   padding: 8px 12px;
   border-bottom: 1px solid var(--border);
 }
@@ -8690,6 +8691,35 @@ body.entry-resizing { cursor: col-resize; user-select: none; }
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--text-muted);
+  margin-right: auto;
+}
+.prompt-template-language-toggle {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  padding: 2px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+}
+.prompt-template-language-toggle button {
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  padding: 6px 8px;
+  cursor: pointer;
+}
+.prompt-template-language-toggle button.active {
+  background: var(--accent-tint);
+  color: var(--accent);
+}
+.prompt-template-language-toggle button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
 }
 .prompt-template-modal-prompt-body {
   margin: 0;

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1200" role="img" aria-label="Minimal Korean product poster sample">
+  <rect width="1200" height="1200" fill="#eef2ef"/>
+  <rect x="86" y="84" width="1028" height="1032" rx="34" fill="#fbfaf5" stroke="#cad2cb" stroke-width="3"/>
+  <ellipse cx="602" cy="875" rx="220" ry="42" fill="#c7d2c7"/>
+  <rect x="487" y="304" width="230" height="548" rx="72" fill="#dfe8e2" stroke="#1f2c29" stroke-width="6"/>
+  <rect x="526" y="232" width="152" height="118" rx="22" fill="#283833"/>
+  <rect x="527" y="468" width="150" height="188" rx="18" fill="#fffaf0" stroke="#283833" stroke-width="4"/>
+  <text x="560" y="530" font-family="Arial, sans-serif" font-size="36" font-weight="700" fill="#283833">리필</text>
+  <text x="532" y="588" font-family="Arial, sans-serif" font-size="27" fill="#58635d">SERUM</text>
+  <text x="100" y="165" font-family="Arial, sans-serif" font-size="36" font-weight="700" fill="#283833">NEW ROUTINE</text>
+  <text x="100" y="226" font-family="Arial, sans-serif" font-size="58" font-weight="700" fill="#283833">가볍게 채우는</text>
+  <text x="100" y="292" font-family="Arial, sans-serif" font-size="58" font-weight="700" fill="#283833">매일의 수분</text>
+  <rect x="830" y="210" width="162" height="54" rx="27" fill="#283833"/>
+  <text x="866" y="247" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#fbfaf5">런칭</text>
+  <text x="830" y="850" font-family="Arial, sans-serif" font-size="28" fill="#58635d">01 저자극</text>
+  <text x="830" y="902" font-family="Arial, sans-serif" font-size="28" fill="#58635d">02 리필 패키지</text>
+  <text x="830" y="954" font-family="Arial, sans-serif" font-size="28" fill="#58635d">03 산뜻한 마감</text>
+</svg>

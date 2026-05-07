@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ConnectorDetail } from '@open-design/contracts';
-import { useT } from '../i18n';
-import type { Dict } from '../i18n/types';
+import { useI18n, useT } from '../i18n';
+import type { Dict, Locale } from '../i18n/types';
+import { localizePromptTemplateSummary } from '../i18n/content';
 import { fetchPromptTemplate } from '../providers/registry';
 import type {
   AudioKind,
@@ -39,6 +40,32 @@ type PromptTemplatePick = {
 };
 
 type TranslateFn = (key: keyof Dict, vars?: Record<string, string | number>) => string;
+
+export function getPromptTemplatePickerItems({
+  locale,
+  surface,
+  templates,
+  query,
+}: {
+  locale: Locale;
+  surface: 'image' | 'video';
+  templates: PromptTemplateSummary[];
+  query: string;
+}): PromptTemplateSummary[] {
+  const surfaceScoped = templates
+    .filter((tpl) => tpl.surface === surface)
+    .map((tpl) => localizePromptTemplateSummary(locale, tpl));
+  const q = query.trim().toLowerCase();
+  if (!q) return surfaceScoped;
+  return surfaceScoped.filter((tpl) => {
+    return (
+      tpl.title.toLowerCase().includes(q) ||
+      tpl.summary.toLowerCase().includes(q) ||
+      (tpl.category || '').toLowerCase().includes(q) ||
+      (tpl.tags ?? []).some((tag) => tag.toLowerCase().includes(q))
+    );
+  });
+}
 
 export type CreateTab = 'prototype' | 'live-artifact' | 'deck' | 'template' | 'image' | 'video' | 'audio' | 'other';
 
@@ -793,7 +820,7 @@ function PromptTemplatePicker({
   value: PromptTemplatePick | null;
   onChange: (next: PromptTemplatePick | null) => void;
 }) {
-  const t = useT();
+  const { locale, t } = useI18n();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [loadingId, setLoadingId] = useState<string | null>(null);
@@ -813,17 +840,8 @@ function PromptTemplatePicker({
   );
 
   const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return surfaceScoped;
-    return surfaceScoped.filter((tpl) => {
-      return (
-        tpl.title.toLowerCase().includes(q) ||
-        tpl.summary.toLowerCase().includes(q) ||
-        (tpl.category || '').toLowerCase().includes(q) ||
-        (tpl.tags ?? []).some((tag) => tag.toLowerCase().includes(q))
-      );
-    });
-  }, [surfaceScoped, query]);
+    return getPromptTemplatePickerItems({ locale, surface, templates, query });
+  }, [locale, surface, templates, query]);
 
   useEffect(() => {
     if (!open) return;

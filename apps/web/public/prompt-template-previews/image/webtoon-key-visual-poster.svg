@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1600" role="img" aria-label="Webtoon key visual sample">
+  <rect width="1200" height="1600" fill="#172033"/>
+  <path d="M0 1040c192-240 370-326 548-258s390 38 652-204v1022H0z" fill="#243b66"/>
+  <circle cx="898" cy="250" r="150" fill="#f6c06f"/>
+  <path d="M456 438c-112 84-178 232-170 424 10 258 170 454 330 454s318-196 328-454c8-192-58-340-170-424-92-68-226-68-318 0z" fill="#e9d4c0" stroke="#101624" stroke-width="8"/>
+  <path d="M334 620c88-210 404-232 554-10-34-176-138-278-276-278-134 0-238 106-278 288z" fill="#171019"/>
+  <rect x="420" y="832" width="384" height="340" rx="30" fill="#9a3040" stroke="#101624" stroke-width="8"/>
+  <path d="M250 726c-96 58-138 174-104 318" stroke="#8dd5ff" stroke-width="20" fill="none" stroke-linecap="round"/>
+  <path d="M952 728c96 58 138 174 104 318" stroke="#ff78a4" stroke-width="20" fill="none" stroke-linecap="round"/>
+  <text x="90" y="180" font-family="Arial, sans-serif" font-size="52" font-weight="700" fill="#fff">NEW WEBTOON</text>
+  <text x="90" y="1378" font-family="Arial, sans-serif" font-size="116" font-weight="900" fill="#fff">비밀시장</text>
+  <text x="96" y="1450" font-family="Arial, sans-serif" font-size="38" font-weight="700" fill="#f6c06f">비 오는 밤, 문이 열린다</text>
+  <rect x="866" y="1340" width="210" height="62" rx="31" fill="#f6c06f"/>
+  <text x="914" y="1382" font-family="Arial, sans-serif" font-size="30" font-weight="700" fill="#172033">1화 공개</text>
+</svg>

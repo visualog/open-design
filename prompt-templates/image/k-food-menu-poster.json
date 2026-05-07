@@ -1,0 +1,25 @@
+{
+  "id": "k-food-menu-poster",
+  "surface": "image",
+  "title": "K-Food Menu Poster",
+  "summary": "A Korean food and cafe menu poster prompt with appetizing photography, clear Hangul hierarchy, and practical shop-ready layout.",
+  "category": "Social Media Post",
+  "tags": [
+    "food",
+    "product",
+    "typography"
+  ],
+  "model": "gpt-image-2",
+  "aspect": "4:5",
+  "previewImageUrl": "/prompt-template-previews/image/k-food-menu-poster.svg",
+  "prompt": "Create a Korean restaurant or cafe menu poster for {argument name=\"menu_item\" default=\"spicy cold noodles with grilled beef and seasonal banchan\"}. Make the food look appetizing and real, with natural steam or condensation where appropriate, accurate textures, and a clean tabletop setting. Add Korean menu name, short tasting notes, price area, and a small shop-promotion line with strong hierarchy that remains readable on mobile. The design should feel suitable for a neighborhood Seoul cafe or modern casual restaurant: warm, practical, and polished. Avoid fake brand logos, messy ingredient piles, and text that overwhelms the food.",
+  "localizedPrompts": {
+    "ko": "{argument name=\"menu_item\" default=\"구운 소고기와 제철 반찬을 곁들인 매콤한 냉면\"}을 위한 한국 식당 또는 카페 메뉴 포스터를 만듭니다. 음식은 먹음직스럽고 실제처럼 보여야 하며, 필요한 곳에는 자연스러운 김이나 물방울, 정확한 식감, 깔끔한 테이블 세팅을 사용하세요. 한국어 메뉴명, 짧은 맛 설명, 가격 영역, 작은 매장 홍보 문구를 추가하되 모바일에서도 읽히는 강한 위계를 유지합니다. 동네 서울 카페나 모던 캐주얼 식당에 어울리는 따뜻하고 실용적이며 완성도 있는 디자인이어야 합니다. 가짜 브랜드 로고, 지저분한 재료 더미, 음식을 압도하는 텍스트는 피합니다."
+  },
+  "source": {
+    "repo": "nexu-io/open-design",
+    "license": "Apache-2.0",
+    "author": "Open Design",
+    "url": "https://github.com/nexu-io/open-design"
+  }
+}

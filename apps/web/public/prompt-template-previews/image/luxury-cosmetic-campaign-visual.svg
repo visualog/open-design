@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1500" role="img" aria-label="Luxury cosmetic campaign sample">
+  <rect width="1200" height="1500" fill="#f1e8df"/>
+  <rect x="120" y="110" width="960" height="1280" rx="54" fill="#fff8f1" stroke="#cbb5a2" stroke-width="3"/>
+  <ellipse cx="602" cy="1044" rx="292" ry="60" fill="#d7b9a8"/>
+  <rect x="505" y="494" width="196" height="496" rx="58" fill="#ead8cf" stroke="#6f5145" stroke-width="6"/>
+  <rect x="534" y="380" width="138" height="168" rx="26" fill="#6f5145"/>
+  <path d="M548 618c84-52 160-16 126 58-30 66-110 78-148 24-24-34-12-62 22-82z" fill="#fff4ed" opacity=".9"/>
+  <text x="164" y="206" font-family="Arial, sans-serif" font-size="30" font-weight="700" letter-spacing="8" fill="#9c654f">LUMINOUS DROP</text>
+  <text x="164" y="298" font-family="Arial, sans-serif" font-size="68" font-weight="700" fill="#3b2b25">피부에 남는</text>
+  <text x="164" y="374" font-family="Arial, sans-serif" font-size="68" font-weight="700" fill="#3b2b25">맑은 결</text>
+  <rect x="164" y="1120" width="330" height="2" fill="#9c654f"/>
+  <text x="164" y="1188" font-family="Arial, sans-serif" font-size="32" fill="#6f5145">수분광 세럼 · 리미티드 런칭</text>
+  <text x="164" y="1242" font-family="Arial, sans-serif" font-size="26" fill="#8d7569">hydration · glow · calm finish</text>
+  <circle cx="844" cy="342" r="74" fill="#dcc4b6"/>
+  <circle cx="900" cy="1238" r="98" fill="#e6d1c6"/>
+</svg>

@@ -1,0 +1,25 @@
+{
+  "id": "architecture-mood-render-korea",
+  "surface": "image",
+  "title": "Architecture Mood Render - Korea",
+  "summary": "An architectural mood render prompt for Korean cafes, studios, pop-ups, or interiors with material realism and atmospheric restraint.",
+  "category": "Illustration",
+  "tags": [
+    "3d-render",
+    "cinematic",
+    "product"
+  ],
+  "model": "gpt-image-2",
+  "aspect": "16:9",
+  "previewImageUrl": "/prompt-template-previews/image/architecture-mood-render-korea.svg",
+  "prompt": "Create an architectural mood render for {argument name=\"space\" default=\"a compact Seoul coffee bar with warm stone, stainless steel, and hanji-inspired light panels\"}. Use realistic spatial perspective, believable material textures, balanced daylight and interior lighting, and a few human-scale details that explain how the space is used. The scene should feel Korean in context without relying on stereotypes: thoughtful signage, compact urban constraints, refined craft materials, and practical circulation. Compose it as a presentation-ready concept image for a client deck. Avoid impossible geometry, overly glossy surfaces, and cluttered decorative props.",
+  "localizedPrompts": {
+    "ko": "{argument name=\"space\" default=\"따뜻한 석재, 스테인리스, 한지에서 영감을 받은 조명 패널이 있는 작은 서울 커피 바\"}를 위한 건축 무드 렌더를 만듭니다. 현실적인 공간 원근, 믿을 수 있는 재료 질감, 균형 잡힌 자연광과 실내 조명, 공간 사용 방식을 설명하는 사람 크기의 디테일을 포함하세요. 고정관념에 기대지 않고 한국적인 맥락이 느껴지도록 세심한 사인물, 촘촘한 도심 조건, 정제된 공예 재료, 실용적인 동선을 반영합니다. 클라이언트 제안서에 바로 넣을 수 있는 콘셉트 이미지처럼 구성하세요. 불가능한 기하 구조, 과도하게 번쩍이는 표면, 산만한 장식 소품은 피합니다."
+  },
+  "source": {
+    "repo": "nexu-io/open-design",
+    "license": "Apache-2.0",
+    "author": "Open Design",
+    "url": "https://github.com/nexu-io/open-design"
+  }
+}

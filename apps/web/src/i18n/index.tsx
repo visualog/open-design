@@ -51,20 +51,32 @@ const DICTS: Record<Locale, Dict> = {
 
 const LS_KEY = 'open-design:locale';
 
-// First-run default is English. We honor an explicit user pick saved to
-// localStorage but never auto-detect from `navigator.language`, so the
-// initial experience is consistent and predictable.
+// First-run default is English, except Korean browser environments start in
+// Korean. An explicit user pick in localStorage always wins.
+export function resolveInitialLocale(
+  stored: string | null | undefined,
+  browserLanguages: readonly string[] = [],
+): Locale {
+  if (stored && (LOCALES as string[]).includes(stored)) {
+    return stored as Locale;
+  }
+  const primary = browserLanguages[0]?.toLowerCase();
+  if (primary === 'ko' || primary?.startsWith('ko-')) return 'ko';
+  return 'en';
+}
+
 function detectInitialLocale(): Locale {
   if (typeof window === 'undefined') return 'en';
+  let stored: string | null = null;
   try {
-    const stored = window.localStorage.getItem(LS_KEY);
-    if (stored && (LOCALES as string[]).includes(stored)) {
-      return stored as Locale;
-    }
+    stored = window.localStorage.getItem(LS_KEY);
   } catch {
     /* ignore */
   }
-  return 'en';
+  const browserLanguages = window.navigator.languages?.length
+    ? window.navigator.languages
+    : [window.navigator.language].filter(Boolean);
+  return resolveInitialLocale(stored, browserLanguages);
 }
 
 interface I18nContextValue {

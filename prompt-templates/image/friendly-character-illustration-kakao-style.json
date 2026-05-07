@@ -1,0 +1,25 @@
+{
+  "id": "friendly-character-illustration-kakao-style",
+  "surface": "image",
+  "title": "Friendly Character Illustration",
+  "summary": "A soft, approachable character illustration prompt for onboarding, community, or help-center visuals in Korean consumer products.",
+  "category": "Illustration",
+  "tags": [
+    "illustration",
+    "hand-drawn",
+    "childlike"
+  ],
+  "model": "gpt-image-2",
+  "aspect": "1:1",
+  "previewImageUrl": "/prompt-template-previews/image/friendly-character-illustration-kakao-style.svg",
+  "prompt": "Create a friendly character illustration for {argument name=\"use_case\" default=\"a Korean mobile app onboarding screen about organizing daily tasks\"}. Use a warm, simple, approachable mascot-like character with rounded shapes, clear silhouette, gentle facial expression, and a small everyday prop. The image should feel Korean consumer-app friendly: useful, lighthearted, and polished, without copying any existing mascot or brand character. Include a minimal background scene, soft color accents, and optional short Korean UI-friendly phrase. Keep it vector-like but hand-touched, with clean edges and no noisy texture.",
+  "localizedPrompts": {
+    "ko": "{argument name=\"use_case\" default=\"하루 할 일을 정리하는 한국 모바일 앱 온보딩 화면\"}에 어울리는 친근한 캐릭터 일러스트를 만듭니다. 둥근 형태, 또렷한 실루엣, 부드러운 표정, 작은 일상 소품을 가진 따뜻하고 단순하며 다가가기 쉬운 마스코트형 캐릭터를 사용하세요. 기존 마스코트나 브랜드 캐릭터를 베끼지 않으면서도 한국 소비자 앱에 잘 어울리는 유용하고 가벼우며 완성도 있는 느낌이어야 합니다. 미니멀한 배경 장면, 부드러운 포인트 컬러, 선택적으로 짧은 한국어 UI 문구를 넣습니다. 벡터처럼 깔끔하지만 손맛이 느껴지게 하고, 선명한 가장자리와 과하지 않은 질감으로 마무리하세요."
+  },
+  "source": {
+    "repo": "nexu-io/open-design",
+    "license": "Apache-2.0",
+    "author": "Open Design",
+    "url": "https://github.com/nexu-io/open-design"
+  }
+}

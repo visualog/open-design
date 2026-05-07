@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { en } from '../../src/i18n/locales/en';
+import { ko } from '../../src/i18n/locales/ko';
+import { resolveInitialLocale } from '../../src/i18n';
 import { LOCALES, LOCALE_LABEL, type Dict, type Locale } from '../../src/i18n/types';
 
 const EXPECTED_LOCALES = ['en', 'de', 'zh-CN', 'zh-TW', 'pt-BR', 'es-ES', 'ru', 'fa', 'ar', 'ja', 'ko', 'pl', 'hu', 'fr', 'uk'];
@@ -46,5 +48,32 @@ describe('i18n locales', () => {
         );
       }
     }
+  });
+
+  it('starts in Korean for Korean browser languages when no locale is saved', () => {
+    expect(resolveInitialLocale(null, ['ko-KR', 'en-US'])).toBe('ko');
+    expect(resolveInitialLocale(null, ['en-US', 'ko-KR'])).toBe('en');
+  });
+
+  it('does not leave Korean user-facing live artifact and comment copy in English', () => {
+    const intentionallyBrandOrProtocol = new Set<keyof Dict>([
+      'app.brand',
+      'app.brandPill',
+      'app.brandSubtitle',
+      'settings.modeApiMeta',
+      'settings.apiSection',
+      'settings.baseUrl',
+      'settings.anthropicApi',
+      'settings.mediaProviderBaseUrl',
+      'ds.specToggle',
+      'avatar.anthropicApi',
+      'agentPicker.byok',
+      'pasteDialog.namePlaceholder',
+    ]);
+    const untranslated = (Object.keys(en) as Array<keyof Dict>).filter((key) => {
+      return ko[key] === en[key] && !intentionallyBrandOrProtocol.has(key);
+    });
+
+    expect(untranslated).toEqual([]);
   });
 });

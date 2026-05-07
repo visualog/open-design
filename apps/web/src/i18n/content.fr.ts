@@ -410,7 +410,17 @@ export const FR_PROMPT_TEMPLATE_CATEGORIES: Record<string, string> = {
   Travel: 'Voyage',
 };
 
-export const FR_PROMPT_TEMPLATE_IDS_WITH_EN_FALLBACK = [] as const;
+export const FR_PROMPT_TEMPLATE_IDS_WITH_EN_FALLBACK = [
+  'architecture-mood-render-korea',
+  'dopamine-3d-cyclist-wheelie-character',
+  'friendly-character-illustration-kakao-style',
+  'k-editorial-magazine-cover',
+  'k-food-menu-poster',
+  'luxury-cosmetic-campaign-visual',
+  'minimal-product-poster-korean-brand',
+  'startup-pitch-hero-visual',
+  'webtoon-key-visual-poster',
+] as const;
 
 export const FR_PROMPT_TEMPLATE_TAGS: Record<string, string> = {
   '3d': '3D',

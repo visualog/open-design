@@ -1,0 +1,25 @@
+{
+  "id": "minimal-product-poster-korean-brand",
+  "surface": "image",
+  "title": "Minimal Product Poster - Korean Brand",
+  "summary": "A clean product-poster prompt for Korean brands, balancing precise product lighting, compact Hangul copy, and calm commercial polish.",
+  "category": "Social Media Post",
+  "tags": [
+    "product",
+    "typography",
+    "3d-render"
+  ],
+  "model": "gpt-image-2",
+  "aspect": "1:1",
+  "previewImageUrl": "/prompt-template-previews/image/minimal-product-poster-korean-brand.svg",
+  "prompt": "Generate a minimal Korean product campaign poster for {argument name=\"product\" default=\"a premium refillable skincare bottle\"}. Place the product as the unmistakable first-read object, shot with precise studio lighting, realistic material texture, and a clean shadow on a simple surface. Add short Korean headline copy, a small feature grid, and a restrained call-to-action arranged with modern Korean brand spacing. Use a quiet but not monochrome palette, crisp hierarchy, and enough whitespace for ecommerce or Instagram use. Avoid excessive gradients, fake logos, cluttered props, misspelled text, and overdecorated packaging.",
+  "localizedPrompts": {
+    "ko": "{argument name=\"product\" default=\"프리미엄 리필형 스킨케어 보틀\"}을 위한 미니멀 한국 제품 캠페인 포스터를 생성합니다. 제품이 가장 먼저 읽히는 명확한 주인공이 되도록 배치하고, 정밀한 스튜디오 조명, 현실적인 재료 질감, 단순한 표면 위의 깔끔한 그림자로 촬영한 느낌을 만드세요. 짧은 한국어 헤드라인 카피, 작은 기능 그리드, 절제된 콜투액션을 현대적인 한국 브랜드 간격으로 구성합니다. 차분하지만 단색에 머물지 않는 팔레트, 선명한 위계, 이커머스나 인스타그램에 충분한 여백을 사용하세요. 과도한 그라디언트, 가짜 로고, 산만한 소품, 오탈자, 지나치게 장식적인 패키지는 피합니다."
+  },
+  "source": {
+    "repo": "nexu-io/open-design",
+    "license": "Apache-2.0",
+    "author": "Open Design",
+    "url": "https://github.com/nexu-io/open-design"
+  }
+}

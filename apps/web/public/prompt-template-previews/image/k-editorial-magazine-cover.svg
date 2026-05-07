@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1500" role="img" aria-label="K-editorial magazine cover sample">
+  <rect width="1200" height="1500" fill="#f3eee4"/>
+  <rect x="62" y="58" width="1076" height="1384" fill="#fffaf0" stroke="#1d1b17" stroke-width="4"/>
+  <text x="90" y="168" font-family="Georgia, serif" font-size="122" font-weight="700" fill="#1d1b17">SEOUL</text>
+  <text x="90" y="246" font-family="Arial, sans-serif" font-size="44" font-weight="700" letter-spacing="10" fill="#b6532f">DESIGN REVIEW</text>
+  <rect x="524" y="318" width="456" height="698" rx="220" fill="#d7c0a5"/>
+  <circle cx="748" cy="470" r="122" fill="#2d2521"/>
+  <path d="M598 625c110-86 292-82 348 62 42 110-24 236-114 294-96 62-258 38-320-68-56-96-20-206 86-288z" fill="#111"/>
+  <path d="M642 650c76-54 190-44 244 38 48 72 14 170-54 214-72 46-180 22-222-50-40-68-28-158 32-202z" fill="#ece6d8"/>
+  <rect x="90" y="348" width="314" height="16" fill="#1d1b17"/>
+  <text x="90" y="420" font-family="Arial, sans-serif" font-size="42" font-weight="700" fill="#1d1b17">새로운 스튜디오의</text>
+  <text x="90" y="478" font-family="Arial, sans-serif" font-size="42" font-weight="700" fill="#1d1b17">감각과 태도</text>
+  <text x="90" y="590" font-family="Arial, sans-serif" font-size="28" fill="#6b5c4b">도시, 브랜드, 사람을 잇는</text>
+  <text x="90" y="632" font-family="Arial, sans-serif" font-size="28" fill="#6b5c4b">한국형 에디토리얼 비주얼</text>
+  <text x="90" y="1160" font-family="Arial, sans-serif" font-size="30" font-weight="700" fill="#b6532f">COVER STORY</text>
+  <text x="90" y="1212" font-family="Arial, sans-serif" font-size="42" font-weight="700" fill="#1d1b17">DESIGNERS OF NOW</text>
+  <text x="90" y="1264" font-family="Arial, sans-serif" font-size="26" fill="#6b5c4b">Issue 04 · Seoul · Print style</text>
+</svg>

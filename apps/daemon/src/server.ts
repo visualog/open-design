@@ -1958,7 +1958,7 @@ export async function startServer({ port = 7456, host = process.env.OD_BIND_HOST
     try {
       const templates = await listPromptTemplates(PROMPT_TEMPLATES_DIR);
       res.json({
-        promptTemplates: templates.map(({ prompt: _prompt, ...rest }) => rest),
+        promptTemplates: templates.map(({ prompt: _prompt, localizedPrompts: _localizedPrompts, ...rest }) => rest),
       });
     } catch (err) {
       res.status(500).json({ error: String(err) });

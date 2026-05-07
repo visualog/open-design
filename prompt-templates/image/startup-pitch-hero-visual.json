@@ -1,0 +1,25 @@
+{
+  "id": "startup-pitch-hero-visual",
+  "surface": "image",
+  "title": "Startup Pitch Hero Visual",
+  "summary": "A startup pitch and landing hero prompt for Korean founders, combining product metaphor, credible data cues, and executive polish.",
+  "category": "App / Web Design",
+  "tags": [
+    "product",
+    "infographic",
+    "typography"
+  ],
+  "model": "gpt-image-2",
+  "aspect": "16:9",
+  "previewImageUrl": "/prompt-template-previews/image/startup-pitch-hero-visual.svg",
+  "prompt": "Generate a hero visual for a Korean startup pitch or landing page about {argument name=\"startup\" default=\"an AI workflow platform for small design teams\"}. Show the product idea through a clear visual metaphor, refined interface fragments, and credible data cues without turning the image into a dense dashboard. Include a short Korean headline, one supporting line, and subtle modular UI elements that suggest traction, workflow, and collaboration. The style should feel investor-ready: calm, precise, modern, and trustworthy, with enough contrast for presentation slides. Avoid vague glowing abstractions, unreadable microtext, and generic startup stock imagery.",
+  "localizedPrompts": {
+    "ko": "{argument name=\"startup\" default=\"소규모 디자인 팀을 위한 AI 워크플로우 플랫폼\"}을 주제로 한 한국 스타트업 피치 또는 랜딩 페이지용 히어로 비주얼을 생성합니다. 이미지를 빽빽한 대시보드로 만들지 말고, 명확한 시각적 메타포, 정제된 인터페이스 조각, 신뢰할 만한 데이터 단서를 통해 제품 아이디어를 보여주세요. 짧은 한국어 헤드라인, 보조 문장 하나, 성과와 워크플로우와 협업을 암시하는 은은한 모듈형 UI 요소를 포함합니다. 투자자에게 보여도 어울리도록 차분하고 정밀하며 현대적이고 신뢰감 있는 스타일이어야 하고, 발표 슬라이드에 충분한 대비를 갖춰야 합니다. 막연한 발광 추상 이미지, 읽기 어려운 미세 텍스트, 흔한 스타트업 스톡 이미지는 피합니다."
+  },
+  "source": {
+    "repo": "nexu-io/open-design",
+    "license": "Apache-2.0",
+    "author": "Open Design",
+    "url": "https://github.com/nexu-io/open-design"
+  }
+}

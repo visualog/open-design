@@ -94,6 +94,14 @@ function validateTemplate(raw, expectedSurface, fileName) {
     model: typeof raw.model === 'string' ? raw.model : undefined,
     aspect: typeof raw.aspect === 'string' ? raw.aspect : undefined,
     prompt: raw.prompt.trim(),
+    localizedPrompts:
+      raw.localizedPrompts && typeof raw.localizedPrompts === 'object'
+        ? Object.fromEntries(
+            Object.entries(raw.localizedPrompts)
+              .filter(([, value]) => typeof value === 'string' && value.trim().length > 0)
+              .map(([key, value]) => [key, value.trim()]),
+          )
+        : undefined,
     previewImageUrl:
       typeof raw.previewImageUrl === 'string' ? raw.previewImageUrl : undefined,
     previewVideoUrl:

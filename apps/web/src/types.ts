@@ -334,6 +334,7 @@ export interface PromptTemplateSummary {
 
 export interface PromptTemplateDetail extends PromptTemplateSummary {
   prompt: string;
+  localizedPrompts?: Partial<Record<'ko', string>>;
 }
 
 export type {
