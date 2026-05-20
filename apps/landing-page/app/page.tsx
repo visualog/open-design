@@ -1,7 +1,7 @@
 /*
  * Open Design — Atelier Zero landing page.
  *
- * Mirrors `skills/open-design-landing/example.html` 1:1. When the canonical
+ * Mirrors `design-templates/open-design-landing/example.html` 1:1. When the canonical
  * example.html changes, mirror the diff here and into `app/globals.css`.
  *
  * Static React component rendered by Astro. The Header and Wire components
@@ -9,9 +9,35 @@
  * islands only when behavior is needed.
  */
 
-import { Header } from './_components/header';
+import { Header, type HeaderProps } from './_components/header';
 import { Wire } from './_components/wire';
-import { heroImage, imageAsset } from './image-assets';
+import {
+  heroImage,
+  heroImageSrcset,
+  imageAsset,
+  PRECISE_LAZY_PLACEHOLDER,
+} from './image-assets';
+
+/**
+ * `<img>` wrapper for non-hero homepage images. Outputs `data-precise-src`
+ * so the global IntersectionObserver in `precise-lazyload.astro` swaps it
+ * to a real `src` once the element enters viewport ± 300px. Avoids the
+ * Chrome native-lazy 1250–3000px over-prefetch on this image-heavy page.
+ *
+ * Use a plain `<img>` (NOT this) for above-the-fold or LCP-critical images
+ * where waiting on IntersectionObserver would defeat the priority hint.
+ */
+function LazyImg(props: { src: string; alt?: string; className?: string }) {
+  return (
+    <img
+      src={PRECISE_LAZY_PLACEHOLDER}
+      data-precise-src={props.src}
+      alt={props.alt ?? ''}
+      className={props.className}
+      decoding='async'
+    />
+  );
+}
 
 const arrowOut = (
   <svg viewBox='0 0 24 24'>
@@ -28,7 +54,7 @@ const arrowPlus = (
 
 const NBSP = '\u00A0';
 
-// Canonical project URLs. Keep in sync with skills/open-design-landing/example.html.
+// Canonical project URLs. Keep in sync with design-templates/open-design-landing/example.html.
 //
 // `data-github-version` invariant: every wrapper must contain ONLY the version
 // string (e.g. `v0.3.0`), never any surrounding label or punctuation. The
@@ -42,6 +68,7 @@ const REPO_DAEMON = `${REPO}/tree/main/apps/daemon`;
 const REPO_SKILLS = `${REPO}/tree/main/skills`;
 const REPO_DESIGN_SYSTEMS = `${REPO}/tree/main/design-systems`;
 const REPO_DOCS = (file: string) => `${REPO}/blob/main/${file}`;
+const DISCORD = 'https://discord.gg/9ptkbbqRu';
 
 // Lineage / inspiration projects — make every brand mention clickable.
 const LINEAGE = {
@@ -90,7 +117,47 @@ const WIRE_CITIES = [
   { name: 'Sydney', coord: '33.87°S' },
 ] as const;
 
-export default function Page() {
+interface PageProps {
+  /**
+   * Live counts from the Markdown catalogs. Required: every visible
+   * "X skills / Y systems" claim on the page reads from here so meta,
+   * nav, hero copy, capability cards, labs pills, selected-work
+   * fractions, and the footer Library never disagree.
+   */
+  counts: HeaderProps['counts'] & {
+    /** Optional richer breakdown used by the Labs filter pills. */
+    byMode?: Readonly<Record<string, number>>;
+    byPlatform?: Readonly<Record<string, number>>;
+  };
+  github: {
+    starsLabel: string;
+    versionLabel: string;
+  };
+}
+
+/**
+ * Format a count for inline editorial copy. Returns the live value when
+ * positive (so a fresh `git pull` immediately reflects the new totals),
+ * falls back to a neutral em-dash when the catalog couldn't be read so
+ * we never publish "0 skills" to a visitor by mistake.
+ */
+function fmt(n: number | undefined): string {
+  return typeof n === 'number' && n > 0 ? String(n) : '—';
+}
+
+/** Two-digit padded count for the Labs pills (matches the "04", "27" feel). */
+function pad2(n: number | undefined): string {
+  if (typeof n !== 'number' || n <= 0) return '—';
+  return n < 10 ? `0${n}` : String(n);
+}
+
+export default function Page({ counts, github }: PageProps) {
+  const skills = fmt(counts.skills);
+  const systems = fmt(counts.systems);
+  const deckCount = pad2(counts.byMode?.deck);
+  const prototypeCount = pad2(counts.byMode?.prototype);
+  const mobileCount = pad2(counts.byPlatform?.mobile);
+
   return (
     <>
       {/* side rails (rotated brand text) */}
@@ -122,7 +189,7 @@ export default function Page() {
             <span className='right'>
               <a className='topbar-link' href={REPO_RELEASES} {...ext}>
                 <span className='pulse' />
-                Live · <span data-github-version>v0.3.0</span>
+                Live · <span data-github-version>{github.versionLabel}</span>
               </a>
               <span className='locale-switch'>
                 <b>EN</b>
@@ -145,12 +212,22 @@ export default function Page() {
 
         {/* ====== NAV ====== */}
         {/* Headroom-style sticky header with live GitHub star count. */}
-        <Header />
+        <Header counts={counts} github={github} />
 
         {/* ====== HERO ====== */}
         <section className='hero' id='top' data-od-id='hero'>
           <div className='container hero-grid'>
             <div className='hero-copy'>
+              <a
+                className='hero-discord-pill'
+                href={DISCORD}
+                aria-label='Join the Open Design Discord'
+                {...ext}
+                data-reveal
+              >
+                <span aria-hidden='true'>●</span>
+                Join Discord
+              </a>
               <span className='label' data-reveal>
                 Open-source design studio <span className='ix'>· Nº 01</span>
               </span>
@@ -162,8 +239,8 @@ export default function Page() {
               <p className='lead' data-reveal>
                 The open-source alternative to Claude Design. Your existing
                 coding agent — Claude · Codex · Cursor · Gemini · OpenCode ·
-                Qwen — becomes the design engine, driven by 31 composable
-                skills and 72 brand-grade design systems.
+                Qwen — becomes the design engine, driven by {skills} composable
+                skills and {systems} brand-grade design systems.
               </p>
               <div className='hero-actions' data-reveal>
                 <a className='btn btn-primary' href={REPO} {...ext}>
@@ -177,13 +254,13 @@ export default function Page() {
               </div>
               <div className='hero-stats' data-reveal>
                 <div className='stat'>
-                  <span className='ring solid'>31</span>
+                  <span className='ring solid'>{skills}</span>
                   <span className='stat-label'>
                     <b>skills</b>shippable
                   </span>
                 </div>
                 <div className='stat'>
-                  <span className='ring'>72</span>
+                  <span className='ring'>{systems}</span>
                   <span className='stat-label'>
                     <b>systems</b>portable
                   </span>
@@ -217,7 +294,16 @@ export default function Page() {
                 Composed in{NBSP}
                 <span style={{ color: 'var(--coral)' }}>Open Design</span>
               </span>
-              <img src={heroImage} alt='' />
+              <img
+                src={heroImage}
+                srcSet={heroImageSrcset}
+                sizes='(max-width: 768px) 100vw, 60vw'
+                width={1280}
+                height={1600}
+                alt=''
+                fetchPriority='high'
+                decoding='async'
+              />
               <div className='index'>
                 <span>
                   <span className='n'>01</span>Detect
@@ -293,7 +379,7 @@ export default function Page() {
                 </div>
               </div>
               <div className='about-art' data-reveal='right'>
-                <img src={imageAsset('about.png', { width: 1024, quality: 82 })} alt='' />
+                <LazyImg src={imageAsset('about.png', { width: 1024, quality: 82 })} />
                 <div className='about-side-note'>
                   <b />
                   From model behavior
@@ -335,7 +421,7 @@ export default function Page() {
               <div className='capabilities-art' data-reveal='left'>
                 <span className='corner tl' />
                 <span className='corner br' />
-                <img src={imageAsset('capabilities.png', { width: 1024, quality: 82 })} alt='' />
+                <LazyImg src={imageAsset('capabilities.png', { width: 1024, quality: 82 })} />
                 <div className='ribbon'>
                   <b>OPEN DESIGN</b>
                   {NBSP}·{NBSP}CAPABILITIES MATRIX{NBSP}·{NBSP}OD/26
@@ -375,7 +461,7 @@ export default function Page() {
                       not plugins
                     </h3>
                     <p>
-                      31 file-based{' '}
+                      {skills} file-based{' '}
                       <code style={{ fontFamily: 'var(--mono)', fontSize: 12 }}>
                         SKILL.md
                       </code>{' '}
@@ -412,7 +498,7 @@ export default function Page() {
                       as Markdown
                     </h3>
                     <p>
-                      72 portable{' '}
+                      {systems} portable{' '}
                       <code style={{ fontFamily: 'var(--mono)', fontSize: 12 }}>
                         DESIGN.md
                       </code>{' '}
@@ -506,7 +592,7 @@ export default function Page() {
               <span className='meta-grp'>
                 <span>Labs / Skills Catalog</span>
                 <span className='dot-mark'>•</span>
-                <span>05 of 31 ongoing</span>
+                <span>05 of {skills} ongoing</span>
               </span>
               <span>004 / 008</span>
             </div>
@@ -521,21 +607,21 @@ export default function Page() {
                 </h2>
               </div>
               <div className='pills' data-reveal='right'>
-                <button type='button' className='pill active'>
-                  All<span className='count'>31</span>
-                </button>
-                <button type='button' className='pill'>
-                  Prototype<span className='count'>27</span>
-                </button>
-                <button type='button' className='pill'>
-                  Deck<span className='count'>04</span>
-                </button>
-                <button type='button' className='pill'>
-                  Mobile<span className='count'>03</span>
-                </button>
-                <button type='button' className='pill'>
-                  Office<span className='count'>08</span>
-                </button>
+                <a className='pill active' href='/skills/'>
+                  All<span className='count'>{skills}</span>
+                </a>
+                <a className='pill' href='/skills/mode/prototype/'>
+                  Prototype<span className='count'>{prototypeCount}</span>
+                </a>
+                <a className='pill' href='/skills/mode/deck/'>
+                  Deck<span className='count'>{deckCount}</span>
+                </a>
+                <a className='pill' href='/skills/'>
+                  Mobile<span className='count'>{mobileCount}</span>
+                </a>
+                <a className='pill' href='/skills/'>
+                  Office<span className='count'>—</span>
+                </a>
               </div>
             </div>
             <div className='labs-meta'>
@@ -603,7 +689,7 @@ export default function Page() {
                 <div className='lab' key={lab.num} data-reveal>
                   <div className='lab-img'>
                     <span className='badge'>{lab.badge}</span>
-                    <img src={lab.src} alt='' />
+                    <LazyImg src={lab.src} />
                   </div>
                   <div className='num-row'>
                     <span>{lab.num}</span>
@@ -634,12 +720,11 @@ export default function Page() {
                 <span />
               </div>
               <span className='meta'>
-                05 / 31 SKILLS{NBSP}·{NBSP}
+                05 / {skills} SKILLS{NBSP}·{NBSP}
                 <a
-                  href={REPO_SKILLS}
+                  href='/skills/'
                   className='library-link'
                   style={{ color: 'var(--coral)' }}
-                  {...ext}
                 >
                   VIEW FULL LIBRARY →
                 </a>
@@ -682,7 +767,7 @@ export default function Page() {
                 {
                   num: '01',
                   title: 'Detect',
-                  body: 'The daemon scans your $PATH for 12 coding agents and auto-loads 31 skills + 72 systems on boot.',
+                  body: `The daemon scans your $PATH for 12 coding agents and auto-loads ${skills} skills + ${systems} systems on boot.`,
                   src: imageAsset('method-1.png', { width: 816, quality: 82 }),
                 },
                 {
@@ -711,7 +796,7 @@ export default function Page() {
                   </h4>
                   <p>{step.body}</p>
                   <div className='img'>
-                    <img src={step.src} alt='' />
+                    <LazyImg src={step.src} />
                   </div>
                 </div>
               ))}
@@ -751,8 +836,8 @@ export default function Page() {
                   <em>artifacts</em>
                   <span className='dot'>.</span>
                 </h2>
-                <a className='work-link' href={REPO_SKILLS} {...ext}>
-                  View all 31 skills
+                <a className='work-link' href='/skills/'>
+                  View all {skills} skills
                 </a>
               </div>
               <a
@@ -763,7 +848,7 @@ export default function Page() {
               >
                 <div className='label-row'>
                   <span className='small-label'>Featured skill</span>
-                  <span className='index'>01 / 31</span>
+                  <span className='index'>01 / {skills}</span>
                 </div>
                 <h3>guizang-ppt</h3>
                 <p>
@@ -771,7 +856,7 @@ export default function Page() {
                   Bundled verbatim, original LICENSE preserved.
                 </p>
                 <div className='img'>
-                  <img src={imageAsset('work-1.png', { width: 768, quality: 82 })} alt='' />
+                  <LazyImg src={imageAsset('work-1.png', { width: 768, quality: 82 })} />
                 </div>
                 <div className='meta-row'>
                   <span className='year'>2026 · DECK</span>
@@ -786,7 +871,7 @@ export default function Page() {
               >
                 <div className='label-row'>
                   <span className='small-label'>Companion system</span>
-                  <span className='index'>04 / 72</span>
+                  <span className='index'>04 / {systems}</span>
                 </div>
                 <h3>kami</h3>
                 <p>
@@ -795,7 +880,7 @@ export default function Page() {
                   zh-CN · ja).
                 </p>
                 <div className='img'>
-                  <img src={imageAsset('work-2.png', { width: 768, quality: 82 })} alt='' />
+                  <LazyImg src={imageAsset('work-2.png', { width: 768, quality: 82 })} />
                 </div>
                 <div className='meta-row'>
                   <span className='year'>2026 · PAPER</span>
@@ -971,7 +1056,7 @@ export default function Page() {
                 </a>
               </div>
               <div className='testimonial-art' data-reveal='right'>
-                <img src={imageAsset('testimonial.png', { width: 1024, quality: 82 })} alt='' />
+                <LazyImg src={imageAsset('testimonial.png', { width: 1024, quality: 82 })} />
               </div>
             </div>
           </div>
@@ -1016,7 +1101,7 @@ export default function Page() {
                 <div className='cta-foot'>
                   <span className='stamp'>● Live</span>
                   <span>
-                    <span data-github-version>v0.3.0</span> / Apache-2.0
+                    <span data-github-version>{github.versionLabel}</span> / Apache-2.0
                   </span>
                   <span style={{ marginLeft: 'auto' }}>
                     52.5200° N · 13.4050° E
@@ -1024,7 +1109,7 @@ export default function Page() {
                 </div>
               </div>
               <div className='cta-art' data-reveal='right'>
-                <img src={imageAsset('cta.png', { width: 1024, quality: 82 })} alt='' />
+                <LazyImg src={imageAsset('cta.png', { width: 1024, quality: 82 })} />
                 <div className='index'>Nº 08</div>
                 <div className='ribbon'>
                   OPEN DESIGN{NBSP}·{NBSP}FIN.
@@ -1040,7 +1125,9 @@ export default function Page() {
             <div className='foot-grid'>
               <div className='foot-brand'>
                 <a href='#top' className='brand'>
-                  <span className='brand-mark'>Ø</span>
+                  <span className='brand-mark'>
+                    <img src='/logo.webp' alt='' width={36} height={36} />
+                  </span>
                   <span>Open Design</span>
                 </a>
                 <p style={{ marginTop: 18 }}>
@@ -1087,7 +1174,7 @@ export default function Page() {
                 >
                   Download desktop
                   <span className='meta'>
-                    macOS · <span data-github-version>v0.3.0</span>
+                    macOS · <span data-github-version>{github.versionLabel}</span>
                   </span>
                 </a>
               </div>
@@ -1116,24 +1203,16 @@ export default function Page() {
                 <h5>Library</h5>
                 <ul>
                   <li>
-                    <a href={REPO_SKILLS} {...ext}>
-                      31 Skills
-                    </a>
+                    <a href='/skills/'>{skills} Skills</a>
                   </li>
                   <li>
-                    <a href={REPO_DESIGN_SYSTEMS} {...ext}>
-                      72 Systems
-                    </a>
+                    <a href='/systems/'>{systems} Systems</a>
                   </li>
                   <li>
-                    <a href={REPO_DESIGN_SYSTEMS} {...ext}>
-                      5 Directions
-                    </a>
+                    <a href='/templates/'>Templates</a>
                   </li>
                   <li>
-                    <a href={`${REPO_SKILLS}/hyperframes`} {...ext}>
-                      5 Frames
-                    </a>
+                    <a href='/craft/'>Craft</a>
                   </li>
                 </ul>
               </div>
@@ -1158,6 +1237,11 @@ export default function Page() {
                   <li>
                     <a href={REPO_RELEASES} {...ext}>
                       Releases
+                    </a>
+                  </li>
+                  <li>
+                    <a href={DISCORD} {...ext}>
+                      Discord
                     </a>
                   </li>
                 </ul>
