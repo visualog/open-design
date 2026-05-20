@@ -19,9 +19,8 @@ import {
 } from "@open-design/sidecar";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const ENTRY_DIR_NAME = path.basename(__dirname);
 
-export const WORKSPACE_ROOT = path.resolve(__dirname, ENTRY_DIR_NAME === "dist" ? "../../.." : "../../..");
+export const WORKSPACE_ROOT = path.resolve(__dirname, "../../..");
 
 export const ALL_APPS = [APP_KEYS.DAEMON, APP_KEYS.WEB, APP_KEYS.DESKTOP] as const;
 export const DEFAULT_START_APPS = [APP_KEYS.DAEMON, APP_KEYS.WEB, APP_KEYS.DESKTOP] as const;
@@ -168,7 +167,7 @@ export function resolveToolDevConfig(options: ToolDevOptions = {}): ToolDevConfi
     apps: {
       daemon: {
         ...daemon,
-        sidecarEntryPath: path.join(WORKSPACE_ROOT, "apps/daemon/sidecar/index.ts"),
+        sidecarEntryPath: path.join(WORKSPACE_ROOT, "apps/daemon/src/sidecar/index.ts"),
       },
       desktop: {
         ...desktop,

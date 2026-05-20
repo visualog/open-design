@@ -1,5 +1,9 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { useT } from '../i18n';
+import { useCallback, useEffect, useState, type ReactNode } from 'react';
+import type {
+  ConnectorDetail,
+  ConnectorStatusResponse,
+} from '@open-design/contracts';
+import type { OpenDesignHostProjectImportSuccess } from '@open-design/host';
 import {
   DEFAULT_AUDIO_MODEL,
   DEFAULT_IMAGE_MODEL,
@@ -7,8 +11,11 @@ import {
 } from '../media/models';
 import type {
   AgentInfo,
+  ApiProtocol,
   AppConfig,
+  AppTheme,
   DesignSystemSummary,
+  ExecMode,
   Project,
   ProjectKind,
   ProjectMetadata,
@@ -16,484 +23,351 @@ import type {
   PromptTemplateSummary,
   SkillSummary,
 } from '../types';
-import { DesignsTab } from './DesignsTab';
-import { DesignSystemPreviewModal } from './DesignSystemPreviewModal';
-import { DesignSystemsTab } from './DesignSystemsTab';
-import { ExamplesTab } from './ExamplesTab';
-import { Icon } from './Icon';
-import { LanguageMenu } from './LanguageMenu';
-import { CenteredLoader } from './Loading';
-import { NewProjectPanel, type CreateInput } from './NewProjectPanel';
-import { PetRail } from './pet/PetRail';
-import { PromptTemplatePreviewModal } from './PromptTemplatePreviewModal';
-import { PromptTemplatesTab } from './PromptTemplatesTab';
-
-type TopTab = 'designs' | 'examples' | 'design-systems' | 'image-templates' | 'video-templates';
+// `EntryShell` owns the redesigned home layout (left rail + centered
+// hero + recent projects + plugins). Keeping the redesign in a sibling
+// component lets future rebases against upstream `EntryView` (props,
+// connector lifecycle, exported helpers) stay close to a no-op here.
+import { EntryShell } from './EntryShell';
+import type { IntegrationTab } from './IntegrationsView';
+import type { CreateInput } from './NewProjectPanel';
+import {
+  fetchConnectors,
+  fetchConnectorStatuses,
+} from '../providers/registry';
+import type {
+  PluginShareAction,
+  PluginShareProjectOutcome,
+} from '../state/projects';
 
 interface Props {
+  // Union of functional skills + design templates — used for id-based
+  // lookups (DesignsTab project chips, NewProjectPanel skill picker).
+  // The Templates gallery itself reads `designTemplates` instead so it
+  // doesn't accidentally show functional skills as renderable cards.
   skills: SkillSummary[];
+  // Design templates only. Sourced from /api/design-templates. See
+  // specs/current/skills-and-design-templates.md.
+  designTemplates: SkillSummary[];
   designSystems: DesignSystemSummary[];
   projects: Project[];
   templates: ProjectTemplate[];
+  onDeleteTemplate: (id: string) => Promise<boolean>;
   promptTemplates: PromptTemplateSummary[];
   defaultDesignSystemId: string | null;
-  config: AppConfig;
   agents: AgentInfo[];
-  loading?: boolean;
-  onCreateProject: (input: CreateInput & { pendingPrompt?: string }) => void;
+  // Execution / model-switching context forwarded to the EntryShell so the
+  // sticky top-bar can expose the active CLI/BYOK + model and persist
+  // changes through the same channels as the project view.
+  config: AppConfig;
+  integrationInitialTab?: IntegrationTab;
+  composioConfigLoading?: boolean;
+  daemonLive: boolean;
+  onModeChange: (mode: ExecMode) => void;
+  onAgentChange: (id: string) => void;
+  onAgentModelChange: (
+    id: string,
+    choice: { model?: string; reasoning?: string },
+  ) => void;
+  onApiProtocolChange: (protocol: ApiProtocol) => void;
+  onApiModelChange: (model: string) => void;
+  onConfigPersist: (cfg: AppConfig) => Promise<void> | void;
+  onRefreshAgents: () => Promise<AgentInfo[]> | AgentInfo[];
+  // Quick theme switch invoked from the avatar-popover dropdown so the
+  // user can flip light/dark/system without opening the full Settings
+  // dialog. Persistence happens in `App`; this component just forwards.
+  onThemeChange: (theme: AppTheme) => void;
+  // Per-resource loading flags. Each tab gates its own content on whichever
+  // flag matches the data it renders, so a slow `/api/agents` probe does
+  // not block tabs that don't need agents. Templates are not gated here —
+  // the New project modal renders an empty state until they arrive (fast
+  // fetch), which keeps the prop surface narrower.
+  skillsLoading?: boolean;
+  designSystemsLoading?: boolean;
+  projectsLoading?: boolean;
+  promptTemplatesLoading?: boolean;
+  onCreateProject: (
+    input: CreateInput & {
+      pendingPrompt?: string;
+      pluginId?: string;
+      appliedPluginSnapshotId?: string;
+      pluginInputs?: Record<string, unknown>;
+      autoSendFirstMessage?: boolean;
+      pendingFiles?: File[];
+    },
+  ) => void;
+  onCreatePluginShareProject: (
+    pluginId: string,
+    action: PluginShareAction,
+    locale?: string,
+  ) => Promise<PluginShareProjectOutcome>;
   onImportClaudeDesign: (file: File) => Promise<void> | void;
+  onImportFolder?: (baseDir: string) => Promise<void> | void;
+  onImportFolderResponse?: (response: OpenDesignHostProjectImportSuccess) => Promise<void> | void;
   onOpenProject: (id: string) => void;
+  onOpenLiveArtifact: (projectId: string, artifactId: string) => void;
   onDeleteProject: (id: string) => void;
+  onRenameProject: (id: string, name: string) => void;
   onChangeDefaultDesignSystem: (id: string) => void;
-  onOpenSettings: () => void;
-  // Deep-link into Settings → Pets so the entry view's "Adopt a pet"
-  // pill drops the user straight onto the catalog instead of asking
-  // them to hunt for the section.
-  onAdoptPet: () => void;
-  // Inline adopt from the right-side rail — picks a pet by id and
-  // wakes the overlay without leaving the entry view.
-  onAdoptPetInline: (petId: string) => void;
-  // Toggle the overlay visibility (wake / tuck) from the rail.
-  onTogglePet: () => void;
+  onCreateDesignSystem?: () => void;
+  renderDesignSystemCreation?: (onBack: () => void) => ReactNode;
+  onOpenDesignSystem?: (id: string) => void;
+  onDesignSystemsRefresh?: () => Promise<void> | void;
+  onPersistComposioKey: (composio: AppConfig['composio']) => Promise<void> | void;
+  onOpenSettings: (section?: 'execution' | 'media' | 'composio' | 'orbit' | 'integrations' | 'mcpClient' | 'language' | 'appearance' | 'notifications' | 'pet' | 'library' | 'about' | 'memory' | 'designSystems') => void;
+  onCompleteOnboarding: () => void;
 }
 
-const SIDEBAR_MIN = 320;
-const SIDEBAR_MAX = 560;
-const SIDEBAR_DEFAULT = 380;
-const SIDEBAR_STORAGE_KEY = 'od-entry-sidebar-width';
+const CONNECTOR_CALLBACK_MESSAGE_TYPE = 'open-design:connector-connected';
 
-// Lets the user fully remove the right-side pet rail from the entry
-// layout. They re-summon it from the entry-view avatar dropdown — the
-// PetRail's own collapse toggle only narrows the column, so this state
-// is the "the rail isn't there at all" escape hatch.
-const PET_RAIL_HIDDEN_KEY = 'open-design:pet-rail-hidden';
-
-function loadSidebarWidth(): number {
+export function isTrustedConnectorCallbackOrigin(origin: string, currentOrigin?: string): boolean {
+  const expectedOrigin = currentOrigin ?? (typeof window === 'undefined' ? '' : window.location.origin);
+  if (origin === expectedOrigin) return true;
   try {
-    const raw = window.localStorage.getItem(SIDEBAR_STORAGE_KEY);
-    if (!raw) return SIDEBAR_DEFAULT;
-    const n = parseInt(raw, 10);
-    if (Number.isNaN(n)) return SIDEBAR_DEFAULT;
-    return Math.max(SIDEBAR_MIN, Math.min(SIDEBAR_MAX, n));
-  } catch {
-    return SIDEBAR_DEFAULT;
-  }
-}
-
-function loadPetRailHidden(): boolean {
-  if (typeof window === 'undefined') return false;
-  try {
-    return window.localStorage.getItem(PET_RAIL_HIDDEN_KEY) === '1';
+    const url = new URL(origin);
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') return false;
+    return url.hostname === 'localhost' || url.hostname === '127.0.0.1' || url.hostname === '[::1]' || url.hostname === '::1';
   } catch {
     return false;
   }
 }
 
+function applyConnectorStatuses(
+  current: ConnectorDetail[],
+  statuses: ConnectorStatusResponse['statuses'],
+): ConnectorDetail[] {
+  if (!Object.keys(statuses).length) return current;
+  return current.map((connector) => {
+    const next = statuses[connector.id];
+    if (!next) return connector;
+    const { accountLabel: _accountLabel, lastError: _lastError, ...base } = connector;
+    return {
+      ...base,
+      status: next.status,
+      ...(next.accountLabel === undefined ? {} : { accountLabel: next.accountLabel }),
+      ...(next.lastError === undefined ? {} : { lastError: next.lastError }),
+    };
+  });
+}
+
+export function sortConnectorsForDisplay(connectors: ConnectorDetail[]): ConnectorDetail[] {
+  return [...connectors].sort((a, b) => {
+    const aConnected = a.status === 'connected';
+    const bConnected = b.status === 'connected';
+    if (aConnected !== bConnected) return aConnected ? -1 : 1;
+    return a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }) || a.id.localeCompare(b.id);
+  });
+}
+
+function normalizedSearchValue(value: string | undefined): string {
+  return typeof value === 'string' ? value.trim().toLowerCase() : '';
+}
+
+function scoreConnectorText(value: string | undefined, query: string, baseScore: number): number | null {
+  const normalized = normalizedSearchValue(value);
+  if (!normalized) return null;
+  if (normalized === query) return baseScore;
+  if (normalized.startsWith(query)) return baseScore + 1;
+  if (normalized.includes(query)) return baseScore + 2;
+  return null;
+}
+
+export function getConnectorSearchScore(connector: ConnectorDetail, query: string): number | null {
+  const normalizedQuery = query.trim().toLowerCase();
+  if (!normalizedQuery) return 0;
+
+  const scores: number[] = [];
+  const collect = (value: string | undefined, baseScore: number) => {
+    const score = scoreConnectorText(value, normalizedQuery, baseScore);
+    if (score !== null) scores.push(score);
+  };
+
+  // Connector identity fields carry the most intent: exact and prefix
+  // name/provider matches should beat incidental mentions elsewhere.
+  collect(connector.name, 0);
+  collect(connector.provider, 0);
+
+  // Secondary connector metadata is still searchable, but lower priority.
+  collect(connector.category, 3);
+  collect(connector.accountLabel, 3);
+
+  // Tool names/titles are more relevant than prose descriptions, but below
+  // connector-level identity matches.
+  for (const tool of connector.tools) {
+    collect(tool.title, 5);
+    collect(tool.name, 5);
+  }
+
+  // Prose descriptions are broad and often mention other products, so they
+  // are intentionally down-ranked rather than excluded.
+  collect(connector.description, 8);
+  for (const tool of connector.tools) {
+    collect(tool.description, 8);
+  }
+
+  return scores.length ? Math.min(...scores) : null;
+}
+
+export function sortConnectorsForSearch(
+  connectors: ConnectorDetail[],
+  query: string,
+): ConnectorDetail[] {
+  const normalizedQuery = query.trim().toLowerCase();
+  if (!normalizedQuery) return sortConnectorsForDisplay(connectors);
+
+  return [...connectors]
+    .map((connector) => ({ connector, score: getConnectorSearchScore(connector, normalizedQuery) }))
+    .filter((entry): entry is { connector: ConnectorDetail; score: number } => entry.score !== null)
+    .sort((a, b) => {
+      if (a.score !== b.score) return a.score - b.score;
+      const aConnected = a.connector.status === 'connected';
+      const bConnected = b.connector.status === 'connected';
+      if (aConnected !== bConnected) return aConnected ? -1 : 1;
+      return (
+        a.connector.name.localeCompare(b.connector.name, undefined, { sensitivity: 'base' }) ||
+        a.connector.id.localeCompare(b.connector.id)
+      );
+    })
+    .map((entry) => entry.connector);
+}
+
 export function EntryView({
   skills,
+  designTemplates,
   designSystems,
   projects,
   templates,
+  onDeleteTemplate,
   promptTemplates,
   defaultDesignSystemId,
-  config,
   agents,
-  loading = false,
+  config,
+  integrationInitialTab,
+  composioConfigLoading = false,
+  daemonLive,
+  onModeChange,
+  onAgentChange,
+  onAgentModelChange,
+  onApiProtocolChange,
+  onApiModelChange,
+  onConfigPersist,
+  onRefreshAgents,
+  onThemeChange,
+  skillsLoading = false,
+  designSystemsLoading = false,
+  projectsLoading = false,
+  promptTemplatesLoading: _promptTemplatesLoading = false,
   onCreateProject,
+  onCreatePluginShareProject,
   onImportClaudeDesign,
+  onImportFolder,
+  onImportFolderResponse,
   onOpenProject,
+  onOpenLiveArtifact,
   onDeleteProject,
+  onRenameProject,
   onChangeDefaultDesignSystem,
+  onCreateDesignSystem,
+  renderDesignSystemCreation,
+  onOpenDesignSystem,
+  onDesignSystemsRefresh,
+  onPersistComposioKey,
   onOpenSettings,
-  onAdoptPet,
-  onAdoptPetInline,
-  onTogglePet,
+  onCompleteOnboarding,
 }: Props) {
-  const t = useT();
-  const [topTab, setTopTab] = useState<TopTab>('designs');
-  const [previewSystemId, setPreviewSystemId] = useState<string | null>(null);
-  const [previewPromptTemplate, setPreviewPromptTemplate] =
-    useState<PromptTemplateSummary | null>(null);
-  const [sidebarWidth, setSidebarWidth] = useState<number>(() => loadSidebarWidth());
-  const [resizing, setResizing] = useState(false);
-  const [petRailHidden, setPetRailHiddenState] = useState<boolean>(() => loadPetRailHidden());
-  const [avatarMenuOpen, setAvatarMenuOpen] = useState(false);
-  const avatarMenuRef = useRef<HTMLDivElement | null>(null);
+  const [connectors, setConnectors] = useState<ConnectorDetail[]>([]);
+  const [connectorsLoading, setConnectorsLoading] = useState(false);
 
-  function setPetRailHidden(next: boolean) {
-    setPetRailHiddenState(next);
-    try {
-      window.localStorage.setItem(PET_RAIL_HIDDEN_KEY, next ? '1' : '0');
-    } catch {
-      /* ignore */
-    }
-  }
-
-  const currentAgent = useMemo(
-    () => agents.find((a) => a.id === config.agentId) ?? null,
-    [agents, config.agentId],
-  );
-
-  const envMetaLine = useMemo(() => {
-    if (config.mode === 'api') {
-      try {
-        return `${config.model} · ${new URL(config.baseUrl).host}`;
-      } catch {
-        return config.model;
-      }
-    }
-    return currentAgent
-      ? `${currentAgent.name}${currentAgent.version ? ` · ${currentAgent.version}` : ''}`
-      : t('settings.noAgentSelected');
-  }, [config.mode, config.model, config.baseUrl, currentAgent, t]);
-
-  // 'Use this prompt' on an example card is a fast path — skip the form and
-  // create the project immediately with sane defaults derived from the skill,
-  // seeding the chat composer with the example prompt via pendingPrompt.
-  function usePromptFromSkill(skill: SkillSummary) {
-    onCreateProject({
-      name: skill.name,
-      skillId: skill.id,
-      designSystemId: null,
-      metadata: metadataForSkill(skill),
-      pendingPrompt: skill.examplePrompt || skill.description,
-    });
-  }
-
-  function previewDesignSystem(id: string) {
-    setPreviewSystemId(id);
-  }
-
-  const previewSystem = useMemo(
-    () => (previewSystemId ? designSystems.find((d) => d.id === previewSystemId) ?? null : null),
-    [designSystems, previewSystemId],
-  );
-
-  function handleCreate(input: CreateInput) {
-    onCreateProject(input);
-  }
-
-  const startWidthRef = useRef(0);
-  const startXRef = useRef(0);
+  const reloadConnectorStatuses = useCallback(async () => {
+    const statuses = await fetchConnectorStatuses();
+    setConnectors((curr) => applyConnectorStatuses(curr, statuses));
+  }, []);
 
   useEffect(() => {
-    if (!resizing) return;
-    function onMove(e: MouseEvent) {
-      const dx = e.clientX - startXRef.current;
-      const next = Math.max(
-        SIDEBAR_MIN,
-        Math.min(SIDEBAR_MAX, startWidthRef.current + dx),
-      );
-      setSidebarWidth(next);
-    }
-    function onUp() {
-      setResizing(false);
-    }
-    document.body.classList.add('entry-resizing');
-    window.addEventListener('mousemove', onMove);
-    window.addEventListener('mouseup', onUp);
+    let cancelled = false;
+    // Fetch connectors on mount so the New project modal can show
+    // already-configured connectors without waiting for the user to
+    // open the Settings → Connectors surface.
+    setConnectorsLoading(true);
+    (async () => {
+      const next = await fetchConnectors();
+      if (cancelled) return;
+      setConnectors(next);
+      setConnectorsLoading(false);
+    })();
     return () => {
-      document.body.classList.remove('entry-resizing');
-      window.removeEventListener('mousemove', onMove);
-      window.removeEventListener('mouseup', onUp);
+      cancelled = true;
     };
-  }, [resizing]);
+  }, []);
 
   useEffect(() => {
-    try {
-      window.localStorage.setItem(SIDEBAR_STORAGE_KEY, String(sidebarWidth));
-    } catch {
-      /* ignore */
+    function onMessage(event: MessageEvent) {
+      const data = event.data;
+      if (!data || typeof data !== 'object' || (data as { type?: unknown }).type !== CONNECTOR_CALLBACK_MESSAGE_TYPE) return;
+      if (!isTrustedConnectorCallbackOrigin(event.origin)) return;
+      void reloadConnectorStatuses();
     }
-  }, [sidebarWidth]);
+    window.addEventListener('message', onMessage);
+    return () => window.removeEventListener('message', onMessage);
+  }, [reloadConnectorStatuses]);
 
-  // Dismiss the avatar dropdown on outside-click / Escape so it behaves
-  // like the project-view AvatarMenu (which uses the same shell CSS).
+  // When the OAuth flow is handed off to the user's system browser (desktop
+  // shell opens connector auth URLs externally rather than in an Electron
+  // popup), the callback page has no `window.opener` to postMessage back to.
+  // Refresh connector statuses whenever the window regains focus so the UI
+  // picks up a just-completed connection without manual intervention.
   useEffect(() => {
-    if (!avatarMenuOpen) return;
-    const onClick = (e: MouseEvent) => {
-      if (!avatarMenuRef.current) return;
-      if (!avatarMenuRef.current.contains(e.target as Node)) {
-        setAvatarMenuOpen(false);
-      }
-    };
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setAvatarMenuOpen(false);
-    };
-    document.addEventListener('mousedown', onClick);
-    document.addEventListener('keydown', onKey);
-    return () => {
-      document.removeEventListener('mousedown', onClick);
-      document.removeEventListener('keydown', onKey);
-    };
-  }, [avatarMenuOpen]);
+    function onFocus() {
+      void reloadConnectorStatuses();
+    }
+    window.addEventListener('focus', onFocus);
+    return () => window.removeEventListener('focus', onFocus);
+  }, [reloadConnectorStatuses]);
 
-  // The right rail tracks its own collapse state internally and tells
-  // us its preferred column width via a CSS variable on the wrapper —
-  // we keep both the expanded and collapsed widths declarative here so
-  // the grid stays in sync with whatever the rail decides to render.
   return (
-    <div
-      className={`entry${petRailHidden ? '' : ' has-pet-rail'}`}
-      style={{
-        gridTemplateColumns: petRailHidden
-          ? `${sidebarWidth}px 1fr`
-          : `${sidebarWidth}px 1fr auto`,
-      }}
-    >
-      <aside className="entry-side" style={{ width: sidebarWidth }}>
-        <div className="entry-brand">
-          <span className="entry-brand-mark" aria-hidden>
-            <img src="/logo.svg" alt="" className="brand-mark-img" draggable={false} />
-          </span>
-          <div className="entry-brand-text">
-            <div className="entry-brand-title-row">
-              <span className="entry-brand-title">{t('app.brand')}</span>
-              <span className="entry-brand-pill">{t('app.brandPill')}</span>
-            </div>
-            <div className="entry-brand-subtitle">{t('app.brandSubtitle')}</div>
-          </div>
-        </div>
-        <NewProjectPanel
-          skills={skills}
-          designSystems={designSystems}
-          defaultDesignSystemId={defaultDesignSystemId}
-          templates={templates}
-          promptTemplates={promptTemplates}
-          onCreate={handleCreate}
-          onImportClaudeDesign={onImportClaudeDesign}
-          mediaProviders={config.mediaProviders}
-          loading={loading}
-        />
-        <div className="entry-side-foot">
-          <button
-            type="button"
-            className={`foot-pill pet-pill${config.pet?.adopted ? '' : ' pet-pill-fresh'}`}
-            onClick={onAdoptPet}
-            title={
-              config.pet?.adopted
-                ? t('pet.changePet')
-                : t('pet.adoptCallout')
-            }
-          >
-            <span className="pet-pill-glyph" aria-hidden>
-              {config.pet?.adopted
-                ? config.pet.petId === 'custom'
-                  ? config.pet.custom.glyph || '🦄'
-                  : '🐾'
-                : '🐾'}
-            </span>
-            <span>
-              {config.pet?.adopted
-                ? t('pet.changePet')
-                : t('pet.adoptCallout')}
-            </span>
-            {!config.pet?.adopted ? <span className="pet-pill-dot" aria-hidden /> : null}
-          </button>
-          <button
-            type="button"
-            className="foot-pill"
-            onClick={onOpenSettings}
-            title={t('settings.envConfigure')}
-          >
-            <Icon name="settings" size={12} />
-            <span>
-              {config.mode === 'daemon'
-                ? t('settings.localCli')
-                : t('settings.anthropicApi')}
-            </span>
-            <span style={{ color: 'var(--text-faint)' }}>·</span>
-            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 180 }}>
-              {envMetaLine}
-            </span>
-          </button>
-          <LanguageMenu />
-        </div>
-        <button
-          type="button"
-          aria-label={t('entry.resizeAria')}
-          className={`entry-side-resizer${resizing ? ' dragging' : ''}`}
-          onMouseDown={(e) => {
-            e.preventDefault();
-            startWidthRef.current = sidebarWidth;
-            startXRef.current = e.clientX;
-            setResizing(true);
-          }}
-        />
-      </aside>
-      <main className="entry-main">
-        <div className="entry-header">
-          <div className="entry-tabs" role="tablist">
-            <TopTabButton current={topTab} value="designs" label={t('entry.tabDesigns')} onClick={setTopTab} />
-            <TopTabButton current={topTab} value="examples" label={t('entry.tabExamples')} onClick={setTopTab} />
-            <TopTabButton
-              current={topTab}
-              value="design-systems"
-              label={t('entry.tabDesignSystems')}
-              onClick={setTopTab}
-            />
-            <TopTabButton
-              current={topTab}
-              value="image-templates"
-              label={t('entry.tabImageTemplates')}
-              onClick={setTopTab}
-            />
-            <TopTabButton
-              current={topTab}
-              value="video-templates"
-              label={t('entry.tabVideoTemplates')}
-              onClick={setTopTab}
-            />
-          </div>
-          <div className="entry-header-right">
-            {/* Avatar dropdown — mirrors the project-view AvatarMenu so
-                users get the same anchor for cross-cutting options
-                (open settings, hide / show the pet rail). */}
-            <div className="avatar-menu" ref={avatarMenuRef}>
-              <button
-                type="button"
-                className="avatar-btn"
-                onClick={() => setAvatarMenuOpen((v) => !v)}
-                title={t('entry.openSettingsTitle')}
-                aria-label={t('entry.openSettingsAria')}
-                aria-haspopup="menu"
-                aria-expanded={avatarMenuOpen}
-              >
-                <img
-                  src="/avatar.png"
-                  alt=""
-                  aria-hidden
-                  draggable={false}
-                  className="avatar-btn-photo"
-                />
-              </button>
-              {avatarMenuOpen ? (
-                <div className="avatar-popover" role="menu">
-                  <button
-                    type="button"
-                    className="avatar-item"
-                    onClick={() => {
-                      setPetRailHidden(!petRailHidden);
-                      setAvatarMenuOpen(false);
-                    }}
-                  >
-                    <span className="avatar-item-icon" aria-hidden>
-                      <Icon name={petRailHidden ? 'sparkles' : 'eye'} size={14} />
-                    </span>
-                    <span>
-                      {petRailHidden
-                        ? t('pet.railShow')
-                        : t('pet.railHide')}
-                    </span>
-                  </button>
-                  <div style={{ height: 1, background: 'var(--border-soft)', margin: '4px 6px' }} />
-                  <button
-                    type="button"
-                    className="avatar-item"
-                    onClick={() => {
-                      setAvatarMenuOpen(false);
-                      onOpenSettings();
-                    }}
-                  >
-                    <span className="avatar-item-icon" aria-hidden>
-                      <Icon name="settings" size={14} />
-                    </span>
-                    <span>{t('avatar.settings')}</span>
-                  </button>
-                </div>
-              ) : null}
-            </div>
-          </div>
-        </div>
-        <div className="entry-tab-content">
-          {loading ? (
-            <CenteredLoader label={t('entry.loadingWorkspace')} />
-          ) : (
-            <>
-              {topTab === 'designs' ? (
-                <DesignsTab
-                  projects={projects}
-                  skills={skills}
-                  designSystems={designSystems}
-                  onOpen={onOpenProject}
-                  onDelete={onDeleteProject}
-                />
-              ) : null}
-              {topTab === 'examples' ? (
-                <ExamplesTab skills={skills} onUsePrompt={usePromptFromSkill} />
-              ) : null}
-              {topTab === 'design-systems' ? (
-                <DesignSystemsTab
-                  systems={designSystems}
-                  selectedId={defaultDesignSystemId}
-                  onSelect={onChangeDefaultDesignSystem}
-                  onPreview={previewDesignSystem}
-                />
-              ) : null}
-              {topTab === 'image-templates' ? (
-                <PromptTemplatesTab
-                  surface="image"
-                  templates={promptTemplates}
-                  onPreview={setPreviewPromptTemplate}
-                />
-              ) : null}
-              {topTab === 'video-templates' ? (
-                <PromptTemplatesTab
-                  surface="video"
-                  templates={promptTemplates}
-                  onPreview={setPreviewPromptTemplate}
-                />
-              ) : null}
-            </>
-          )}
-        </div>
-      </main>
-      {petRailHidden ? null : (
-        <PetRail
-          config={config}
-          onAdoptInline={onAdoptPetInline}
-          onOpenPetSettings={onAdoptPet}
-          onTuck={onTogglePet}
-          onHide={() => setPetRailHidden(true)}
-        />
-      )}
-      {previewSystem ? (
-        <DesignSystemPreviewModal
-          system={previewSystem}
-          onClose={() => setPreviewSystemId(null)}
-        />
-      ) : null}
-      {previewPromptTemplate ? (
-        <PromptTemplatePreviewModal
-          summary={previewPromptTemplate}
-          onClose={() => setPreviewPromptTemplate(null)}
-        />
-      ) : null}
-    </div>
-  );
-}
-
-function TopTabButton({
-  current,
-  value,
-  label,
-  onClick,
-}: {
-  current: TopTab;
-  value: TopTab;
-  label: string;
-  onClick: (v: TopTab) => void;
-}) {
-  return (
-    <button
-      role="tab"
-      data-testid={`entry-tab-${value}`}
-      aria-selected={current === value}
-      className={`entry-tab ${current === value ? 'active' : ''}`}
-      onClick={() => onClick(value)}
-    >
-      {label}
-    </button>
+    <EntryShell
+      skills={skills}
+      designTemplates={designTemplates}
+      designSystems={designSystems}
+      projects={projects}
+      templates={templates}
+      promptTemplates={promptTemplates}
+      defaultDesignSystemId={defaultDesignSystemId}
+      connectors={connectors}
+      connectorsLoading={connectorsLoading}
+      {...(integrationInitialTab ? { integrationInitialTab } : {})}
+      composioConfigLoading={composioConfigLoading}
+      skillsLoading={skillsLoading}
+      designSystemsLoading={designSystemsLoading}
+      projectsLoading={projectsLoading}
+      config={config}
+      agents={agents}
+      daemonLive={daemonLive}
+      onModeChange={onModeChange}
+      onAgentChange={onAgentChange}
+      onAgentModelChange={onAgentModelChange}
+      onApiProtocolChange={onApiProtocolChange}
+      onApiModelChange={onApiModelChange}
+      onConfigPersist={onConfigPersist}
+      onRefreshAgents={onRefreshAgents}
+      onThemeChange={onThemeChange}
+      onCreateProject={onCreateProject}
+      onCreatePluginShareProject={onCreatePluginShareProject}
+      onImportClaudeDesign={onImportClaudeDesign}
+      {...(onImportFolder ? { onImportFolder } : {})}
+      {...(onImportFolderResponse ? { onImportFolderResponse } : {})}
+      onOpenProject={onOpenProject}
+      onOpenLiveArtifact={onOpenLiveArtifact}
+      onDeleteProject={onDeleteProject}
+      onRenameProject={onRenameProject}
+      onChangeDefaultDesignSystem={onChangeDefaultDesignSystem}
+      onCreateDesignSystem={onCreateDesignSystem}
+      renderDesignSystemCreation={renderDesignSystemCreation}
+      onOpenDesignSystem={onOpenDesignSystem}
+      onDesignSystemsRefresh={onDesignSystemsRefresh}
+      onPersistComposioKey={onPersistComposioKey}
+      onOpenSettings={onOpenSettings}
+      onCompleteOnboarding={onCompleteOnboarding}
+    />
   );
 }
 
@@ -504,7 +378,10 @@ function TopTabButton({
 // skill hints in SKILL.md frontmatter (od.fidelity, od.speaker_notes,
 // od.animations) override the defaults so each example reproduces the
 // shipped example.html — e.g. wireframe-sketch declares fidelity:wireframe.
-function metadataForSkill(skill: SkillSummary): ProjectMetadata {
+//
+// Kept exported (and the kindForSkill helper too) so the New project modal
+// and any future skill-driven creation surface can share the mapping.
+export function metadataForSkill(skill: SkillSummary): ProjectMetadata {
   const kind = kindForSkill(skill);
   if (kind === 'prototype') {
     return { kind, fidelity: skill.fidelity ?? 'high-fidelity' };
@@ -540,7 +417,7 @@ function metadataForSkill(skill: SkillSummary): ProjectMetadata {
   return { kind: 'other' };
 }
 
-function kindForSkill(skill: SkillSummary): ProjectKind {
+export function kindForSkill(skill: SkillSummary): ProjectKind {
   if (skill.mode === 'deck') return 'deck';
   if (skill.mode === 'prototype') return 'prototype';
   if (skill.mode === 'template') return 'template';

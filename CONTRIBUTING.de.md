@@ -4,7 +4,7 @@ Danke, dass Sie über einen Beitrag nachdenken. OD ist bewusst klein gehalten �
 
 Dieser Leitfaden zeigt, wo Sie für welche Art Beitrag suchen sollten und welche Messlatte ein PR vor dem Merge erfüllen muss.
 
-<p align="center"><a href="CONTRIBUTING.md">English</a> · <b>Deutsch</b> · <a href="CONTRIBUTING.zh-CN.md">简体中文</a> · <a href="CONTRIBUTING.ja-JP.md">日本語</a></p>
+<p align="center"><a href="CONTRIBUTING.md">English</a> · <a href="CONTRIBUTING.pt-BR.md">Português (Brasil)</a> · <b>Deutsch</b> · <a href="CONTRIBUTING.fr.md">Français</a> · <a href="CONTRIBUTING.zh-CN.md">简体中文</a> · <a href="CONTRIBUTING.ja-JP.md">日本語</a></p>
 
 ---
 
@@ -16,7 +16,7 @@ Dieser Leitfaden zeigt, wo Sie für welche Art Beitrag suchen sollten und welche
 | OD die visuelle Sprache einer neuen Marke sprechen lassen | ein **Design System** | [`design-systems/<brand>/DESIGN.md`](design-systems/) | eine Markdown-Datei |
 | Eine neue coding-agent CLI anbinden | einen **Agent adapter** | [`apps/daemon/src/agents.ts`](apps/daemon/src/agents.ts) | ca. 10 Zeilen in einem Array |
 | Feature ergänzen, Bug fixen, UX-Pattern aus [`open-codesign`][ocod] übernehmen | Code | `apps/web/src/`, `apps/daemon/` | normaler PR |
-| Dokumentation verbessern, Deutsch / 中文 ergänzen, Tippfehler fixen | Dokumentation | `README.md`, `README.de.md`, `README.zh-CN.md`, `docs/`, `QUICKSTART.md` | ein PR |
+| Dokumentation verbessern, Französisch / Deutsch / 中文 ergänzen, Tippfehler fixen | Dokumentation | `README.md`, `README.fr.md`, `README.de.md`, `README.zh-CN.md`, `docs/`, `QUICKSTART.md` | ein PR |
 
 Wenn Sie nicht sicher sind, in welchen Bereich Ihre Idee fällt, [öffnen Sie zuerst eine Discussion / Issue](https://github.com/nexu-io/open-design/issues/new). Wir zeigen Ihnen dann die passende Oberfläche.
 
@@ -33,7 +33,7 @@ corepack enable           # wählt das gepinnte pnpm aus packageManager
 pnpm install
 pnpm tools-dev run web    # daemon + web foreground loop
 pnpm typecheck            # tsc -b --noEmit
-pnpm build                # production build
+pnpm --filter @open-design/web build  # Web-Paket bei Bedarf bauen
 ```
 
 Node `~24` und pnpm `10.33.x` sind erforderlich. `nvm` / `fnm` sind optional; nutzen Sie `nvm install 24 && nvm use 24` oder `fnm install 24 && fnm use 24`, wenn Sie Node so verwalten. macOS, Linux und WSL2 sind die primären Pfade. Windows nativ sollte funktionieren, ist aber kein primäres Ziel.
@@ -258,6 +258,23 @@ Um das Projekt fokussiert zu halten, öffnen Sie bitte keine PRs, die:
 - **Ein Binary bündeln** ohne Lizenzdatei und Autorenschaft direkt daneben.
 
 Wenn Sie nicht sicher sind, ob eine Idee passt, öffnen Sie vor dem Code eine Discussion.
+
+---
+
+<!-- Machine-translated section; native-speaker review welcome via PR. -->
+## Maintainer werden
+
+Wenn Sie kontinuierlich beigetragen haben und wissen möchten, wie der Weg zum Maintainer aussieht, finden Sie die Regeln in **[`MAINTAINERS.md`](MAINTAINERS.md)**. Die Kurzfassung:
+
+- Ein Maintainer kann Issues prüfen, freigeben und schließen. Der Merge-Button bleibt beim Core Team — Ihre Freigabe zählt jedoch als die für den Merge erforderliche Freigabe.
+- Die Hürde liegt bei **≥ 20 merged PRs** plus einer veröffentlichten Account-Qualitätsprüfung (Anti-Bot, Anti-Sock-Puppet) plus einer Einschätzung des Core Teams zur Qualität der Beiträge. Es gibt kein Bewerbungsformular; das Core Team bringt Kandidatinnen und Kandidaten intern zur Sprache und meldet sich.
+- Es gibt **keine Quoten, keine SLAs und keine feste Amtszeit.** Ein Rücktritt ist einfach und reversibel (Emeritus → Rückkehr, sobald sich das Leben wieder beruhigt).
+- Alle Schwellenwerte, der Nominierungsablauf, die Regeln zum Rücktritt und die Ausnahmeregelung für die frühe Projektphase stehen in [`MAINTAINERS.md`](MAINTAINERS.md). Lesen Sie dieses Dokument, falls Sie etwas davon interessiert.
+
+Das tl;dr: Liefern Sie gute PRs, prüfen Sie sorgfältig, halten Sie sich in [Discussions][discussions] / [Discord][discord] auf — und der Rest ergibt sich von selbst.
+
+[discussions]: https://github.com/nexu-io/open-design/discussions
+[discord]: https://discord.gg/qhbcCH8Am4
 
 ---
 

@@ -4,6 +4,8 @@ import { AgentIcon } from './AgentIcon';
 import { Icon } from './Icon';
 import { renderModelOptions } from './modelOptions';
 import type { AgentInfo, AppConfig, ExecMode } from '../types';
+import { apiProtocolLabel } from '../utils/apiProtocol';
+import { isMacPlatform } from '../utils/platform';
 
 interface Props {
   config: AppConfig;
@@ -96,7 +98,7 @@ export function AvatarMenu({
             <span className="who">
               {config.mode === 'daemon'
                 ? t('avatar.localCli')
-                : t('avatar.anthropicApi')}
+                : apiProtocolLabel(config.apiProtocol)}
             </span>
             <span className="where">
               {config.mode === 'api'
@@ -264,6 +266,7 @@ export function AvatarMenu({
               <Icon name="settings" size={14} />
             </span>
             <span>{t('avatar.settings')}</span>
+            <span className="avatar-item-meta">{isMacPlatform() ? '⌘,' : 'Ctrl+,'}</span>
           </button>
           {onBack ? (
             <button

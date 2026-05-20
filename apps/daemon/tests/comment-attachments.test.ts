@@ -23,6 +23,15 @@ import {
 
 let tempDir: string | null = null;
 
+function tableColumnNames(rows: unknown[]): string[] {
+  return rows.map((row) => {
+    if (!row || typeof row !== 'object' || !('name' in row) || typeof row.name !== 'string') {
+      throw new Error('expected PRAGMA table_info row with string name');
+    }
+    return row.name;
+  });
+}
+
 afterEach(() => {
   closeDatabase();
   if (tempDir) fs.rmSync(tempDir, { recursive: true, force: true });
@@ -30,6 +39,23 @@ afterEach(() => {
 });
 
 describe('preview comment persistence', () => {
+  it('keeps critique migration wired while adding pod columns on a fresh database', () => {
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'od-comments-'));
+    const db = openDatabase(tempDir);
+
+    const previewColumns = db
+      .prepare(`PRAGMA table_info(preview_comments)`)
+      .all();
+    const critiqueTable = db
+      .prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='critique_runs'`)
+      .get() as { name?: string } | undefined;
+
+    expect(tableColumnNames(previewColumns)).toEqual(
+      expect.arrayContaining(['selection_kind', 'member_count', 'pod_members_json']),
+    );
+    expect(critiqueTable?.name).toBe('critique_runs');
+  });
+
   it('upserts the latest comment by conversation, file, and element', () => {
     const db = seededDb();
     const first = upsertPreviewComment(db, 'project-1', 'conversation-1', {
@@ -102,6 +128,27 @@ describe('preview comment persistence', () => {
 
     expect(listMessages(db, 'conversation-1')[0]?.commentAttachments).toEqual([attachment]);
   });
+
+  it('persists assistant feedback on messages', () => {
+    const db = seededDb();
+    const feedback = {
+      rating: 'positive' as const,
+      reasonCodes: ['matched_request', 'other'],
+      customReason: 'The output was ready to present.',
+      reasonsSubmittedAt: 1_700_000_000_400,
+      createdAt: 1_700_000_000_000,
+      updatedAt: 1_700_000_000_500,
+    };
+
+    upsertMessage(db, 'conversation-1', {
+      id: 'message-1',
+      role: 'assistant',
+      content: 'Done',
+      feedback,
+    });
+
+    expect(listMessages(db, 'conversation-1')[0]?.feedback).toEqual(feedback);
+  });
 });
 
 describe('preview comment agent payload', () => {
@@ -124,6 +171,74 @@ describe('preview comment agent payload', () => {
     expect(hint).toContain('file: index.html');
     expect(hint).toContain('selector: [data-od-id="hero-title"]');
     expect(hint).toContain('comment: Make the headline shorter');
+  });
+
+  it('renders pod attachments with grouped member context', () => {
+    const normalized = normalizeCommentAttachments([
+      commentAttachment({
+        id: 'pod-1',
+        selectionKind: 'pod',
+        memberCount: 99,
+        selector: '[data-od-id="hero"], [data-od-id="chart"]',
+        label: 'Hero and chart',
+        podMembers: [
+          {
+            elementId: 'hero',
+            selector: '[data-od-id="hero"]',
+            label: 'section.hero',
+            text: 'Hero title',
+            position: { x: 10, y: 20, width: 200, height: 100 },
+            htmlHint: '<section data-od-id="hero">',
+          },
+          {
+            elementId: 'chart',
+            selector: '[data-od-id="chart"]',
+            label: 'section.chart',
+            text: 'Chart value',
+            position: { x: 120, y: 80, width: 190, height: 120 },
+            htmlHint: '<section data-od-id="chart">',
+          },
+        ],
+      }),
+    ]);
+
+    const hint = renderCommentAttachmentHint(normalized);
+
+    expect(hint).toContain('targetKind: pod');
+    expect(hint).toContain('memberCount: 2');
+    expect(normalized[0]?.memberCount).toBe(2);
+    expect(hint).toContain('member.1: hero | section.hero | [data-od-id="hero"]');
+  });
+
+  it('normalizes visual annotation attachments without a selector', () => {
+    const normalized = normalizeCommentAttachments([
+      commentAttachment({
+        id: 'visual-1',
+        elementId: 'visual-mark-1',
+        selector: '',
+        label: 'Marked screenshot region',
+        comment: '',
+        selectionKind: 'visual',
+        screenshotPath: 'uploads/drawing.png',
+        markKind: 'stroke',
+        intent: 'The screenshot has red strokes that identify the visual region the user wants changed.',
+      }),
+    ]);
+
+    const hint = renderCommentAttachmentHint(normalized);
+
+    expect(normalized).toHaveLength(1);
+    expect(normalized[0]).toMatchObject({
+      selectionKind: 'visual',
+      screenshotPath: 'uploads/drawing.png',
+      markKind: 'stroke',
+      comment: expect.stringContaining('red strokes'),
+    });
+    expect(hint).toContain('targetKind: visual');
+    expect(hint).toContain('screenshot: uploads/drawing.png');
+    expect(hint).toContain('markKind: stroke');
+    expect(hint).toContain('marked region');
+    expect(hint).not.toContain('selector: ');
   });
 });
 

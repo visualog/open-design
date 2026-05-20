@@ -13,7 +13,6 @@ od:
   mode: image
   surface: image
   scenario: personal
-  featured: 3
   preview:
     type: image
     entry: final/spritesheet.png
