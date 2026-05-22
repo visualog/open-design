@@ -1,0 +1,87 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "video-template-urban-newspaper-courier-lifestyle-sequence",
+  "title": "Urban Newspaper Courier Lifestyle Sequence",
+  "version": "0.1.0",
+  "description": "A detailed multi-scene cinematic sequence showing a young woman delivering newspapers in a busy city during a golden sunrise, featuring various angles and close-up details.",
+  "license": "CC-BY-4.0",
+  "author": {
+    "name": "Synthia",
+    "url": "https://x.com/AIwithSynthia/status/2057074373304164488"
+  },
+  "homepage": "https://github.com/YouMind-OpenLab/awesome-seedance-2-prompts",
+  "tags": [
+    "video-template",
+    "first-party",
+    "video",
+    "general",
+    "portrait",
+    "cinematic",
+    "action"
+  ],
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "video",
+    "scenario": "video",
+    "surface": "video",
+    "preview": {
+      "type": "video",
+      "poster": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/af73e52d137d3b2d2b444848d005458a/thumbnails/thumbnail.jpg",
+      "video": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/af73e52d137d3b2d2b444848d005458a/downloads/default.mp4"
+    },
+    "useCase": {
+      "query": "“Cinematic urban lifestyle sequence of a young female newspaper courier delivering papers across a busy sunny city morning, wearing a navy waterproof windbreaker, black cycling shorts, sneakers, and wireless headphones. Golden sunrise light reflecting off skyscraper windows, energetic downtown atmosphere, realistic city hustle, traffic movement, pedestrians crossing streets, coffee shops opening, cinematic realism with warm tones and dynamic camera motion.\n\nScene 1: Close-up under warm sunrise light, organizing stacks of newspapers beside a city kiosk, subtle steam from coffee carts, detailed facial focus, cinematic depth of field.\n\nScene 2: Riding bicycle through busy Manhattan-style streets, sunlight streaks between buildings, taxis and buses moving beside her, realistic urban energy, stabilized tracking shot.\n\nScene 3: Side-angle action shot delivering newspapers into apartment mailboxes and storefront stands, quick hand movement, shallow depth of field, cinematic motion blur.\n\nScene 4: Fast cycling through intersections during morning rush hour, pedestrians crossing, traffic lights glowing, dynamic drone shot following movement.\n\nScene 5: Portrait close-up while listening to music through headphones, confident focused expression, sunlight hitting hair and skin naturally, luxury fashion-commercial aesthetic.\n\nScene 6: Rear tracking shot riding through tree-lined avenues and modern city blocks, long shadows on pavement, realistic reflections, smooth cinematic camera movement.\n\nScene 7: Detailed close-up of newspapers sliding into a blue mailbox, realistic paper textures, warm sunlight highlights, premium commercial cinematography.\n\nScene 8: Wide cinematic ending shot of her cycling toward downtown skyline as the city fully wakes up, glowing golden-hour atmosphere, inspirational urban lifestyle ending, ultra realistic, 35mm cinematic photography, high detail, natural motion blur, smooth transitions, campaign film aesthetic.”"
+    },
+    "inputs": [
+      {
+        "name": "model",
+        "label": "Model",
+        "type": "select",
+        "options": [
+          "seedance-2.0"
+        ],
+        "default": "seedance-2.0"
+      },
+      {
+        "name": "aspect",
+        "label": "Aspect ratio",
+        "type": "select",
+        "options": [
+          "16:9",
+          "9:16",
+          "1:1",
+          "4:5"
+        ],
+        "default": "16:9"
+      }
+    ],
+    "context": {
+      "assets": [
+        "./template.json"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "video-generate"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "media:video-generate"
+    ],
+    "importedAt": "2026-05-22",
+    "localized": {
+      "ko": {
+        "title": "도시 신문 배달원 라이프스타일",
+        "description": "seedance-2.0 비디오 생성을 위한 범용 프롬프트 템플릿입니다. 카드 제목과 설명은 한국어로 표시하지만 프롬프트 본문은 원문을 유지합니다."
+      }
+    }
+  }
+}

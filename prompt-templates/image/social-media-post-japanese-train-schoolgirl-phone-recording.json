@@ -1,0 +1,21 @@
+{
+  "id": "social-media-post-japanese-train-schoolgirl-phone-recording",
+  "surface": "image",
+  "title": "Social Media Post - Japanese Train Schoolgirl Phone Recording",
+  "summary": "Generates a realistic vertical smartphone-style recording still of a censored schoolgirl commuter inside a crowded Japanese train.",
+  "category": "Social Media Post",
+  "tags": [
+    "anime"
+  ],
+  "model": "gpt-image-2",
+  "aspect": "1:1",
+  "prompt": "Create a photorealistic vertical smartphone candid photo inside a busy Japanese commuter train, shot from standing passenger height with a wide-angle phone lens. The main subject is {argument name=\"character description\" default=\"a Japanese high school girl with long straight black hair\"} standing in the aisle, wearing a classic navy-and-white sailor school uniform: short-sleeve white cropped sailor blouse with navy collar and double white stripes, navy neckerchief, navy pleated skirt, white crew socks, and brown loafers. Her face is intentionally hidden by a centered soft-edged square pixel blur/mosaic censor block. She raises her left arm to hold one gray triangular overhead train strap and looks downward while holding a dark smartphone in her right hand. On her shoulder is {argument name=\"bag description\" default=\"a navy rectangular school shoulder bag\"} decorated with exactly 5 visible dangling character charms: a pink bunny plush, a small red mushroom-like mascot, a blonde anime girl doll, a black-haired anime boy doll, and a pink-and-blue pastel plush on the far right. Surround her with other commuters in white shirts and school uniforms, some standing and some seated, with their faces blurred; include train windows showing an urban city view outside, metal poles, fluorescent ceiling lights, Japanese ad posters above the windows, and many gray triangular hanging straps receding into the background. Add a realistic phone video recording overlay: white corner frame brackets, a red dot and “REC” at the top center, timer text {argument name=\"recording time\" default=\"03:12\"}, small phone status icons at the top corners, and a small sparkle icon near the bottom right. Lighting should be natural daylight mixed with train interior fluorescent light, highly realistic, slightly compressed social-media photo quality, candid documentary mood, no glamour posing, no watermark.",
+  "previewImageUrl": "https://cms-assets.youmind.com/media/1779354391410_lfe1rl_HIxjMoVbAAABfrO.jpg",
+  "source": {
+    "repo": "YouMind-OpenLab/awesome-gpt-image-2",
+    "license": "CC-BY-4.0",
+    "author": "トーマ＠Grok愛好家",
+    "url": "https://x.com/TomaAIbijo/status/2057128871028527270#reversed-0"
+  },
+  "importedAt": "2026-05-22"
+}

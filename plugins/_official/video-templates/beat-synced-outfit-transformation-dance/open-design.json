@@ -29,10 +29,7 @@
       "poster": "https://pbs.twimg.com/media/HG_FqHJboAA5vAe.jpg"
     },
     "useCase": {
-      "query": {
-        "en": "Have the character from Image 1 perform the dance based on the breakdown in Image 3. During the performance, include a beat-synced transformation into the character from Image 2. After the transformation, the character from Image 2 continues and completes the remaining dance steps from Image 3. Emphasize precise beat matching with the music",
-        "zh-CN": "使用这个插件完成以下任务：Have the character from Image 1 perform the dance based on the breakdown in Image 3. During the performance, include a beat-synced transformation into the character from Image 2. After the transformation, the character from Image 2 continues and completes the remaining dance steps from Image 3. Emphasize precise beat matching with the music"
-      }
+      "query": "Have the character from Image 1 perform the dance based on the breakdown in Image 3. During the performance, include a beat-synced transformation into the character from Image 2. After the transformation, the character from Image 2 continues and completes the remaining dance steps from Image 3. Emphasize precise beat matching with the music"
     },
     "inputs": [
       {
@@ -75,6 +72,12 @@
     "capabilities": [
       "prompt:inject",
       "media:video-generate"
-    ]
+    ],
+    "localized": {
+      "ko": {
+        "title": "비트 싱크 의상 변신 댄스",
+        "description": "seedance-2.0 비디오 생성을 위한 범용 프롬프트 템플릿입니다. 카드 제목과 설명은 한국어로 표시하지만 프롬프트 본문은 원문을 유지합니다."
+      }
+    }
   }
 }

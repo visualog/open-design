@@ -32,10 +32,7 @@
       "poster": "https://cms-assets.youmind.com/media/1777453121103_le4xip_HG958SlbsAAESjg.jpg"
     },
     "useCase": {
-      "query": {
-        "en": "Create a portrait size wallpaper of pride in carrying out the profession as an ({argument name=\"name\" default=\"ALINA\"}), in the wallpaper contains a photo of the attached subject wearing a uniform or things related to the profession, make a pose, the subject's expression looks happy, don't have the same expression as the attached photo, give the wallpaper ornaments, decorations related to the profession, add several activities related to the profession arranged neatly, precisely, harmoniously, the typography says \"I am ({argument name=\"job title\" default=\"ALINA FASHION TEACHER\"}) \"above the subject's head, the font adjusts to the subject's job, each part of the wallpaper must be neat, the wallpaper visuals should not look monotonous, should not look stiff, must be original style wallpaper cinematic resolution 8K coloring, grading, wallpaper effects must look premium. Face and body exactly same as uploaded image.",
-        "zh-CN": "使用这个插件完成以下任务：Create a portrait size wallpaper of pride in carrying out the profession as an ({argument name=\"name\" default=\"ALINA\"}), in the wallpaper contains a photo of the attached subject wearing a uniform or things related to the profession, make a pose, the subject's expression looks happy, don't have the same expression as the attached photo, give the wallpaper ornaments, decorations related to the profession, add several activities related to the profession arranged neatly, precisely, harmoniously, the typography says \"I am ({argument name=\"job title\" default=\"ALINA FASHION TEACHER\"}) \"above the subject's head, the font adjusts to the subject's job, each part of the wallpaper must be neat, the wallpaper visuals should not look monotonous, should not look stiff, must be original style wallpaper cinematic resolution 8K coloring, grading, wallpaper effects must look premium. Face and body exactly same as uploaded image."
-      }
+      "query": "Create a portrait size wallpaper of pride in carrying out the profession as an ({argument name=\"name\" default=\"ALINA\"}), in the wallpaper contains a photo of the attached subject wearing a uniform or things related to the profession, make a pose, the subject's expression looks happy, don't have the same expression as the attached photo, give the wallpaper ornaments, decorations related to the profession, add several activities related to the profession arranged neatly, precisely, harmoniously, the typography says \"I am ({argument name=\"job title\" default=\"ALINA FASHION TEACHER\"}) \"above the subject's head, the font adjusts to the subject's job, each part of the wallpaper must be neat, the wallpaper visuals should not look monotonous, should not look stiff, must be original style wallpaper cinematic resolution 8K coloring, grading, wallpaper effects must look premium. Face and body exactly same as uploaded image."
     },
     "inputs": [
       {
@@ -79,6 +76,12 @@
     "capabilities": [
       "prompt:inject",
       "media:image-generate"
-    ]
+    ],
+    "localized": {
+      "ko": {
+        "title": "프로필 / 아바타 - 전문 아이덴티티 월페이퍼",
+        "description": "gpt-image-2 이미지 생성을 위한 프로필 / 아바타 프롬프트 템플릿입니다. 카드 제목과 설명은 한국어로 표시하지만 프롬프트 본문은 원문을 유지합니다."
+      }
+    }
   }
 }

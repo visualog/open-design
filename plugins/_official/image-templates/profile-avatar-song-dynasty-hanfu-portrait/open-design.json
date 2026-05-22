@@ -29,10 +29,7 @@
       "poster": "https://cms-assets.youmind.com/media/1777453126318_sew6kg_HG-PNvQbsAAup2e.jpg"
     },
     "useCase": {
-      "query": {
-        "en": "An {argument name=\"character description\" default=\"18-year-old Chinese Internet celebrity beauty\"}, with a model figure, exquisite facial features, cold and sweet temperament, wearing {argument name=\"outfit\" default=\"elegant light pink Song Dynasty Hanfu\"}, exquisite clothing details, with ancient-style buns, exquisite hairpin headdresses and embroidered shoes. The whole body stands in the front, with a natural and elegant posture, slightly showing the curve of the body. The {argument name=\"setting\" default=\"scene is a beautiful ancient-style courtyard, with flowers and trees, cloisters and soft light and shadow\"}. The picture is a high-quality ultra-realistic photography style, the characters are clear, the skin is delicate, the whole is aesthetic and high-end, and the 9:16 vertical composition.",
-        "zh-CN": "使用这个插件完成以下任务：An {argument name=\"character description\" default=\"18-year-old Chinese Internet celebrity beauty\"}, with a model figure, exquisite facial features, cold and sweet temperament, wearing {argument name=\"outfit\" default=\"elegant light pink Song Dynasty Hanfu\"}, exquisite clothing details, with ancient-style buns, exquisite hairpin headdresses and embroidered shoes. The whole body stands in the front, with a natural and elegant posture, slightly showing the curve of the body. The {argument name=\"setting\" default=\"scene is a beautiful ancient-style courtyard, with flowers and trees, cloisters and soft light and shadow\"}. The picture is a high-quality ultra-realistic photography style, the characters are clear, the skin is delicate, the whole is aesthetic and high-end, and the 9:16 vertical composition."
-      }
+      "query": "An {argument name=\"character description\" default=\"18-year-old Chinese Internet celebrity beauty\"}, with a model figure, exquisite facial features, cold and sweet temperament, wearing {argument name=\"outfit\" default=\"elegant light pink Song Dynasty Hanfu\"}, exquisite clothing details, with ancient-style buns, exquisite hairpin headdresses and embroidered shoes. The whole body stands in the front, with a natural and elegant posture, slightly showing the curve of the body. The {argument name=\"setting\" default=\"scene is a beautiful ancient-style courtyard, with flowers and trees, cloisters and soft light and shadow\"}. The picture is a high-quality ultra-realistic photography style, the characters are clear, the skin is delicate, the whole is aesthetic and high-end, and the 9:16 vertical composition."
     },
     "inputs": [
       {
@@ -76,6 +73,12 @@
     "capabilities": [
       "prompt:inject",
       "media:image-generate"
-    ]
+    ],
+    "localized": {
+      "ko": {
+        "title": "프로필 / 아바타 - 송나라 왕조 한푸",
+        "description": "gpt-image-2 이미지 생성을 위한 프로필 / 아바타 프롬프트 템플릿입니다. 카드 제목과 설명은 한국어로 표시하지만 프롬프트 본문은 원문을 유지합니다."
+      }
+    }
   }
 }

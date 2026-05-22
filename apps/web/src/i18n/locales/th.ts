@@ -308,7 +308,11 @@ export const th: Dict = {
   'promptTemplates.openFullscreen': 'เปิดแสดงผลเต็มหน้าจอ',
   'promptTemplates.closeFullscreen': 'ปิดแสดงผลเต็มหน้าจอ',
   'promptTemplates.allSources': 'ทุกแหล่งที่มา',
-  'promptTemplates.sourceFilterAria': 'กรองตามแหล่งที่มา',
+  'promptTemplates.sourceFilterAria': 'Filter by source',
+  'promptTemplates.sortAria': 'Sort templates',
+  'promptTemplates.sortName': 'Name',
+  'promptTemplates.sortNewest': 'Newest',
+  'promptTemplates.newBadge': 'New',
   'promptTemplates.retry': 'ลองใหม่',
 
   'connectors.title': 'ตัวเชื่อมต่อ',

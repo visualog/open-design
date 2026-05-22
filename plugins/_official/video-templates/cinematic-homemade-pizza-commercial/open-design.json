@@ -1,0 +1,85 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "video-template-cinematic-homemade-pizza-commercial",
+  "title": "Cinematic Homemade Pizza Commercial",
+  "version": "0.1.0",
+  "description": "A high-quality prompt for generating a realistic food commercial featuring a freshly baked pizza with melting cheese and steam.",
+  "license": "CC-BY-4.0",
+  "author": {
+    "name": "Zarlish",
+    "url": "https://x.com/Zarlish_Shahid/status/2057059287306850336"
+  },
+  "homepage": "https://github.com/YouMind-OpenLab/awesome-seedance-2-prompts",
+  "tags": [
+    "video-template",
+    "first-party",
+    "video",
+    "cinematic",
+    "food"
+  ],
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "video",
+    "scenario": "video",
+    "surface": "video",
+    "preview": {
+      "type": "video",
+      "poster": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/bf0b98476cffec2cb202adc81ed81530/thumbnails/thumbnail.jpg",
+      "video": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/bf0b98476cffec2cb202adc81ed81530/downloads/default.mp4"
+    },
+    "useCase": {
+      "query": "A freshly baked homemade pizza placed on a wooden table near a window during golden hour, natural sunlight softly hitting the melted cheese, realistic steam rising slowly, hands casually pulling out a cheesy slice, crispy crust details, cozy kitchen atmosphere, cinematic handheld camera feel, authentic food textures, warm family dinner vibe, soft depth of field, organic and natural food commercial aesthetic, ultra realistic, 4K."
+    },
+    "inputs": [
+      {
+        "name": "model",
+        "label": "Model",
+        "type": "select",
+        "options": [
+          "seedance-2.0"
+        ],
+        "default": "seedance-2.0"
+      },
+      {
+        "name": "aspect",
+        "label": "Aspect ratio",
+        "type": "select",
+        "options": [
+          "16:9",
+          "9:16",
+          "1:1",
+          "4:5"
+        ],
+        "default": "16:9"
+      }
+    ],
+    "context": {
+      "assets": [
+        "./template.json"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "video-generate"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "media:video-generate"
+    ],
+    "importedAt": "2026-05-22",
+    "localized": {
+      "ko": {
+        "title": "시네마틱 홈메이드 피자",
+        "description": "seedance-2.0 비디오 생성을 위한 시네마틱 프롬프트 템플릿입니다. 카드 제목과 설명은 한국어로 표시하지만 프롬프트 본문은 원문을 유지합니다."
+      }
+    }
+  }
+}

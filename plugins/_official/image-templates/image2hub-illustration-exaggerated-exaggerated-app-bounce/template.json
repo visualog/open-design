@@ -1,0 +1,21 @@
+{
+  "id": "image2hub-illustration-exaggerated-exaggerated-app-bounce",
+  "surface": "image",
+  "title": "Image2 과장 캐릭터 - Exaggerated Exaggerated App Bounce",
+  "summary": "Image2 Hub의 일러스트 / 과장 캐릭터 카테고리에서 가져온 이미지 생성 스타일입니다. 한국어 텍스트가 필요한 장면은 한국어 라벨과 카피를 사용하도록 조정했습니다.",
+  "category": "Illustration",
+  "tags": [
+    "3d-render",
+    "illustration"
+  ],
+  "model": "gpt-image-2",
+  "aspect": "1:1",
+  "previewImageUrl": "https://image2hub.netlify.app/assets/illustration/exaggerated/exaggerated-app-bounce.webp",
+  "prompt": "A complete single 3D illustration, exaggerated artistic editorial illustration style, not storyboard, not a collage layout.\n\nThe subject is an exaggerated cartoon character with a tiny head, round chubby body, extremely elongated limbs, oversized hands and oversized shoes, off-balance center of gravity, frozen mid-air in a dramatic jumping pose, with strong tension and comedic energy.\n\nOverall form looks like a soft sculpture toy — round, chunky, bouncy, exaggerated — not anatomically correct.\n\nMaterials are matte soft rubber, fuzzy fabric, knitted texture, plasticine feel, with fine fiber details, slight grain, hand-sculpted touch — avoid glossy plastic toy look, avoid translucent glass look, avoid high reflections.\n\nHigh-saturation dopamine color palette, bold color clashes, large flat color blocks, bright but not over-glowing.\n\nClean white background, minimal space, only a soft oval shadow on the ground, no complex scene.\n\nFloating abstract graphic elements around the character: stars, squiggle lines, balls, cubes, icons, symbols — all rendered as soft rubber or paper props to enhance motion and design feel.\n\nSoft studio lighting, global illumination, soft shadows, low contrast, clean commercial render.\n\nC4D / Blender 3D illustration, stylized soft sculpture, matte clay material, fuzzy fabric texture, knitted surface detail, playful editorial 3D illustration, high quality.\n\n— Theme: a tiny-headed kid mid-air bounce surrounded by floating mobile app UI cards (calendar, checkmark, photo icon), playful onboarding illustration Use Korean-language copy, labels, captions, titles, and UI text wherever text appears; keep all text readable and culturally natural for Korean users.",
+  "source": {
+    "repo": "houshifang/image",
+    "license": "Unspecified",
+    "author": "Image2 Hub",
+    "url": "https://image2hub.netlify.app/"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "id": "cinematic-homemade-pizza-commercial",
+  "surface": "video",
+  "title": "Cinematic Homemade Pizza Commercial",
+  "summary": "A high-quality prompt for generating a realistic food commercial featuring a freshly baked pizza with melting cheese and steam.",
+  "category": "Cinematic",
+  "tags": [
+    "cinematic",
+    "food"
+  ],
+  "model": "seedance-2.0",
+  "aspect": "16:9",
+  "prompt": "A freshly baked homemade pizza placed on a wooden table near a window during golden hour, natural sunlight softly hitting the melted cheese, realistic steam rising slowly, hands casually pulling out a cheesy slice, crispy crust details, cozy kitchen atmosphere, cinematic handheld camera feel, authentic food textures, warm family dinner vibe, soft depth of field, organic and natural food commercial aesthetic, ultra realistic, 4K.",
+  "previewImageUrl": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/bf0b98476cffec2cb202adc81ed81530/thumbnails/thumbnail.jpg",
+  "previewVideoUrl": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/bf0b98476cffec2cb202adc81ed81530/downloads/default.mp4",
+  "source": {
+    "repo": "YouMind-OpenLab/awesome-seedance-2-prompts",
+    "license": "CC-BY-4.0",
+    "author": "Zarlish",
+    "url": "https://x.com/Zarlish_Shahid/status/2057059287306850336"
+  },
+  "importedAt": "2026-05-22"
+}

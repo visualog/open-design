@@ -1,0 +1,86 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "image-template-profile-avatar-cinematic-early-summer-japanese-portrait",
+  "title": "Profile / Avatar - Cinematic Early Summer Japanese Portrait",
+  "version": "0.1.0",
+  "description": "A highly detailed prompt for a cinematic early summer portrait of a Japanese woman with realistic textures and lighting.",
+  "license": "CC-BY-4.0",
+  "author": {
+    "name": "Cyberトータル",
+    "url": "https://x.com/CyberTotal2026/status/2057248813631607164"
+  },
+  "homepage": "https://github.com/YouMind-OpenLab/awesome-gpt-image-2",
+  "tags": [
+    "image-template",
+    "first-party",
+    "image",
+    "profile-avatar",
+    "portrait",
+    "cinematic"
+  ],
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "image",
+    "scenario": "image",
+    "surface": "image",
+    "preview": {
+      "type": "image",
+      "poster": "https://cms-assets.youmind.com/media/1779354361495_3aph3e_HIzQ49xaMAAitCP.jpg"
+    },
+    "useCase": {
+      "query": "Subject: {argument name=\"subject\" default=\"Early summer portrait bathed in sunlight filtering through trees\"}\nPerson/Expression: {argument name=\"person\" default=\"Japanese woman in her early 20s, natural long black hair, light sheer makeup, transparent skin, soft atmosphere, modest smile, bangs and hair swaying naturally in the wind, calm eye contact\"}\nClothing/Pose: Ivory short-sleeved rib knit, light floral long skirt, canvas tote bag, light Japanese-style early summer outfit, natural posture sitting on a stone bench and looking back slightly, supporting the body with one arm behind\nBackground/Light: Classic red brick building, deep green trees and large branches covering the top of the screen, vivid green, strong early summer sunlight through leaves, soft backlighting, transparent atmosphere\nComposition/Camera: Vertical composition, slightly low angle, person placed slightly below the center, cinematic composition with heavily blurred background, 85mm portrait lens, f1.4, shallow depth of field, full-frame mirrorless photography, natural bokeh and aerial perspective\nTexture/Style: High definition, realistic skin texture, delicate hair details, deep and vivid green colors, film-like gradation, Japanese cinematic photography, transparent natural light portrait, Sony α7R V photography style\nNegative: Low quality, unnatural face, unnatural hands, extra fingers, excessive skin retouching, overly flashy makeup, uniform, text, logo, watermark, artificial lighting"
+    },
+    "inputs": [
+      {
+        "name": "model",
+        "label": "Model",
+        "type": "select",
+        "options": [
+          "gpt-image-2"
+        ],
+        "default": "gpt-image-2"
+      },
+      {
+        "name": "aspect",
+        "label": "Aspect ratio",
+        "type": "select",
+        "options": [
+          "1:1",
+          "16:9",
+          "9:16",
+          "4:5",
+          "3:2"
+        ],
+        "default": "1:1"
+      }
+    ],
+    "context": {
+      "assets": [
+        "./template.json"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "image-generate"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "media:image-generate"
+    ],
+    "importedAt": "2026-05-22",
+    "localized": {
+      "ko": {
+        "title": "프로필 / 아바타 - 시네마틱 초여름 여름 일본풍",
+        "description": "gpt-image-2 이미지 생성을 위한 프로필 / 아바타 프롬프트 템플릿입니다. 카드 제목과 설명은 한국어로 표시하지만 프롬프트 본문은 원문을 유지합니다."
+      }
+    }
+  }
+}

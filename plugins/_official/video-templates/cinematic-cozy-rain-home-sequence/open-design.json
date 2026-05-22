@@ -1,0 +1,85 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "video-template-cinematic-cozy-rain-home-sequence",
+  "title": "Cinematic Cozy Rain Home Sequence",
+  "version": "0.1.0",
+  "description": "A detailed one-take cinematic script featuring a woman arriving at a glowing tiny home during a heavy rainstorm.",
+  "license": "CC-BY-4.0",
+  "author": {
+    "name": "Julia Clark",
+    "url": "https://x.com/JuliaClarky/status/2057063748037173385"
+  },
+  "homepage": "https://github.com/YouMind-OpenLab/awesome-seedance-2-prompts",
+  "tags": [
+    "video-template",
+    "first-party",
+    "video",
+    "cinematic",
+    "food"
+  ],
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "video",
+    "scenario": "video",
+    "surface": "video",
+    "preview": {
+      "type": "video",
+      "poster": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/afa5bc76201f7fb2cee3f00e4eaf9266/thumbnails/thumbnail.jpg",
+      "video": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/afa5bc76201f7fb2cee3f00e4eaf9266/downloads/default.mp4"
+    },
+    "useCase": {
+      "query": "Ultra-realistic cinematic one-take cozy lifestyle sequence set during heavy rain in a beautiful quiet modern society surrounded by trees and soft street lights. A small beautiful pastel tiny-home sits peacefully among the rainy neighborhood. The atmosphere feels warm, feminine, calm, peaceful, and emotionally comforting.\n\nA beautiful young woman wearing a floral dress, soft cardigan, rain boots, and holding a transparent umbrella walks quickly through heavy rain carrying a basket full of fresh vegetables and groceries. Her tiny pastel home glows warmly from inside while rain pours heavily outside.\n\nThe ENTIRE video must flow smoothly like one continuous cinematic shot with NO cuts or abrupt transitions.\n\n🎥 CONTINUOUS CINEMATIC FLOW (NO CUTS)\n\n⏱️ 0:00 – 0:02 | RAINY ARRIVAL\n\nHeavy rain pours across a peaceful beautiful society street at evening.\n\nThe girl walks quickly with umbrella toward her tiny glowing home\n\nBasket full of vegetables in her hand\n\nRain droplets reflecting warm street lights\n\nCozy pastel house glowing softly in rainy darkness\n\n🎥 Camera Movement: Smooth cinematic tracking shot following beside her naturally through rain.\n\n🎵 Sound: Heavy rain + soft cozy piano ambience.\n\n⏱️ 0:02 – 0:05 | ENTERING HOME\n\nShe quickly opens the tiny home door and rushes inside warmly laughing softly.\n\nShe closes umbrella beside the door\n\nPlaces vegetable basket onto kitchen counter\n\nWarm fairy lights glow beautifully around room\n\nShe removes her wet cardigan and shoes comfortably\n\n🎥 Camera Movement: Single smooth movement entering home with her naturally.\n\n🎙️ Girl (soft relieved sigh):\n“Finally…”\n\n⏱️ 0:05 – 0:08 | FRESHENING UP\n\nStill in one continuous shot, she walks toward the tiny bathroom area.\n\nWarm mirror lights glowing softly\n\nShe changes from wet clothes into cozy pastel homewear\n\nSoft towel drying wet hair\n\nRain visible through small bathroom window\n\n🎥 Camera Movement: Slow floating cinematic movement around the tiny cozy house.\n\n⏱️ 0:08 – 0:12 | COOKING DINNER\n\nShe begins cooking peacefully in her tiny pastel kitchen.\n\nSteam rising from warm food\n\nSoft fairy lights reflecting around kitchen shelves\n\nCutting vegetables from grocery basket\n\nCozy tea kettle steaming softly\n\nWarm peaceful feminine energy throughout\n\n🎥 Camera Movement: Smooth close-up transitions between food, hands, lights, and cozy details.\n\n🎙️ Girl (soft smile):\n“This weather feels magical.”\n\n⏱️ 0:12 – 0:15 | WINDOW DINNER ENDING\n\nShe sits beside the large rainy window eating peacefully.\n\nWarm food plate beside steaming tea cup\n\nRain sliding beautifully down glass window\n\nCozy blanket around shoulders\n\nShe quietly enjoys rainy weather while smiling softly\n\nTiny pastel home glowing warmly inside rainy evening"
+    },
+    "inputs": [
+      {
+        "name": "model",
+        "label": "Model",
+        "type": "select",
+        "options": [
+          "seedance-2.0"
+        ],
+        "default": "seedance-2.0"
+      },
+      {
+        "name": "aspect",
+        "label": "Aspect ratio",
+        "type": "select",
+        "options": [
+          "16:9",
+          "9:16",
+          "1:1",
+          "4:5"
+        ],
+        "default": "16:9"
+      }
+    ],
+    "context": {
+      "assets": [
+        "./template.json"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "video-generate"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "media:video-generate"
+    ],
+    "importedAt": "2026-05-22",
+    "localized": {
+      "ko": {
+        "title": "시네마틱 아늑한 비",
+        "description": "seedance-2.0 비디오 생성을 위한 시네마틱 프롬프트 템플릿입니다. 카드 제목과 설명은 한국어로 표시하지만 프롬프트 본문은 원문을 유지합니다."
+      }
+    }
+  }
+}

@@ -88,6 +88,20 @@ export interface Dict {
   'plugins.availableDetails.integrity': string;
   'plugins.availableDetails.permissions': string;
   'plugins.availableDetails.capabilitySummary': string;
+  'pluginDetails.viewDetailsAria': string;
+  'pluginDetails.chooseUseAria': string;
+  'pluginDetails.useOptionsAria': string;
+  'pluginDetails.shareAria': string;
+  'pluginDetails.publishGithubAria': string;
+  'pluginDetails.contributeOpenDesignAria': string;
+  'pluginDetails.publishGithub': string;
+  'pluginDetails.contributeOpenDesign': string;
+  'pluginDetails.usePlugin': string;
+  'pluginDetails.useWithQuery': string;
+  'pluginDetails.publish': string;
+  'pluginDetails.contribute': string;
+  'pluginDetails.starting': string;
+  'pluginDetails.pluginInfo': string;
 
   // App / brand
   'app.brand': string;
@@ -1269,6 +1283,10 @@ export interface Dict {
   'promptTemplates.closeFullscreen': string;
   'promptTemplates.allSources': string;
   'promptTemplates.sourceFilterAria': string;
+  'promptTemplates.sortAria': string;
+  'promptTemplates.sortName': string;
+  'promptTemplates.sortNewest': string;
+  'promptTemplates.newBadge': string;
   'promptTemplates.retry': string;
 
   // Designs tab

@@ -24,62 +24,83 @@ interface PromptTemplate {
   model?: string;
   aspect?: string;
   prompt: string;
+  localizedPrompts?: Record<string, string>;
   previewImageUrl?: string;
   previewVideoUrl?: string;
+  importedAt?: string;
   source: { repo: string; license: string; author?: string; url?: string };
 }
+
+type PromptTemplateRootInput = string | readonly string[];
 
 function isRecord(value: unknown): value is JsonRecord {
   return Boolean(value) && typeof value === 'object';
 }
 
-export async function listPromptTemplates(root: string): Promise<PromptTemplate[]> {
-  const out: PromptTemplate[] = [];
+export async function listPromptTemplates(rootInput: PromptTemplateRootInput): Promise<PromptTemplate[]> {
+  const out = new Map<string, PromptTemplate>();
+  const roots = normalizeRoots(rootInput);
   for (const surface of SUPPORTED_SURFACES) {
-    const dir = path.join(root, surface);
-    let entries = [];
-    try {
-      entries = await readdir(dir, { withFileTypes: true });
-    } catch {
-      continue;
-    }
-    for (const entry of entries) {
-      if (!entry.isFile()) continue;
-      if (!entry.name.endsWith('.json')) continue;
-      const filePath = path.join(dir, entry.name);
+    for (const root of roots) {
+      const dir = path.join(root, surface);
+      let entries = [];
       try {
-        const stats = await stat(filePath);
-        if (!stats.isFile()) continue;
-        const raw = await readFile(filePath, 'utf8');
-        const parsed = JSON.parse(raw);
-        const validated = validateTemplate(parsed, surface, entry.name);
-        if (validated) out.push(validated);
-      } catch (err) {
-        console.warn(`prompt-templates: failed ${filePath}`, err);
+        entries = await readdir(dir, { withFileTypes: true });
+      } catch {
+        continue;
+      }
+      for (const entry of entries) {
+        if (!entry.isFile()) continue;
+        if (!entry.name.endsWith('.json')) continue;
+        const filePath = path.join(dir, entry.name);
+        try {
+          const stats = await stat(filePath);
+          if (!stats.isFile()) continue;
+          const raw = await readFile(filePath, 'utf8');
+          const parsed = JSON.parse(raw);
+          const validated = validateTemplate(parsed, surface, entry.name);
+          if (validated && !out.has(templateKey(validated))) out.set(templateKey(validated), validated);
+        } catch (err) {
+          console.warn(`prompt-templates: failed ${filePath}`, err);
+        }
       }
     }
   }
   // Stable order — same surface group together, alpha by title within
   // surface so the gallery matches what `ls` would suggest.
-  out.sort((a, b) => {
+  const templates = [...out.values()];
+  templates.sort((a, b) => {
     if (a.surface !== b.surface) {
       return a.surface === 'image' ? -1 : 1;
     }
     return a.title.localeCompare(b.title);
   });
-  return out;
+  return templates;
 }
 
-export async function readPromptTemplate(root: string, surface: string, id: string): Promise<PromptTemplate | null> {
+export async function readPromptTemplate(rootInput: PromptTemplateRootInput, surface: string, id: string): Promise<PromptTemplate | null> {
   if (!isPromptTemplateSurface(surface)) return null;
-  const filePath = path.join(root, surface, `${id}.json`);
-  try {
-    const raw = await readFile(filePath, 'utf8');
-    const parsed = JSON.parse(raw);
-    return validateTemplate(parsed, surface, `${id}.json`);
-  } catch {
-    return null;
+  for (const root of normalizeRoots(rootInput)) {
+    const filePath = path.join(root, surface, `${id}.json`);
+    try {
+      const raw = await readFile(filePath, 'utf8');
+      const parsed = JSON.parse(raw);
+      const validated = validateTemplate(parsed, surface, `${id}.json`);
+      if (validated) return validated;
+    } catch {
+      continue;
+    }
   }
+  return null;
+}
+
+function normalizeRoots(rootInput: PromptTemplateRootInput): string[] {
+  const roots = Array.isArray(rootInput) ? rootInput : [rootInput];
+  return roots.filter((root) => typeof root === 'string' && root.length > 0);
+}
+
+function templateKey(template: PromptTemplate): string {
+  return `${template.surface}:${template.id}`;
 }
 
 function isPromptTemplateSurface(surface: string): surface is PromptTemplateSurface {
@@ -104,10 +125,16 @@ function validateTemplate(raw: unknown, expectedSurface: PromptTemplateSurface, 
     return null;
   }
   const source = isRecord(raw.source) ? raw.source : null;
-  if (!source || typeof source.repo !== 'string' || typeof source.license !== 'string') {
-    console.warn(`prompt-templates: ${fileName} missing source.repo / license`);
-    return null;
-  }
+  const sourceRepo = source && typeof source.repo === 'string' ? source.repo : 'local';
+  const sourceLicense = source && typeof source.license === 'string' ? source.license : 'unspecified';
+  const localizedPrompts =
+    raw.localizedPrompts && typeof raw.localizedPrompts === 'object'
+      ? Object.fromEntries(
+          Object.entries(raw.localizedPrompts)
+            .filter(([, value]) => typeof value === 'string' && value.trim().length > 0)
+            .map(([key, value]) => [key, value.trim()]),
+        )
+      : null;
   const template: PromptTemplate = {
     id: raw.id,
     surface: expectedSurface,
@@ -116,28 +143,21 @@ function validateTemplate(raw: unknown, expectedSurface: PromptTemplateSurface, 
     category: typeof raw.category === 'string' ? raw.category : 'General',
     tags: Array.isArray(raw.tags) ? raw.tags.filter((t): t is string => typeof t === 'string') : [],
     prompt: raw.prompt.trim(),
-    localizedPrompts:
-      raw.localizedPrompts && typeof raw.localizedPrompts === 'object'
-        ? Object.fromEntries(
-            Object.entries(raw.localizedPrompts)
-              .filter(([, value]) => typeof value === 'string' && value.trim().length > 0)
-              .map(([key, value]) => [key, value.trim()]),
-          )
-        : undefined,
-    previewImageUrl:
-      typeof raw.previewImageUrl === 'string' ? raw.previewImageUrl : undefined,
-    previewVideoUrl:
-      typeof raw.previewVideoUrl === 'string' ? raw.previewVideoUrl : undefined,
+    ...(localizedPrompts ? { localizedPrompts } : {}),
+    ...(typeof raw.previewImageUrl === 'string' ? { previewImageUrl: raw.previewImageUrl } : {}),
+    ...(typeof raw.previewVideoUrl === 'string' ? { previewVideoUrl: raw.previewVideoUrl } : {}),
+    ...(typeof raw.importedAt === 'string' ? { importedAt: raw.importedAt } : {}),
     source: {
-      repo: source.repo,
-      license: source.license,
+      repo: sourceRepo,
+      license: sourceLicense,
     },
   };
   if (typeof raw.model === 'string') template.model = raw.model;
   if (typeof raw.aspect === 'string') template.aspect = raw.aspect;
   if (typeof raw.previewImageUrl === 'string') template.previewImageUrl = raw.previewImageUrl;
   if (typeof raw.previewVideoUrl === 'string') template.previewVideoUrl = raw.previewVideoUrl;
-  if (typeof source.author === 'string') template.source.author = source.author;
-  if (typeof source.url === 'string') template.source.url = source.url;
+  if (typeof raw.importedAt === 'string') template.importedAt = raw.importedAt;
+  if (source && typeof source.author === 'string') template.source.author = source.author;
+  if (source && typeof source.url === 'string') template.source.url = source.url;
   return template;
 }

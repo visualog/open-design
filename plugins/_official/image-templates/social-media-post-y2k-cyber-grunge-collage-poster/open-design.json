@@ -1,0 +1,86 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "image-template-social-media-post-y2k-cyber-grunge-collage-poster",
+  "title": "Social Media Post - Y2K Cyber-Grunge Collage Poster",
+  "version": "0.1.0",
+  "description": "A complex streetwear aesthetic poster featuring digital collage elements, ASCII art, halftone graphics, and red airbrush paint.",
+  "license": "CC-BY-4.0",
+  "author": {
+    "name": "Harboris",
+    "url": "https://x.com/harboriis/status/2057139925569659368"
+  },
+  "homepage": "https://github.com/YouMind-OpenLab/awesome-gpt-image-2",
+  "tags": [
+    "image-template",
+    "first-party",
+    "image",
+    "social-media-post",
+    "anime",
+    "cinematic"
+  ],
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "image",
+    "scenario": "image",
+    "surface": "image",
+    "preview": {
+      "type": "image",
+      "poster": "https://cms-assets.youmind.com/media/1779354351917_m2cxo8_HIxt2z6bIAAEE09.jpg"
+    },
+    "useCase": {
+      "query": "Create a vertical {argument name=\"poster type\" default=\"mixed-media digital collage poster\"} in a Y2K cyber-grunge and streetwear aesthetic. The background is a textured, grainy white paper. In the center stands a {argument name=\"subject\" default=\"young man wearing a loose plaid shirt, oversized wide leg baggy jeans, air Jordan 1s, and a trucker hat\"}, with one hand in their pocket. His face is slightly positioned to the left. Behind him is a large, bold {argument name=\"graphic\" default=\"red halftone cross graphic\"}. Add vibrant red airbrush spray paint streaks to the top right and bottom left corners. On the left side of the figure, include a vertical block of ASCII art and computer code. Near the figure's legs, place a holographic sticker and a rectangular barcode sticker. In the bottom right corner, include a rough black ink line-art sketch of an anime-style character alongside small distressed text. Scatter small minimalist stars, hearts, and black cyber-sigilism tribal lines throughout the background. The overall vibe should be edgy, distressed, and reminiscent of a 2000s digital scrapbook."
+    },
+    "inputs": [
+      {
+        "name": "model",
+        "label": "Model",
+        "type": "select",
+        "options": [
+          "gpt-image-2"
+        ],
+        "default": "gpt-image-2"
+      },
+      {
+        "name": "aspect",
+        "label": "Aspect ratio",
+        "type": "select",
+        "options": [
+          "1:1",
+          "16:9",
+          "9:16",
+          "4:5",
+          "3:2"
+        ],
+        "default": "1:1"
+      }
+    ],
+    "context": {
+      "assets": [
+        "./template.json"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "image-generate"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "media:image-generate"
+    ],
+    "importedAt": "2026-05-22",
+    "localized": {
+      "ko": {
+        "title": "소셜 미디어 포스트 - 그런지 콜라주",
+        "description": "gpt-image-2 이미지 생성을 위한 소셜 미디어 포스트 프롬프트 템플릿입니다. 카드 제목과 설명은 한국어로 표시하지만 프롬프트 본문은 원문을 유지합니다."
+      }
+    }
+  }
+}

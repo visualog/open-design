@@ -1,0 +1,85 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "video-template-meteor-tsunami-disaster-scene",
+  "title": "Meteor Tsunami Disaster Scene",
+  "version": "0.1.0",
+  "description": "An intense handheld disaster movie prompt of a meteor crashing into the ocean and creating a colossal tsunami.",
+  "license": "CC-BY-4.0",
+  "author": {
+    "name": "Rahul Nanda",
+    "url": "https://x.com/rahulnanda86/status/2056827504355381316"
+  },
+  "homepage": "https://github.com/YouMind-OpenLab/awesome-seedance-2-prompts",
+  "tags": [
+    "video-template",
+    "first-party",
+    "video",
+    "general",
+    "cinematic"
+  ],
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "video",
+    "scenario": "video",
+    "surface": "video",
+    "preview": {
+      "type": "video",
+      "poster": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/8b5264b96018bf425ce122ffff679de3/thumbnails/thumbnail.jpg",
+      "video": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/8b5264b96018bf425ce122ffff679de3/downloads/default.mp4"
+    },
+    "useCase": {
+      "query": "A shaky, panicked handheld recording from the balcony of a sea-facing hotel during the day. The person filming suddenly spots something in the distance, does a jerky zoom-in, then quickly refocuses as a massive giant meteor streaks across the sky and crashes into the ocean with enormous force.\nThe impact creates a colossal tsunami that rushes toward the shore. The wave violently annihilates the beach, shacks, and entire coastline in a brutal display of nature’s power. The person filming is in complete panic — camera extremely shaky, breathing heavy.\nWater surges dramatically, rising rapidly until it reaches just a few floors below the balcony. A water droplet splashes onto the camera lens. The building rocks and shakes violently from the shockwave. In the background, people are screaming in terror while emergency sirens blare with back-and-forth intensity.\nCinematic, hyper-realistic, intense documentary-style footage, natural daylight, high tension, raw and chaotic energy."
+    },
+    "inputs": [
+      {
+        "name": "model",
+        "label": "Model",
+        "type": "select",
+        "options": [
+          "seedance-2.0"
+        ],
+        "default": "seedance-2.0"
+      },
+      {
+        "name": "aspect",
+        "label": "Aspect ratio",
+        "type": "select",
+        "options": [
+          "16:9",
+          "9:16",
+          "1:1",
+          "4:5"
+        ],
+        "default": "16:9"
+      }
+    ],
+    "context": {
+      "assets": [
+        "./template.json"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "video-generate"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "media:video-generate"
+    ],
+    "importedAt": "2026-05-22",
+    "localized": {
+      "ko": {
+        "title": "운석 쓰나미 재난",
+        "description": "seedance-2.0 비디오 생성을 위한 범용 프롬프트 템플릿입니다. 카드 제목과 설명은 한국어로 표시하지만 프롬프트 본문은 원문을 유지합니다."
+      }
+    }
+  }
+}

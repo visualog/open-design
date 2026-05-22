@@ -30,10 +30,7 @@
       "poster": "https://cms-assets.youmind.com/media/1777453183422_nu32e1_HG9s-kFbMAACMYA.jpg"
     },
     "useCase": {
-      "query": {
-        "en": "A realistic outdoor portrait of a thoughtful, naturally beautiful young woman standing on a garden path in soft golden-hour light. She is framed from about mid-thigh upward, centered in the image, facing the camera with a relaxed upright posture. She has {argument name=\"hair color\" default=\"dark brown\"} long, voluminous, loosely curly hair with a slightly tousled texture, falling around her shoulders. Dress her in an oversized cream-white knit sweater with long sleeves and dark high-waisted loose trousers or a flowing skirt-like bottom in deep navy or black. A pair of thin round eyeglasses hangs from the neckline of the sweater. In one hand she holds a sharpened yellow pencil, and in the other she carries an open sketchbook or notebook with slightly worn pages, suggesting she is writing, sketching, or observing nature. The mood should feel literary, artistic, intelligent, and understated rather than glamorous. Place her in a lush garden with 1 visible stone pathway, abundant soft greenery, and blurred flowers in the foreground and background. Use shallow depth of field with creamy bokeh, warm sunlight filtering through trees behind her, and gentle natural highlights on her hair and sweater. The image should look like a candid editorial photograph, highly realistic, soft and tasteful, with muted natural colors, subtle texture, and an atmosphere of calm, cultured beauty. Vertical composition, 4:5 portrait orientation.",
-        "zh-CN": "使用这个插件完成以下任务：A realistic outdoor portrait of a thoughtful, naturally beautiful young woman standing on a garden path in soft golden-hour light. She is framed from about mid-thigh upward, centered in the image, facing the camera with a relaxed upright posture. She has {argument name=\"hair color\" default=\"dark brown\"} long, voluminous, loosely curly hair with a slightly tousled texture, falling around her shoulders. Dress her in an oversized cream-white knit sweater with long sleeves and dark high-waisted loose trousers or a flowing skirt-like bottom in deep navy or black. A pair of thin round eyeglasses hangs from the neckline of the sweater. In one hand she holds a sharpened yellow pencil, and in the other she carries an open sketchbook or notebook with slightly worn pages, suggesting she is writing, sketching, or observing nature. The mood should feel literary, artistic, intelligent, and understated rather than glamorous. Place her in a lush garden with 1 visible stone pathway, abundant soft greenery, and blurred flowers in the foreground and background. Use shallow depth of field with creamy bokeh, warm sunlight filtering through trees behind her, and gentle natural highlights on her hair and sweater. The image should look like a candid editorial photograph, highly realistic, soft and tasteful, with muted natural colors, subtle texture, and an atmosphere of calm, cultured beauty. Vertical composition, 4:5 portrait orientation."
-      }
+      "query": "A realistic outdoor portrait of a thoughtful, naturally beautiful young woman standing on a garden path in soft golden-hour light. She is framed from about mid-thigh upward, centered in the image, facing the camera with a relaxed upright posture. She has {argument name=\"hair color\" default=\"dark brown\"} long, voluminous, loosely curly hair with a slightly tousled texture, falling around her shoulders. Dress her in an oversized cream-white knit sweater with long sleeves and dark high-waisted loose trousers or a flowing skirt-like bottom in deep navy or black. A pair of thin round eyeglasses hangs from the neckline of the sweater. In one hand she holds a sharpened yellow pencil, and in the other she carries an open sketchbook or notebook with slightly worn pages, suggesting she is writing, sketching, or observing nature. The mood should feel literary, artistic, intelligent, and understated rather than glamorous. Place her in a lush garden with 1 visible stone pathway, abundant soft greenery, and blurred flowers in the foreground and background. Use shallow depth of field with creamy bokeh, warm sunlight filtering through trees behind her, and gentle natural highlights on her hair and sweater. The image should look like a candid editorial photograph, highly realistic, soft and tasteful, with muted natural colors, subtle texture, and an atmosphere of calm, cultured beauty. Vertical composition, 4:5 portrait orientation."
     },
     "inputs": [
       {
@@ -77,6 +74,12 @@
     "capabilities": [
       "prompt:inject",
       "media:image-generate"
-    ]
+    ],
+    "localized": {
+      "ko": {
+        "title": "프로필 / 아바타 - 시적인 여성",
+        "description": "gpt-image-2 이미지 생성을 위한 프로필 / 아바타 프롬프트 템플릿입니다. 카드 제목과 설명은 한국어로 표시하지만 프롬프트 본문은 원문을 유지합니다."
+      }
+    }
   }
 }

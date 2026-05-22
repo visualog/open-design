@@ -1,0 +1,86 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "video-template-tactical-agent-hotel-combat-sequence",
+  "title": "Tactical Agent Hotel Combat Sequence",
+  "version": "0.1.0",
+  "description": "A cinematic action sequence featuring an undercover agent in a tactical suit engaging in fluid gun-fu choreography through a neon-lit luxury hotel corridor.",
+  "license": "CC-BY-4.0",
+  "author": {
+    "name": "Pierrick Chevallier | IA",
+    "url": "https://x.com/CharaspowerAI/status/2057106600817557875"
+  },
+  "homepage": "https://github.com/YouMind-OpenLab/awesome-seedance-2-prompts",
+  "tags": [
+    "video-template",
+    "first-party",
+    "video",
+    "action",
+    "cinematic",
+    "cyberpunk"
+  ],
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "video",
+    "scenario": "video",
+    "surface": "video",
+    "preview": {
+      "type": "video",
+      "poster": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/c40d6216d51fef9fce39392c573a99fe/thumbnails/thumbnail.jpg",
+      "video": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/c40d6216d51fef9fce39392c573a99fe/downloads/default.mp4"
+    },
+    "useCase": {
+      "query": "A lone undercover agent in a black tactical suit, bruised face, intense focused eyes, breathing heavily while gripping a pistol with trembling precision\nWalks slowly through a luxury hotel corridor as enemies emerge from every room, instantly transitioning into brutal close-quarters combat with fluid gun-fu choreography, smashing through glass walls and exchanging point-blank shots while explosions erupt behind him\nNeon-lit luxury hotel interior with shattered mirrors, flickering lights, smoke and debris covering the floor\nStarts with slow cinematic push-in from behind, subtle handheld tension, sudden whip pan into first gunshot, continuous tracking shot weaving through combat, crash zooms on impacts, orbit shot during slow-motion glass explosion, muzzle flashes illuminating the corridor, debris and sparks flooding the lens, ending with the agent standing alone in the destroyed hallway while sprinklers rain down over burning wreckage, camera slowly pulling back as silence replaces chaos"
+    },
+    "inputs": [
+      {
+        "name": "model",
+        "label": "Model",
+        "type": "select",
+        "options": [
+          "seedance-2.0"
+        ],
+        "default": "seedance-2.0"
+      },
+      {
+        "name": "aspect",
+        "label": "Aspect ratio",
+        "type": "select",
+        "options": [
+          "16:9",
+          "9:16",
+          "1:1",
+          "4:5"
+        ],
+        "default": "16:9"
+      }
+    ],
+    "context": {
+      "assets": [
+        "./template.json"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "video-generate"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "media:video-generate"
+    ],
+    "importedAt": "2026-05-22",
+    "localized": {
+      "ko": {
+        "title": "전술 에이전트 호텔 전투",
+        "description": "seedance-2.0 비디오 생성을 위한 창작 템플릿 프롬프트 템플릿입니다. 카드 제목과 설명은 한국어로 표시하지만 프롬프트 본문은 원문을 유지합니다."
+      }
+    }
+  }
+}

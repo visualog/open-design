@@ -1,0 +1,22 @@
+{
+  "id": "profile-avatar-extreme-close-up-laughing-couple-portrait",
+  "surface": "image",
+  "title": "Profile / Avatar - Extreme Close-Up Laughing Couple Portrait",
+  "summary": "Generates a moody hyper-realistic square macro portrait of a laughing young couple for cinematic editorial or social media visuals.",
+  "category": "Profile / Avatar",
+  "tags": [
+    "portrait",
+    "cinematic"
+  ],
+  "model": "gpt-image-2",
+  "aspect": "1:1",
+  "prompt": "Create an extreme close-up square macro portrait of a young couple laughing together, with two people: a young woman on the left with messy {argument name=\"hair color\" default=\"light brown blonde\"} windblown hair, and a young man on the right with dark tousled hair and light stubble. Their faces are pressed very close together, cropped tightly so the composition fills the entire frame; show only partial hair, cheeks, mouths, jawlines, and the upper edges of dark chunky knit sweaters. Capture a candid, hyper-realistic editorial photography style with high-fidelity skin texture, natural pores, slight freckles, subtle cheek flush, realistic teeth and gums, crinkled nearly closed eyes from intense joyful laughter, and authentic imperfect expressions. Use a dark minimalist background and moody cinematic color grading with deep desaturated tones, warm raw skin undertones, high contrast, and soft dramatic directional key light catching fine strands of hair and sculpting the noses, brows, lips, and cheek contours. Shot as if on {argument name=\"camera look\" default=\"35mm film\"}, shallow depth of field, sharp focus on the center where the faces meet, dark textured knitwear around their necks, raw intimate atmosphere, award-winning fashion editorial realism. Use a 1:1 square aspect ratio and avoid text, logos, extra people, or overly polished beauty retouching.",
+  "previewImageUrl": "https://cms-assets.youmind.com/media/1779354384650_2c0xhg_HIvxL60a4AAV6dp.jpg",
+  "source": {
+    "repo": "YouMind-OpenLab/awesome-gpt-image-2",
+    "license": "CC-BY-4.0",
+    "author": "Ozair AI",
+    "url": "https://x.com/Ozayrr_irl/status/2057002867727458512#reversed-0"
+  },
+  "importedAt": "2026-05-22"
+}

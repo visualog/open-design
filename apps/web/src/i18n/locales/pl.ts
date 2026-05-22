@@ -339,7 +339,11 @@ export const pl: Dict = {
   'promptTemplates.openFullscreen': 'Podgląd pełnoekranowy',
   'promptTemplates.closeFullscreen': 'Zamknij podgląd pełnoekranowy',
   'promptTemplates.allSources': 'Wszystkie źródła',
-  'promptTemplates.sourceFilterAria': 'Filtruj według źródła',
+  'promptTemplates.sourceFilterAria': 'Filter by source',
+  'promptTemplates.sortAria': 'Sort templates',
+  'promptTemplates.sortName': 'Name',
+  'promptTemplates.sortNewest': 'Newest',
+  'promptTemplates.newBadge': 'New',
   'promptTemplates.retry': 'Ponów',
 
   'connectors.title': 'Konektory',

@@ -1,0 +1,88 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "image-template-social-media-post-watercolor-cyberpunk-rooftop-girl",
+  "title": "Social Media Post - Watercolor Cyberpunk Rooftop Girl",
+  "version": "0.1.0",
+  "description": "A neon watercolor cyberpunk scene of a lone woman overlooking a rainy futuristic city, useful for atmospheric sci-fi illustration prompts.",
+  "license": "CC-BY-4.0",
+  "author": {
+    "name": "NoPuppet",
+    "url": "https://x.com/nopuppet/status/2057249357326614964#reversed-0"
+  },
+  "homepage": "https://github.com/YouMind-OpenLab/awesome-gpt-image-2",
+  "tags": [
+    "image-template",
+    "first-party",
+    "image",
+    "social-media-post",
+    "anime",
+    "cyberpunk",
+    "fantasy",
+    "cinematic-romance"
+  ],
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "image",
+    "scenario": "image",
+    "surface": "image",
+    "preview": {
+      "type": "image",
+      "poster": "https://cms-assets.youmind.com/media/1779354375713_0dkb5b_HIzRUQSboAAgbAv.jpg"
+    },
+    "useCase": {
+      "query": "Create a vertical cyberpunk watercolor illustration of one young woman seen from behind on a high rooftop balcony, overlooking a vast rainy futuristic city at night. The mood is soft and welcoming despite the dystopian setting, with luminous neon magenta, cyan, violet, and deep indigo washes, visible watercolor paper texture, ink-like edges, rain streaks, splatters, and glowing reflections. The woman has extremely long windblown {argument name=\"hair color\" default=\"hot pink hair with cyan-blue underside streaks\"}, a bare shoulder, dangling earrings, and a glossy black off-shoulder tech jacket covered in neon circuitry; her transparent iridescent skirt and straps glow with blue-pink light. Add exactly one visible flying drone or hovercraft in the sky. The skyline is dense with countless skyscrapers, holographic screens, vertical neon signs, and wet rooftops; include exactly three prominent readable Japanese text elements: 「未来都市」 on the largest magenta tower billboard, 「ホテル」 on a smaller right-side sign, and 「未来」 on the woman’s sleeve. Include exactly two opaque privacy/censor blocks as part of the composition: one dark plum square covering the woman’s face area, and one pink vertical rectangle covering the center of the giant billboard on the right. Use {argument name=\"art style\" default=\"delicate watercolor cyberpunk anime concept art\"}, dramatic back lighting, high detail, romantic rain, no photorealism, no clean vector look, no extra characters, and no watermark."
+    },
+    "inputs": [
+      {
+        "name": "model",
+        "label": "Model",
+        "type": "select",
+        "options": [
+          "gpt-image-2"
+        ],
+        "default": "gpt-image-2"
+      },
+      {
+        "name": "aspect",
+        "label": "Aspect ratio",
+        "type": "select",
+        "options": [
+          "1:1",
+          "16:9",
+          "9:16",
+          "4:5",
+          "3:2"
+        ],
+        "default": "1:1"
+      }
+    ],
+    "context": {
+      "assets": [
+        "./template.json"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "image-generate"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "media:image-generate"
+    ],
+    "importedAt": "2026-05-22",
+    "localized": {
+      "ko": {
+        "title": "소셜 미디어 포스트 - 사이버펑크 루프탑 소녀",
+        "description": "gpt-image-2 이미지 생성을 위한 소셜 미디어 포스트 프롬프트 템플릿입니다. 카드 제목과 설명은 한국어로 표시하지만 프롬프트 본문은 원문을 유지합니다."
+      }
+    }
+  }
+}

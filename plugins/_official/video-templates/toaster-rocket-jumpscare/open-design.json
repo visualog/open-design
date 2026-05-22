@@ -30,10 +30,7 @@
       "video": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/fbf9f399fd8f4905a62661966d937ba8/downloads/default.mp4"
     },
     "useCase": {
-      "query": {
-        "en": "A realistic shot of an old man in a cozy kitchen being jumpscared when his toaster launches the bread five feet into the air like a rocket. Handheld \"home video\" style capturing his genuine look of shock and the bread hitting the ceiling.A realistic shot of an old man in a cozy kitchen being jumpscared when his toaster launches the bread five feet into the air like a rocket. Handheld \"home video\" style capturing his genuine look of shock and the bread hitting the ceiling.",
-        "zh-CN": "使用这个插件完成以下任务：A realistic shot of an old man in a cozy kitchen being jumpscared when his toaster launches the bread five feet into the air like a rocket. Handheld \"home video\" style capturing his genuine look of shock and the bread hitting the ceiling.A realistic shot of an old man in a cozy kitchen being jumpscared when his toaster launches the bread five feet into the air like a rocket. Handheld \"home video\" style capturing his genuine look of shock and the bread hitting the ceiling."
-      }
+      "query": "A realistic shot of an old man in a cozy kitchen being jumpscared when his toaster launches the bread five feet into the air like a rocket. Handheld \"home video\" style capturing his genuine look of shock and the bread hitting the ceiling.A realistic shot of an old man in a cozy kitchen being jumpscared when his toaster launches the bread five feet into the air like a rocket. Handheld \"home video\" style capturing his genuine look of shock and the bread hitting the ceiling."
     },
     "inputs": [
       {
@@ -76,6 +73,12 @@
     "capabilities": [
       "prompt:inject",
       "media:video-generate"
-    ]
+    ],
+    "localized": {
+      "ko": {
+        "title": "토스터 로켓 점프스케어",
+        "description": "seedance-2.0 비디오 생성을 위한 범용 프롬프트 템플릿입니다. 카드 제목과 설명은 한국어로 표시하지만 프롬프트 본문은 원문을 유지합니다."
+      }
+    }
   }
 }

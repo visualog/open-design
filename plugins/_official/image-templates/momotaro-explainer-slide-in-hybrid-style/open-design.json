@@ -28,10 +28,7 @@
       "poster": "https://cms-assets.youmind.com/media/1776699414289_t6mebs_HGQQxukbUAA_qc0.jpg"
     },
     "useCase": {
-      "query": {
-        "en": "Create an explanatory slide ({argument name=\"format\" default=\"ponchi-e diagram\"}) for {argument name=\"theme\" default=\"Momotaro\"} that fuses the gentle atmosphere of \"Irasutoya\" with the overwhelming information density of \"Kasumigaseki slides\".",
-        "zh-CN": "使用这个插件完成以下任务：Create an explanatory slide ({argument name=\"format\" default=\"ponchi-e diagram\"}) for {argument name=\"theme\" default=\"Momotaro\"} that fuses the gentle atmosphere of \"Irasutoya\" with the overwhelming information density of \"Kasumigaseki slides\"."
-      }
+      "query": "Create an explanatory slide ({argument name=\"format\" default=\"ponchi-e diagram\"}) for {argument name=\"theme\" default=\"Momotaro\"} that fuses the gentle atmosphere of \"Irasutoya\" with the overwhelming information density of \"Kasumigaseki slides\"."
     },
     "inputs": [
       {
@@ -75,6 +72,12 @@
     "capabilities": [
       "prompt:inject",
       "media:image-generate"
-    ]
+    ],
+    "localized": {
+      "ko": {
+        "title": "설명 슬라이드 하이브리드 스타일",
+        "description": "gpt-image-2 이미지 생성을 위한 일러스트레이션 프롬프트 템플릿입니다. 카드 제목과 설명은 한국어로 표시하지만 프롬프트 본문은 원문을 유지합니다."
+      }
+    }
   }
 }

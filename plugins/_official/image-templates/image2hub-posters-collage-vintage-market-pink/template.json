@@ -1,0 +1,22 @@
+{
+  "id": "image2hub-posters-collage-vintage-market-pink",
+  "surface": "image",
+  "title": "Image2 콜라주 포스터 - Collage Vintage Market Pink",
+  "summary": "Image2 Hub의 포스터 / 콜라주 포스터 카테고리에서 가져온 이미지 생성 스타일입니다. 한국어 텍스트가 필요한 장면은 한국어 라벨과 카피를 사용하도록 조정했습니다.",
+  "category": "Social Media Post",
+  "tags": [
+    "3d-render",
+    "marketing",
+    "social"
+  ],
+  "model": "gpt-image-2",
+  "aspect": "9:16",
+  "previewImageUrl": "https://image2hub.netlify.app/assets/posters/collage/vintage-market-pink.webp",
+  "prompt": "International top-tier graphic design, Neo editorial magazine layout, design exhibition poster. A stylized exhibition title as the dominant visual with custom-designed artistic typography. Tightly composed editorial layout. Fluorescent color blocks as borders, overlaid with paper texture and subtle noise grain to evoke a sticker-collage feel. Black-and-white photographic background base. High-saturation single-color 3D object with a slightly rough surface material. Collage composition that is irregular yet retains design order. Minimal whitespace background. Magazine-grade professional layout. Decorative small elements such as stamps, arrows, Korean captions and the ® symbol. International design exhibition tone, awwwards / Behance professional caliber. Poster theme: Weekend Vintage Market — magenta gramophone edition. Aspect ratio 9:16, 4K resolution. Use Korean-language copy, labels, captions, titles, and UI text wherever text appears; keep all text readable and culturally natural for Korean users.",
+  "source": {
+    "repo": "houshifang/image",
+    "license": "Unspecified",
+    "author": "Image2 Hub",
+    "url": "https://image2hub.netlify.app/"
+  }
+}

@@ -40,8 +40,12 @@ export function registerStaticResourceRoutes(app: Express, ctx: RegisterStaticRe
     SKILLS_DIR,
     USER_SKILLS_DIR,
     PROMPT_TEMPLATES_DIR,
+    USER_PROMPT_TEMPLATES_DIR,
     BUNDLED_PETS_DIR,
   } = ctx.paths;
+  const promptTemplateRoots = [USER_PROMPT_TEMPLATES_DIR, PROMPT_TEMPLATES_DIR].filter(
+    (root): root is string => typeof root === 'string' && root.length > 0,
+  );
   const {
     listAllSkills,
     listAllDesignTemplates,
@@ -310,9 +314,9 @@ export function registerStaticResourceRoutes(app: Express, ctx: RegisterStaticRe
 
   app.get('/api/prompt-templates', async (_req, res) => {
     try {
-      const templates = await listPromptTemplates(PROMPT_TEMPLATES_DIR);
+      const templates = await listPromptTemplates(promptTemplateRoots);
       res.json({
-        promptTemplates: templates.map(({ prompt: _prompt, ...rest }) => rest),
+        promptTemplates: templates.map(({ prompt: _prompt, localizedPrompts: _localizedPrompts, ...rest }) => rest),
       });
     } catch (err: any) {
       res.status(500).json({ error: String(err) });
@@ -322,7 +326,7 @@ export function registerStaticResourceRoutes(app: Express, ctx: RegisterStaticRe
   app.get('/api/prompt-templates/:surface/:id', async (req, res) => {
     try {
       const tpl = await readPromptTemplate(
-        PROMPT_TEMPLATES_DIR,
+        promptTemplateRoots,
         req.params.surface,
         req.params.id,
       );

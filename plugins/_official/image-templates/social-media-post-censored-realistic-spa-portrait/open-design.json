@@ -1,0 +1,85 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "image-template-social-media-post-censored-realistic-spa-portrait",
+  "title": "Social Media Post - Censored Realistic Spa Portrait",
+  "version": "0.1.0",
+  "description": "Generates a hyper-realistic luxury spa portrait of a woman with natural skin texture and an opaque square censor block over the face.",
+  "license": "CC-BY-4.0",
+  "author": {
+    "name": "Finaltouch 📮",
+    "url": "https://x.com/Finaltoucch/status/2057170388182810928#reversed-0"
+  },
+  "homepage": "https://github.com/YouMind-OpenLab/awesome-gpt-image-2",
+  "tags": [
+    "image-template",
+    "first-party",
+    "image",
+    "profile-avatar",
+    "portrait"
+  ],
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "image",
+    "scenario": "image",
+    "surface": "image",
+    "preview": {
+      "type": "image",
+      "poster": "https://cms-assets.youmind.com/media/1779354377327_yedhw8_HIyJZGrWQAA8aOY.jpg"
+    },
+    "useCase": {
+      "query": "Create a hyper-realistic vertical portrait photo of {argument name=\"subject\" default=\"an elegant adult woman\"} in a softly lit luxury bathroom or spa interior. The subject is framed from the upper chest to just above the head, facing slightly to the viewer's right, with long dark brown wavy hair pulled back loosely behind one ear and falling over the left shoulder. She wears a cream satin robe or blouse with a deep V neckline, showing natural collarbones, neck texture, subtle freckles and moles, warm tan skin, realistic pores, fine body hair, and natural highlights from sunlight. Place a large opaque square censor block over the entire face, centered from the forehead to below the mouth, filled with a smooth brown skin-tone gradient, hiding all facial features while leaving the hair, ears, neck, shoulders, and clothing visible. Use {argument name=\"lighting\" default=\"warm late-afternoon natural sunlight\"} with soft shadows and glossy skin highlights. Background: shallow-depth-of-field marble wall panels, muted beige-gray stone, a vertical brass or gold trim line on the right, faint blurred white flowers on the left, and an upscale calm interior mood. Photographic style: realistic editorial beauty portrait, 4:5 vertical crop, 768x1024 composition, natural imperfections, no text, no watermark, no jewelry, no extra people."
+    },
+    "inputs": [
+      {
+        "name": "model",
+        "label": "Model",
+        "type": "select",
+        "options": [
+          "gpt-image-2"
+        ],
+        "default": "gpt-image-2"
+      },
+      {
+        "name": "aspect",
+        "label": "Aspect ratio",
+        "type": "select",
+        "options": [
+          "1:1",
+          "16:9",
+          "9:16",
+          "4:5",
+          "3:2"
+        ],
+        "default": "1:1"
+      }
+    ],
+    "context": {
+      "assets": [
+        "./template.json"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "image-generate"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "media:image-generate"
+    ],
+    "importedAt": "2026-05-22",
+    "localized": {
+      "ko": {
+        "title": "소셜 미디어 포스트 - 검열 스파",
+        "description": "gpt-image-2 이미지 생성을 위한 프로필 / 아바타 프롬프트 템플릿입니다. 카드 제목과 설명은 한국어로 표시하지만 프롬프트 본문은 원문을 유지합니다."
+      }
+    }
+  }
+}

@@ -30,10 +30,7 @@
       "poster": "https://cms-assets.youmind.com/media/1777453164857_ghcikd_HG9U5wnbYAE3-76.jpg"
     },
     "useCase": {
-      "query": {
-        "en": "realistic skin texture, visible pores around nose and cheeks, natural slight unevenness, no filter quality, handheld phone camera feel, slight angle, casual framing, filmed in a real environment, soft window light from the left, natural indoor lighting, no harsh highlights",
-        "zh-CN": "使用这个插件完成以下任务：realistic skin texture, visible pores around nose and cheeks, natural slight unevenness, no filter quality, handheld phone camera feel, slight angle, casual framing, filmed in a real environment, soft window light from the left, natural indoor lighting, no harsh highlights"
-      }
+      "query": "realistic skin texture, visible pores around nose and cheeks, natural slight unevenness, no filter quality, handheld phone camera feel, slight angle, casual framing, filmed in a real environment, soft window light from the left, natural indoor lighting, no harsh highlights"
     },
     "inputs": [
       {
@@ -77,6 +74,12 @@
     "capabilities": [
       "prompt:inject",
       "media:image-generate"
-    ]
+    ],
+    "localized": {
+      "ko": {
+        "title": "프로필 / 아바타 - 하이퍼 셀피 텍스처",
+        "description": "gpt-image-2 이미지 생성을 위한 프로필 / 아바타 프롬프트 템플릿입니다. 카드 제목과 설명은 한국어로 표시하지만 프롬프트 본문은 원문을 유지합니다."
+      }
+    }
   }
 }

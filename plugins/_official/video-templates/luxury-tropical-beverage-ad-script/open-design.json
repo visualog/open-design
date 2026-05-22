@@ -1,0 +1,87 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "video-template-luxury-tropical-beverage-ad-script",
+  "title": "Luxury Tropical Beverage Ad Script",
+  "version": "0.1.0",
+  "description": "A multi-scene script for a luxury beverage commercial featuring a woman on a tropical beach with consistent character movements.",
+  "license": "CC-BY-4.0",
+  "author": {
+    "name": "Aaliya",
+    "url": "https://x.com/aaliya_va/status/2057012397710213407"
+  },
+  "homepage": "https://github.com/YouMind-OpenLab/awesome-seedance-2-prompts",
+  "tags": [
+    "video-template",
+    "first-party",
+    "video",
+    "advertising",
+    "portrait",
+    "cinematic",
+    "product"
+  ],
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "video",
+    "scenario": "video",
+    "surface": "video",
+    "preview": {
+      "type": "video",
+      "poster": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/22905460b1a14befb57ff8e55c5398a2/thumbnails/thumbnail.jpg",
+      "video": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/22905460b1a14befb57ff8e55c5398a2/downloads/default.mp4"
+    },
+    "useCase": {
+      "query": "Create a 15-second cinematic luxury beverage advertisement featuring the same woman throughout all scenes.\n\nA beautiful young woman with long, wavy brunette hair wears a flowing light floral maxi dress on a tropical beach. She carries and drinks a chilled Summer Club Pogmosa can with visible condensation droplets. Bright tropical sunlight, premium lifestyle aesthetic, realistic photography, natural movements, luxury beverage campaign style.\n\nScene 1 (0-2 sec) – Arrival\nWide cinematic shot. A woman walks down a wooden beach pathway toward a pristine tropical beach carrying a woven beach bag. Palm trees sway gently in the breeze. The camera follows behind her.\n\nScene 2 (2-4 sec) – Discovery\nMedium shot. She sits near the shoreline, opens her beach bag, and pulls out a cold Summer Club can. Condensation glistens in the sunlight. She smiles naturally.\nScene 3 (4-6 sec) – Open & Refresh\n Close-up product shot. Her hand slowly cracks open the can. Crisp opening sound. Tiny water droplets sparkle. Slow-motion detail shot.\nScene 4 (6-8 sec) – First Sip\nClose-up portrait. She takes a refreshing sip while looking toward the ocean. Wind gently moves her hair and dress. Warm sunlight highlights her face.\nScene 5 (8-10 sec) – Beach Walk\nFull-body tracking shot. She walks barefoot along the shoreline holding the can. Waves roll in beside her. Dress flows beautifully in the sea breeze.\nScene 6 (10-12 sec) – Summer Toast\nMedium shot. She raises the can toward the camera with a bright smile as if making a toast. Ocean and palm trees softly blurred in the background.\nScene 7 (12-15 sec) – Sunset Finale\nWide cinematic sunset shot. Woman sits on a beach blanket watching the sun set over the ocean. Summer Club can beside her. Camera slowly pulls back revealing the golden beach landscape.\nVisual Style\nUltra-realistic commercial photography\nLuxury beverage advertising\nTropical paradise setting\nGolden-hour lighting\nCinematic camera movement\nShallow depth of field\nNatural skin tones\nSmooth transitions between scenes\nPremium brand aesthetic\nHigh-end fashion and lifestyle campaign\n4K HDR quality\n24 fps cinematic look\nSoft lens flares\nVibrant summer colors\nEnd Frame:\nProduct hero shot of the chilled Summer Club Pogmosa can on the beach with ocean waves in the background.\nText overlay:\n\"Summer Club\"\n\"Taste Summer Anywhere\"\nPremium beverage commercial ending with logo reveal and sunset glow."
+    },
+    "inputs": [
+      {
+        "name": "model",
+        "label": "Model",
+        "type": "select",
+        "options": [
+          "seedance-2.0"
+        ],
+        "default": "seedance-2.0"
+      },
+      {
+        "name": "aspect",
+        "label": "Aspect ratio",
+        "type": "select",
+        "options": [
+          "16:9",
+          "9:16",
+          "1:1",
+          "4:5"
+        ],
+        "default": "16:9"
+      }
+    ],
+    "context": {
+      "assets": [
+        "./template.json"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "video-generate"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "media:video-generate"
+    ],
+    "importedAt": "2026-05-22",
+    "localized": {
+      "ko": {
+        "title": "럭셔리 트로피컬 음료 스크립트",
+        "description": "seedance-2.0 비디오 생성을 위한 창작 템플릿 프롬프트 템플릿입니다. 카드 제목과 설명은 한국어로 표시하지만 프롬프트 본문은 원문을 유지합니다."
+      }
+    }
+  }
+}

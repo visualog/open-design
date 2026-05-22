@@ -1,0 +1,86 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "image-template-profile-avatar-censored-fantasy-cosplayer-at-expo",
+  "title": "Profile / Avatar - Censored Fantasy Cosplayer at Expo",
+  "version": "0.1.0",
+  "description": "A photorealistic vertical convention snapshot of an ornate white-and-gold fantasy cosplayer with face censored, suitable for recreating cosplay expo imagery.",
+  "license": "CC-BY-4.0",
+  "author": {
+    "name": "soda ho",
+    "url": "https://x.com/soda_ho/status/2057196357568598344#reversed-2"
+  },
+  "homepage": "https://github.com/YouMind-OpenLab/awesome-gpt-image-2",
+  "tags": [
+    "image-template",
+    "first-party",
+    "image",
+    "profile-avatar",
+    "anime",
+    "fantasy"
+  ],
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "image",
+    "scenario": "image",
+    "surface": "image",
+    "preview": {
+      "type": "image",
+      "poster": "https://cms-assets.youmind.com/media/1779354411540_tfdur7_HIyhHZcakAAEeHM.jpg"
+    },
+    "useCase": {
+      "query": "Create a realistic candid convention photo of an adult woman cosplayer posing close to the camera in a crowded indoor anime/game expo. She wears an ornate white-and-gold fantasy goddess costume with translucent off-shoulder draped sleeves, gold filigree trim, a jeweled necklace with a glowing opal-like pendant, dangling earrings, and an elaborate gold crown hairpiece with pearls and crystal ornaments. Her long dark brown hair is styled half-up with glossy waves. The composition is a vertical smartphone shot from slightly below chest height, tightly cropped from upper torso to head, with her arms extended outward as if posing; place a solid rectangular censor block over the face in a muted brown skin-tone color. Emphasize glossy fabric, metallic gold details, realistic skin lighting, and shallow depth of field. Background: busy exhibition hall with overhead black ceiling trusses, bright booth lights, blurred attendees, a large fantasy character poster on the left with Chinese calligraphy, and a glowing booth sign on the right. Use photorealistic detail, natural convention lighting, wide-angle phone perspective, and no watermark. Customize the setting as {argument name=\"event setting\" default=\"crowded indoor anime/game expo\"}, the costume theme as {argument name=\"costume theme\" default=\"white-and-gold fantasy goddess\"}, the jewelry centerpiece as {argument name=\"jewelry centerpiece\" default=\"opal-like pendant\"}, the censor block color as {argument name=\"censor block color\" default=\"muted brown skin-tone\"}, and the background poster text style as {argument name=\"background poster text style\" default=\"Chinese calligraphy\"}."
+    },
+    "inputs": [
+      {
+        "name": "model",
+        "label": "Model",
+        "type": "select",
+        "options": [
+          "gpt-image-2"
+        ],
+        "default": "gpt-image-2"
+      },
+      {
+        "name": "aspect",
+        "label": "Aspect ratio",
+        "type": "select",
+        "options": [
+          "1:1",
+          "16:9",
+          "9:16",
+          "4:5",
+          "3:2"
+        ],
+        "default": "1:1"
+      }
+    ],
+    "context": {
+      "assets": [
+        "./template.json"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "image-generate"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "media:image-generate"
+    ],
+    "importedAt": "2026-05-22",
+    "localized": {
+      "ko": {
+        "title": "프로필 / 아바타 - 검열",
+        "description": "gpt-image-2 이미지 생성을 위한 프로필 / 아바타 프롬프트 템플릿입니다. 카드 제목과 설명은 한국어로 표시하지만 프롬프트 본문은 원문을 유지합니다."
+      }
+    }
+  }
+}

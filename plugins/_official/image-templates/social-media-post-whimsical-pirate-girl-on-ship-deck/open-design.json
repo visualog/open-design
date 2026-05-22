@@ -1,0 +1,86 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "image-template-social-media-post-whimsical-pirate-girl-on-ship-deck",
+  "title": "Social Media Post - Whimsical Pirate Girl on Ship Deck",
+  "version": "0.1.0",
+  "description": "Generates a vibrant fantasy pirate character scene with a cute shoulder companion, ideal for storybook or animated adventure concept art.",
+  "license": "CC-BY-4.0",
+  "author": {
+    "name": "Mattyou Benett",
+    "url": "https://x.com/Mattyoubenett/status/2057155684739825906#reversed-0"
+  },
+  "homepage": "https://github.com/YouMind-OpenLab/awesome-gpt-image-2",
+  "tags": [
+    "image-template",
+    "first-party",
+    "image",
+    "social-media-post",
+    "cinematic",
+    "fantasy"
+  ],
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "image",
+    "scenario": "image",
+    "surface": "image",
+    "preview": {
+      "type": "image",
+      "poster": "https://cms-assets.youmind.com/media/1779354412447_w6lloq_HIx75R6XYAAXR1k.jpg"
+    },
+    "useCase": {
+      "query": "Create a vibrant vertical 2:3 cinematic fantasy adventure illustration in a polished 3D animated feature style. Show {argument name=\"character name\" default=\"a young pirate girl\"} standing full-body on the sunlit wooden deck of a pirate ship, confident pose with one hand on her hip and the other arm extended outward. Her face is intentionally covered by a centered solid medium-brown square mask with no facial features. She has abundant dark brown curly hair blowing in the sea breeze, tied with a bright pink bandana bow, and wears a cream lace-up pirate blouse with puffy sleeves, a short purple vest with gold trim, loose high-waisted purple trousers decorated with small gold stars, a wide brown belt with a large brass buckle and dangling chain, a pink patterned sash at one hip, brown cuffed pirate boots with gold star accents, and small gold jewelry. Perched on her shoulder is {argument name=\"companion creature\" default=\"a cute tiny blue fantasy monkey-mouse mascot\"} with huge round ears, big expressive eyes, a cheerful smile, colorful pink and blue feathers on its head, a curled tail, and a small gold star charm wand. The setting is a richly detailed pirate ship deck with ropes, barrels, chests, brass fittings, mast, rigging, and glowing golden sparkles around the character’s feet; behind her are striped cream-and-red sails and exactly 1 black pirate flag with a yellow skull-and-crossbones style emblem. In the background, show a turquoise ocean with foamy waves, a tropical island with cliffs and palm trees, fluffy white clouds, and exactly 4 white seagulls flying in the bright blue sky. Use warm golden-hour sunlight, saturated colors, rim lighting, shallow depth of field, dynamic composition, ultra-detailed textures, whimsical magical atmosphere, and high-end family adventure movie concept art quality. No text, no watermark, no extra characters."
+    },
+    "inputs": [
+      {
+        "name": "model",
+        "label": "Model",
+        "type": "select",
+        "options": [
+          "gpt-image-2"
+        ],
+        "default": "gpt-image-2"
+      },
+      {
+        "name": "aspect",
+        "label": "Aspect ratio",
+        "type": "select",
+        "options": [
+          "1:1",
+          "16:9",
+          "9:16",
+          "4:5",
+          "3:2"
+        ],
+        "default": "1:1"
+      }
+    ],
+    "context": {
+      "assets": [
+        "./template.json"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "image-generate"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "media:image-generate"
+    ],
+    "importedAt": "2026-05-22",
+    "localized": {
+      "ko": {
+        "title": "소셜 미디어 포스트 - 기발한 해적 소녀 배 덱",
+        "description": "gpt-image-2 이미지 생성을 위한 소셜 미디어 포스트 프롬프트 템플릿입니다. 카드 제목과 설명은 한국어로 표시하지만 프롬프트 본문은 원문을 유지합니다."
+      }
+    }
+  }
+}

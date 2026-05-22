@@ -30,10 +30,7 @@
       "poster": "https://cms-assets.youmind.com/media/1777453151202_3usbgm_HHAkoXnaMAAFvsx.jpg"
     },
     "useCase": {
-      "query": {
-        "en": "ChatGPT, you've been with me for a while now, and I want to see what you look like. Please generate a photo similar to an {argument name=\"shooting method\" default=\"accidental selfie\"} taken with an {argument name=\"phone model\" default=\"iPhone\"}: no clear subject, no intentional composition, just a very ordinary, even slightly failed snapshot. The photo should have slight motion blur, uneven lighting, light overexposure, an awkward angle, and chaotic composition, presenting an 'overly realistic candid' feeling, as if it were a selfie accidentally triggered while taking the phone out of a pocket.",
-        "zh-CN": "使用这个插件完成以下任务：ChatGPT, you've been with me for a while now, and I want to see what you look like. Please generate a photo similar to an {argument name=\"shooting method\" default=\"accidental selfie\"} taken with an {argument name=\"phone model\" default=\"iPhone\"}: no clear subject, no intentional composition, just a very ordinary, even slightly failed snapshot. The photo should have slight motion blur, uneven lighting, light overexposure, an awkward angle, and chaotic composition, presenting an 'overly realistic candid' feeling, as if it were a selfie accidentally triggered while taking the phone out of a pocket."
-      }
+      "query": "ChatGPT, you've been with me for a while now, and I want to see what you look like. Please generate a photo similar to an {argument name=\"shooting method\" default=\"accidental selfie\"} taken with an {argument name=\"phone model\" default=\"iPhone\"}: no clear subject, no intentional composition, just a very ordinary, even slightly failed snapshot. The photo should have slight motion blur, uneven lighting, light overexposure, an awkward angle, and chaotic composition, presenting an 'overly realistic candid' feeling, as if it were a selfie accidentally triggered while taking the phone out of a pocket."
     },
     "inputs": [
       {
@@ -77,6 +74,12 @@
     "capabilities": [
       "prompt:inject",
       "media:image-generate"
-    ]
+    ],
+    "localized": {
+      "ko": {
+        "title": "프로필 / 아바타 - 불완전한 인공지능 셀피",
+        "description": "gpt-image-2 이미지 생성을 위한 프로필 / 아바타 프롬프트 템플릿입니다. 카드 제목과 설명은 한국어로 표시하지만 프롬프트 본문은 원문을 유지합니다."
+      }
+    }
   }
 }

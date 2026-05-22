@@ -1,0 +1,20 @@
+{
+  "id": "hypercar-transformation-vfx",
+  "surface": "video",
+  "title": "Hypercar Transformation VFX",
+  "summary": "A high-octane VFX prompt for a transforming hypercar driving through a collapsing tunnel, featuring complex camera moves and environmental destruction.",
+  "category": "VFX / Fantasy",
+  "tags": [],
+  "model": "seedance-2.0",
+  "aspect": "16:9",
+  "prompt": "A hypercar transforming at high speed, body panels shifting, mechanical parts reconfiguring, glowing energy core activating\nDrives through a collapsing tunnel while transforming mid-motion, avoiding falling debris and explosions\nUnderground tunnel breaking apart, sparks, fire and debris raining down\nLow tracking shot near wheels transitioning into side tracking during transformation, crash zoom on mechanical changes, whip pans to falling debris, motion blur and reflections enhancing speed",
+  "previewImageUrl": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/f5ed0ac88e07edccd5258b1d4fd3c31b/thumbnails/thumbnail.jpg",
+  "previewVideoUrl": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/f5ed0ac88e07edccd5258b1d4fd3c31b/downloads/default.mp4",
+  "source": {
+    "repo": "YouMind-OpenLab/awesome-seedance-2-prompts",
+    "license": "CC-BY-4.0",
+    "author": "Pierrick Chevallier | IA",
+    "url": "https://x.com/CharaspowerAI/status/2056744209265082662"
+  },
+  "importedAt": "2026-05-22"
+}

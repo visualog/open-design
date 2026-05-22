@@ -1,0 +1,22 @@
+{
+  "id": "profile-avatar-subway-corridor-fashion-portrait",
+  "surface": "image",
+  "title": "Profile / Avatar - Subway Corridor Fashion Portrait",
+  "summary": "A photorealistic vertical portrait of a woman in a white sweater dress standing in a cool, reflective underground station corridor.",
+  "category": "Profile / Avatar",
+  "tags": [
+    "portrait",
+    "cinematic"
+  ],
+  "model": "gpt-image-2",
+  "aspect": "1:1",
+  "prompt": "Create a photorealistic vertical fashion portrait of a young woman standing in a quiet underground train station corridor in the morning. She is centered slightly right of frame, full body from head to mid-thigh visible, wearing a fitted ribbed {argument name=\"dress color\" default=\"white\"} long-sleeve turtleneck mini sweater dress. Her long softly waved {argument name=\"hair color\" default=\"rose-gold blonde\"} hair falls over both shoulders, parted near the center. Her face is intentionally obscured by a smooth rectangular blur block matching warm skin tones, with no facial features visible. She stands beside a glossy white square-tiled wall on the right, lightly touching the wall with her right hand while her left arm hangs relaxed. The corridor recedes deeply into the background with wet reflective floor tiles, cool fluorescent ceiling lights, a blurred overhead station sign, and exactly 3 distant commuter silhouettes in the background. Use a realistic full-frame camera look with shallow depth of field, cool blue-gray subway lighting, subtle reflections, cinematic urban atmosphere, natural body proportions, high detail in fabric ribs and tiles, and a small pale sparkle/star watermark-like mark near the bottom-right corner. No readable text, no extra people in the foreground, no accessories, no bags, no visible face.",
+  "previewImageUrl": "https://cms-assets.youmind.com/media/1779354398275_ondl5d_HItxY4FbUAEgWCu.jpg",
+  "source": {
+    "repo": "YouMind-OpenLab/awesome-gpt-image-2",
+    "license": "CC-BY-4.0",
+    "author": "susumu_Mind",
+    "url": "https://x.com/SusumuMind/status/2056863024905134122#reversed-1"
+  },
+  "importedAt": "2026-05-22"
+}

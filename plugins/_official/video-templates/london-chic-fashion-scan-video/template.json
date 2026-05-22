@@ -1,0 +1,23 @@
+{
+  "id": "london-chic-fashion-scan-video",
+  "surface": "video",
+  "title": "London Chic Fashion Scan Video",
+  "summary": "A photorealistic cinematic fashion video set in London, featuring a woman in luxury attire with digital text labels scanning her outfit.",
+  "category": "General",
+  "tags": [
+    "cinematic",
+    "action"
+  ],
+  "model": "seedance-2.0",
+  "aspect": "16:9",
+  "prompt": "Photorealistic cinematic fashion video set on an elegant London shopping street inspired by Bond Street. A stylish British woman in her late 20s walks confidently past a luxury boutique. She wears gold earrings, a burgundy double-breasted blazer, matching mini skirt, a light blue ruffled silk blouse, a structured dark red leather shoulder bag, and metallic pointed heels. Her chestnut hair is styled in a sleek low bun.\nHer phone rings. She glances at the screen, stops gracefully, and answers. A male voice asks, “Hello there, can you please scan your outfit?” She smiles and replies in a soft British accent, “I guess so.”\nThe camera performs a smooth head-to-toe scan, displaying elegant text labels for each outfit item, then ends on a confident editorial pose in front of the boutique window.\nBright natural sunlight, shallow depth of field, smooth gimbal movement, luxury editorial aesthetic, polished and sophisticated mood, 9:16 vertical, 15 seconds.",
+  "previewImageUrl": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/55688a25fd59a348996da9210678ec9b/thumbnails/thumbnail.jpg",
+  "previewVideoUrl": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/55688a25fd59a348996da9210678ec9b/downloads/default.mp4",
+  "source": {
+    "repo": "YouMind-OpenLab/awesome-seedance-2-prompts",
+    "license": "CC-BY-4.0",
+    "author": "Shami",
+    "url": "https://x.com/ShamiWeb3/status/2056904361792716894"
+  },
+  "importedAt": "2026-05-22"
+}

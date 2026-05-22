@@ -1,0 +1,23 @@
+{
+  "id": "social-media-post-modern-korean-men-s-fashion-editorial",
+  "surface": "image",
+  "title": "Social Media Post - Modern Korean Men's Fashion Editorial",
+  "summary": "An editorial-style prompt for high-end masculine fashion photography, focusing on sophisticated earth-tone layers and luxury studio lighting.",
+  "category": "Social Media Post",
+  "tags": [
+    "portrait",
+    "cinematic",
+    "action"
+  ],
+  "model": "gpt-image-2",
+  "aspect": "1:1",
+  "prompt": "Create an ultra-realistic modern Korean men’s fashion editorial portrait featuring a stylish young man in a sophisticated earth-tone outfit. He is wearing a {argument name=\"blazer type\" default=\"camel brown suede blazer\"} layered over a {argument name=\"sweater style\" default=\"mustard yellow textured sweater\"}, paired with {argument name=\"trousers\" default=\"tailored brown trousers\"} and polished dark brown Chelsea boots. Add fashionable amber-tinted sunglasses, stacked bracelets, and a silver necklace with a sun pendant for a luxury casual aesthetic.\n\nHe has neatly styled soft black hair, sharp jawline, flawless smooth skin, and a calm confident expression. Relaxed pose with one hand in pocket, minimalist masculine styling, elegant proportions.\n\nClean neutral beige studio background with soft professional lighting, subtle shadows, premium editorial composition, luxury menswear campaign aesthetic, Vogue Korea inspired fashion photography, ultra-detailed fabric textures, photorealistic skin detail, sharp focus, cinematic color grading, 85mm lens, full-body composition, modern luxury style, 8k ultra realistic.",
+  "previewImageUrl": "https://cms-assets.youmind.com/media/1779354346032_a4mqxc_HIs1S56aUAAVN2e.jpg",
+  "source": {
+    "repo": "YouMind-OpenLab/awesome-gpt-image-2",
+    "license": "CC-BY-4.0",
+    "author": "Zephyra Leigh",
+    "url": "https://x.com/ZephyraLeigh/status/2057128576701641032"
+  },
+  "importedAt": "2026-05-22"
+}

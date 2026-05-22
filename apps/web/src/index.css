@@ -16719,6 +16719,19 @@ body.entry-resizing { cursor: col-resize; user-select: none; }
   background: linear-gradient(135deg, #ff5e3a 0%, #f0c14b 100%);
   color: #1a1410;
 }
+.prompt-template-thumb-new {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  background: var(--accent);
+  color: var(--bg);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 7px;
+  border-radius: 999px;
+  letter-spacing: 0;
+  box-shadow: var(--shadow-sm);
+}
 .prompt-template-meta {
   display: flex;
   flex-direction: column;

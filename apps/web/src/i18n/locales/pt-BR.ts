@@ -338,7 +338,11 @@ export const ptBR: Dict = {
   'promptTemplates.openFullscreen': 'Abrir prévia em tela cheia',
   'promptTemplates.closeFullscreen': 'Fechar prévia em tela cheia',
   'promptTemplates.allSources': 'Todas as fontes',
-  'promptTemplates.sourceFilterAria': 'Filtrar por fonte',
+  'promptTemplates.sourceFilterAria': 'Filter by source',
+  'promptTemplates.sortAria': 'Sort templates',
+  'promptTemplates.sortName': 'Name',
+  'promptTemplates.sortNewest': 'Newest',
+  'promptTemplates.newBadge': 'New',
   'promptTemplates.retry': 'Tentar novamente',
 
   'connectors.title': 'Conectores',

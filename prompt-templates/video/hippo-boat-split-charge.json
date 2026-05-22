@@ -1,0 +1,20 @@
+{
+  "id": "hippo-boat-split-charge",
+  "surface": "video",
+  "title": "Hippo Boat Split Charge",
+  "summary": "A dramatic multi-shot video prompt depicting a massive hippo invading a boat and causing structural collapse with intense camera movement.",
+  "category": "General",
+  "tags": [],
+  "model": "seedance-2.0",
+  "aspect": "16:9",
+  "prompt": "0s–2s (HOOK — FIRST IMPACT)\n\nCamera already ON the boat mid-turn.\n\nA MASSIVE HIPPO slams THROUGH the side railing — not hitting — already halfway inside.\n\nWood explodes inward.\n\nIts jaws snap right in front of camera.\n\nBoat jerks violently sideways.\n\n2s–5s\n\nCamera gets thrown across deck — hits metal edge.\n\nWater floods in.\n\nThe hippo keeps pushing forward, forcing its bulk into the boat.\n\nFloor cracks slightly down the middle.\n\nPeople lose footing — sliding, grabbing anything.\n\n5s–8s (SCRAMRAMBLE — NO SAFETY)\n\nCamera tries to get up — footing gone.\n\nBoat now tilted.\n\nSomeone climbs toward the engine — slips instantly.\n\nCamera turns — hippo is no longer where it was.\n\nThat’s the problem.\n\n8s–11s (SECOND ATTACK SETUP — NO BREATH)\n\nHalf a second of unstable quiet.\n\nJust water sloshing.\n\nThen—\n\nWater beside the boat starts moving FAST in one direction.\n\nTracking something.\n\nCamera barely reacts.\n\n11s–14s (SECOND HIT — WORSE)\n\nHIPPO erupts from the opposite side — full body surge.\n\nSmashes into what’s left of the boat.\n\nBoat finally gives — structure collapses.\n\nCamera goes with it.\n\nEverything flips.\n\n14s–15s (PAYOFF)\n\nCamera SLAMS into muddy water.\n\nFully submerged.\n\nBrown chaos.\n\nNo visibility.\n\nCut.",
+  "previewImageUrl": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/9234b63dc7c5843810334ef2dc528e72/thumbnails/thumbnail.jpg",
+  "previewVideoUrl": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/9234b63dc7c5843810334ef2dc528e72/downloads/default.mp4",
+  "source": {
+    "repo": "YouMind-OpenLab/awesome-seedance-2-prompts",
+    "license": "CC-BY-4.0",
+    "author": "Rahul Nanda",
+    "url": "https://x.com/rahulnanda86/status/2057204318118576448"
+  },
+  "importedAt": "2026-05-22"
+}

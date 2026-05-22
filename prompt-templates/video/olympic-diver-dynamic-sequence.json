@@ -1,0 +1,22 @@
+{
+  "id": "olympic-diver-dynamic-sequence",
+  "surface": "video",
+  "title": "Olympic Diver Dynamic Sequence",
+  "summary": "A video generation prompt for an Olympic diver performing a takeoff and perfect mid-air dive into a blue pool.",
+  "category": "General",
+  "tags": [
+    "action"
+  ],
+  "model": "seedance-2.0",
+  "aspect": "16:9",
+  "prompt": "Female Olympic diver from platform takeoff to mid-air perfect dive into blue pool, full sequence action, colorful swimsuit, dynamic shot.",
+  "previewImageUrl": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/6c94c3c2e769205b33b44cdd0e47c234/thumbnails/thumbnail.jpg",
+  "previewVideoUrl": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/6c94c3c2e769205b33b44cdd0e47c234/downloads/default.mp4",
+  "source": {
+    "repo": "YouMind-OpenLab/awesome-seedance-2-prompts",
+    "license": "CC-BY-4.0",
+    "author": "Ratul Ali",
+    "url": "https://x.com/Ratul_AI/status/2056969972556222690"
+  },
+  "importedAt": "2026-05-22"
+}

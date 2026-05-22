@@ -1,0 +1,87 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "image-template-profile-avatar-cinematic-abandoned-music-room-portrait",
+  "title": "Profile / Avatar - Cinematic Abandoned Music Room Portrait",
+  "version": "0.1.0",
+  "description": "A highly detailed prompt for creating a realistic, cinematic portrait of a woman in an abandoned music room with vintage aesthetics and dramatic lighting.",
+  "license": "CC-BY-4.0",
+  "author": {
+    "name": "Cyberトータル",
+    "url": "https://x.com/CyberTotal2026/status/2056988932794118522"
+  },
+  "homepage": "https://github.com/YouMind-OpenLab/awesome-gpt-image-2",
+  "tags": [
+    "image-template",
+    "first-party",
+    "image",
+    "profile-avatar",
+    "portrait",
+    "cinematic",
+    "action"
+  ],
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "image",
+    "scenario": "image",
+    "surface": "image",
+    "preview": {
+      "type": "image",
+      "poster": "https://cms-assets.youmind.com/media/1779354363802_bjph6j_HIvjfEZb0AABonf.jpg"
+    },
+    "useCase": {
+      "query": "{argument name=\"age\" default=\"20-year-old\"} woman. Elegant and beautiful, tall and slender build. Perfect hourglass silhouette, firm yet soft waist, natural smooth curves, well-proportioned rounded hips, long shapely legs, light and tight body line. High cheekbones with a skeletal feel, sculpted and maturely sophisticated facial features. Deep, alluring almond eyes. An atmosphere of cool luxury and sexy tension. Light see-through bangs, feathery soft ends.\n\nPose: Sitting shallowly next to an old upright piano. Natural movement like a snapshot. Looking back at the camera. Body slightly leaning forward, relaxed yet showing visual interaction and sex appeal.\n\nOutfit: {argument name=\"outfit color\" default=\"Black\"} high-waisted tight sports shorts, black bandeau top inner, light gray loose cropped leather jacket. The shoulder line of the jacket drops naturally, revealing the shoulders and collarbone.\n\nScene: A highly detailed {argument name=\"scene\" default=\"ruined old music room\"}. A large vintage upright piano in the background. Scattered music stands and sheet music. Light streaming through broken windows. Fine dust dancing in the air. Aged wooden floor. Dim, cinematic indoor lighting. Intersection of warm and cool light creating strong cinematic contrast. Dust floating in shafts of light, with rich details throughout the space.\n\nComposition: Full body composition. Eye-level perspective. Side angle from the right. Both the person and background space are clearly visible. 50mm lens. Natural depth of field. Soft foreground bokeh. Slight foreground obstruction. The background environment is sharp and three-dimensional.\n\nQuality/Aesthetics: Fujifilm Classic Chrome colors. Soft cinematic color. Low contrast. Realistic atmosphere like a documentary film. Low-saturation blue and red tones. Travel film texture. Natural light detail. Sharp texture down to the fabric. Delicate facial details. Realistic spatial depth. Ultra-high definition. Movie-grade lighting."
+    },
+    "inputs": [
+      {
+        "name": "model",
+        "label": "Model",
+        "type": "select",
+        "options": [
+          "gpt-image-2"
+        ],
+        "default": "gpt-image-2"
+      },
+      {
+        "name": "aspect",
+        "label": "Aspect ratio",
+        "type": "select",
+        "options": [
+          "1:1",
+          "16:9",
+          "9:16",
+          "4:5",
+          "3:2"
+        ],
+        "default": "1:1"
+      }
+    ],
+    "context": {
+      "assets": [
+        "./template.json"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "image-generate"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "media:image-generate"
+    ],
+    "importedAt": "2026-05-22",
+    "localized": {
+      "ko": {
+        "title": "프로필 / 아바타 - 시네마틱 버려진 음악 방",
+        "description": "gpt-image-2 이미지 생성을 위한 프로필 / 아바타 프롬프트 템플릿입니다. 카드 제목과 설명은 한국어로 표시하지만 프롬프트 본문은 원문을 유지합니다."
+      }
+    }
+  }
+}

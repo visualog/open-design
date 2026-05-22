@@ -1,9 +1,11 @@
 import path from 'node:path';
+import fs from 'node:fs/promises';
+import os from 'node:os';
 import { fileURLToPath } from 'node:url';
 
 import { describe, expect, it } from 'vitest';
 
-import { listPromptTemplates } from '../src/prompt-templates.js';
+import { listPromptTemplates, readPromptTemplate } from '../src/prompt-templates.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -45,6 +47,53 @@ const PREVIEW_EXTENSION_BY_ID: Partial<Record<(typeof KOREAN_STYLE_TEMPLATE_IDS)
 };
 
 describe('prompt template registry', () => {
+  it('includes user image templates from the runtime data root before bundled templates', async () => {
+    const tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'od-prompt-template-roots-'));
+    try {
+      const userRoot = path.join(tempRoot, 'user');
+      const bundledRoot = path.join(tempRoot, 'bundled');
+      await fs.mkdir(path.join(userRoot, 'image'), { recursive: true });
+      await fs.mkdir(path.join(bundledRoot, 'image'), { recursive: true });
+      await fs.writeFile(
+        path.join(userRoot, 'image', 'custom-style.json'),
+        JSON.stringify({
+          id: 'custom-style',
+          surface: 'image',
+          title: 'Custom Style',
+          prompt: 'Create a detailed custom image prompt that survives application updates and remains selectable.',
+        }),
+      );
+      await fs.writeFile(
+        path.join(bundledRoot, 'image', 'custom-style.json'),
+        JSON.stringify({
+          id: 'custom-style',
+          surface: 'image',
+          title: 'Bundled Style',
+          prompt: 'Create a bundled image prompt that should be shadowed by a user-provided template with the same id.',
+          source: { repo: 'nexu-io/open-design', license: 'Apache-2.0' },
+        }),
+      );
+
+      const templates = await listPromptTemplates([userRoot, bundledRoot]) as PromptTemplateForTest[];
+      const customTemplates = templates.filter((template) => template.id === 'custom-style');
+
+      expect(customTemplates).toHaveLength(1);
+      expect(customTemplates[0]).toMatchObject({
+        id: 'custom-style',
+        title: 'Custom Style',
+        source: {
+          repo: 'local',
+          license: 'unspecified',
+        },
+      });
+      await expect(readPromptTemplate([userRoot, bundledRoot], 'image', 'custom-style')).resolves.toMatchObject({
+        title: 'Custom Style',
+      });
+    } finally {
+      await fs.rm(tempRoot, { recursive: true, force: true });
+    }
+  });
+
   it('includes the curated Korean-friendly image style templates', async () => {
     const templates = await listPromptTemplates(promptTemplatesRoot) as PromptTemplateForTest[];
     const byId = new Map(templates.map((template) => [template.id, template]));

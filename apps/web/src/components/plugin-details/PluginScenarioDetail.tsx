@@ -12,6 +12,8 @@ import type {
   InstalledPluginRecord,
   PluginManifest,
 } from '@open-design/contracts';
+import { useI18n } from '../../i18n';
+import { localizedPluginTitle } from '../../runtime/plugin-localization';
 import { Icon } from '../Icon';
 import { TrustBadge } from '../TrustBadge';
 import { PluginPreviewHero } from './PluginPreviewHero';
@@ -31,6 +33,7 @@ export function PluginScenarioDetail({
   onUse,
   isApplying,
 }: Props) {
+  const { locale, t } = useI18n();
   const closeRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
@@ -58,6 +61,7 @@ export function PluginScenarioDetail({
   const manifest: PluginManifest = record.manifest ?? ({} as PluginManifest);
   const od = manifest.od ?? {};
   const query = od.useCase?.query ?? '';
+  const title = localizedPluginTitle(record, locale);
   const examples = useMemo(
     () => (od.useCase?.exampleOutputs ?? []) as Array<{ path: string; title?: string }>,
     [od.useCase?.exampleOutputs],
@@ -69,7 +73,7 @@ export function PluginScenarioDetail({
       className="plugin-details-modal-backdrop"
       role="dialog"
       aria-modal="true"
-      aria-label={`${record.title} details`}
+      aria-label={t('pluginDetails.viewDetailsAria', { title })}
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
@@ -81,7 +85,7 @@ export function PluginScenarioDetail({
         <header className="plugin-details-modal__head">
           <div className="plugin-details-modal__head-titles">
             <div className="plugin-details-modal__head-row">
-              <h2 className="plugin-details-modal__title">{record.title}</h2>
+              <h2 className="plugin-details-modal__title">{title}</h2>
               <TrustBadge trust={record.trust} />
             </div>
             <div className="plugin-details-modal__meta">
@@ -107,8 +111,8 @@ export function PluginScenarioDetail({
               type="button"
               className="plugin-details-modal__close"
               onClick={onClose}
-              aria-label="Close details"
-              title="Close (Esc)"
+              aria-label={t('common.close')}
+              title={`${t('common.close')} (Esc)`}
             >
               <Icon name="close" size={18} />
             </button>
@@ -119,7 +123,7 @@ export function PluginScenarioDetail({
           {examples.length > 0 ? (
             <PluginPreviewHero
               pluginId={record.id}
-              pluginTitle={record.title}
+              pluginTitle={title}
               examples={examples}
             />
           ) : null}
@@ -133,7 +137,7 @@ export function PluginScenarioDetail({
             className="plugin-details-modal__secondary"
             onClick={onClose}
           >
-            Close
+            {t('common.close')}
           </button>
           <button
             type="button"
@@ -144,10 +148,10 @@ export function PluginScenarioDetail({
             data-testid={`plugin-details-use-${record.id}`}
           >
             {isApplying
-              ? 'Applying…'
+              ? t('homeHero.applying')
               : query
-                ? 'Use example query'
-                : 'Use plugin'}
+                ? t('pluginDetails.useWithQuery')
+                : t('pluginDetails.usePlugin')}
           </button>
         </footer>
       </div>

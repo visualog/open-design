@@ -29,10 +29,7 @@
       "video": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/d3d5dcaf102414a8cceca23d60b5c0d0/downloads/default.mp4"
     },
     "useCase": {
-      "query": {
-        "en": "create a walking animation for this hunched over character. the character stays in place",
-        "zh-CN": "使用这个插件完成以下任务：create a walking animation for this hunched over character. the character stays in place"
-      }
+      "query": "create a walking animation for this hunched over character. the character stays in place"
     },
     "inputs": [
       {
@@ -75,6 +72,12 @@
     "capabilities": [
       "prompt:inject",
       "media:video-generate"
-    ]
+    ],
+    "localized": {
+      "ko": {
+        "title": "웅크린 캐릭터 애니메이션",
+        "description": "seedance-2.0 비디오 생성을 위한 범용 프롬프트 템플릿입니다. 카드 제목과 설명은 한국어로 표시하지만 프롬프트 본문은 원문을 유지합니다."
+      }
+    }
   }
 }

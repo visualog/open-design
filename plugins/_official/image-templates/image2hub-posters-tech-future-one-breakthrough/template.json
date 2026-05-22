@@ -1,0 +1,22 @@
+{
+  "id": "image2hub-posters-tech-future-one-breakthrough",
+  "surface": "image",
+  "title": "Image2 테크 포스터 - Tech Future One Breakthrough",
+  "summary": "Image2 Hub의 포스터 / 테크 포스터 카테고리에서 가져온 이미지 생성 스타일입니다. 한국어 텍스트가 필요한 장면은 한국어 라벨과 카피를 사용하도록 조정했습니다.",
+  "category": "Social Media Post",
+  "tags": [
+    "3d-render",
+    "marketing",
+    "social"
+  ],
+  "model": "gpt-image-2",
+  "aspect": "9:16",
+  "previewImageUrl": "https://image2hub.netlify.app/assets/posters/tech/future-one-breakthrough.webp",
+  "prompt": "Create an image. International top-tier tech launch visual poster, minimalist futuristic design, deep pure black background, generous negative space, 9:16 vertical composition. Tech visual style similar to Apple, Toss, Notion and Linear. Clean minimalist 3D hero graphic; rendering quality: premium C4D / Octane Render look, frosted glass material. Typography and layout: centered composition. Theme: Future One — The Next Breakthrough, new product imminent. Use Korean-language copy, labels, captions, titles, and UI text wherever text appears; keep all text readable and culturally natural for Korean users.",
+  "source": {
+    "repo": "houshifang/image",
+    "license": "Unspecified",
+    "author": "Image2 Hub",
+    "url": "https://image2hub.netlify.app/"
+  }
+}

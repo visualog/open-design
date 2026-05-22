@@ -338,7 +338,11 @@ export const ja: Dict = {
   'promptTemplates.openFullscreen': 'フルスクリーンプレビューを開く',
   'promptTemplates.closeFullscreen': 'フルスクリーンプレビューを閉じる',
   'promptTemplates.allSources': 'すべてのソース',
-  'promptTemplates.sourceFilterAria': 'ソースで絞り込む',
+  'promptTemplates.sourceFilterAria': 'Filter by source',
+  'promptTemplates.sortAria': 'Sort templates',
+  'promptTemplates.sortName': 'Name',
+  'promptTemplates.sortNewest': 'Newest',
+  'promptTemplates.newBadge': 'New',
   'promptTemplates.retry': '再試行',
 
   'newproj.tabPrototype': 'プロトタイプ',

@@ -1,0 +1,84 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "video-template-night-flashlight-hippo-attack-pov",
+  "title": "Night Flashlight Hippo Attack POV",
+  "version": "0.1.0",
+  "description": "A high-intensity, horror-style POV sequence capturing a sudden hippo attack from a small boat at night, featuring chaotic camera movements and dramatic lighting.",
+  "license": "CC-BY-4.0",
+  "author": {
+    "name": "Rahul Nanda",
+    "url": "https://x.com/rahulnanda86/status/2057209986548421005"
+  },
+  "homepage": "https://github.com/YouMind-OpenLab/awesome-seedance-2-prompts",
+  "tags": [
+    "video-template",
+    "first-party",
+    "video",
+    "general"
+  ],
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "video",
+    "scenario": "video",
+    "surface": "video",
+    "preview": {
+      "type": "video",
+      "poster": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/34b9b4e9ba9d912ce1118900b3c81c6f/thumbnails/thumbnail.jpg",
+      "video": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/34b9b4e9ba9d912ce1118900b3c81c6f/downloads/default.mp4"
+    },
+    "useCase": {
+      "query": "0s–2s (HOOK — FACE FIRST)\n\nPOV flashlight already LOCKED on a MASSIVE HIPPO FACE right beside a small boat.\n\nToo close.\n\nEyes reflecting hard.\n\nWater dripping off its mouth.\n\nSomeone screams:\n “BACK! BACK! BACK!”\n\nThe hippo SNAPS forward instantly — jaws filling frame.\nCamera jerks violently.\n\n2s–5s\n\nCamera falls sideways into the boat.\n\nFlashlight drops — spinning beam chaos.\n\nLight flashes:\n\nmetal railing\n\nwater splashing in\n\nsomeone slipping\n\nScreams overlapping:\n “MOVE! MOVE!”\nThe boat rocks violently.\n5s–8s (SCRAMBLE — NO CONTROL)\n\nCamera grabs the flashlight again — shaky beam.\nPoints toward water —\n\nNothing there.\n\nJust ripples.\n\nToo quiet for half a second.\n\nHeavy breathing.\n\n8s–11s (SECOND PROXIMITY SHOCK)\n\nBeam swings right —\n\nHIPPO already THERE again, closer than before.\n\nMouth open.\n\nSomeone screams right next to camera:\n “IT’S RIGHT HERE!”\n\nWater blasts up as it surges forward.\n\nLight flickers from the splash.\n\n11s–14s (CHAOS PEAK)\n\nCamera gets knocked backward — half off the boat.\n\nFlashlight beam now angled low across water.\n\nWe see:\nthrashing water\n\npart of the head\n\nnothing fully clear\n\nSound carries it:\nSPLASHES + SCREAMS + WOOD HITTING WATER\n\n14s–15s (PAYOFF)\n\nFlashlight flickers once…\n\nThen cuts out.\n\nComplete darkness.\n\nOne final HEAVY SPLASH right next to camera.\nCut.\nKey Visual Hook\n\nHippo face already in flashlight beam in frame one — no search, no buildup — immediate attack."
+    },
+    "inputs": [
+      {
+        "name": "model",
+        "label": "Model",
+        "type": "select",
+        "options": [
+          "seedance-2.0"
+        ],
+        "default": "seedance-2.0"
+      },
+      {
+        "name": "aspect",
+        "label": "Aspect ratio",
+        "type": "select",
+        "options": [
+          "16:9",
+          "9:16",
+          "1:1",
+          "4:5"
+        ],
+        "default": "16:9"
+      }
+    ],
+    "context": {
+      "assets": [
+        "./template.json"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "video-generate"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "media:video-generate"
+    ],
+    "importedAt": "2026-05-22",
+    "localized": {
+      "ko": {
+        "title": "밤 손전등 공격 시점",
+        "description": "seedance-2.0 비디오 생성을 위한 범용 프롬프트 템플릿입니다. 카드 제목과 설명은 한국어로 표시하지만 프롬프트 본문은 원문을 유지합니다."
+      }
+    }
+  }
+}

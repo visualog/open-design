@@ -1,0 +1,87 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "image-template-social-media-post-imperial-marshal-anime-commander",
+  "title": "Social Media Post - Imperial Marshal Anime Commander",
+  "version": "0.1.0",
+  "description": "Generates a cinematic dark fantasy anime portrait of an ornate male military marshal in a steampunk imperial battlefield setting.",
+  "license": "CC-BY-4.0",
+  "author": {
+    "name": "AIossansan",
+    "url": "https://x.com/toraaiuser2/status/2057133330165084427#reversed-0"
+  },
+  "homepage": "https://github.com/YouMind-OpenLab/awesome-gpt-image-2",
+  "tags": [
+    "image-template",
+    "first-party",
+    "image",
+    "social-media-post",
+    "anime",
+    "cinematic",
+    "fantasy"
+  ],
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "image",
+    "scenario": "image",
+    "surface": "image",
+    "preview": {
+      "type": "image",
+      "poster": "https://cms-assets.youmind.com/media/1779354390438_g4sdpr_HIxmUFPbwAEICdK.jpg"
+    },
+    "useCase": {
+      "query": "Create a dramatic vertical anime fantasy-military illustration of {argument name=\"character name\" default=\"Marshal Berg\"}, an imposing adult male commander standing in a low-angle hero shot. He has {argument name=\"hair color\" default=\"long tousled blond hair\"} blown by the wind, a stern aristocratic presence, and a face visible without obstruction. Dress him in a black imperial marshal uniform with a high structured collar, fitted black jacket, gold piping, ornate epaulettes with heavy fringe, medals, jeweled brooches, layered gold chains, tassels, leather gloves, a wide black belt with a decorative gold buckle, and a deep crimson cape lined in shadow. His right hand holds an ornate black pistol angled downward in the foreground; his other hand rests near his side with confident posture. The setting is a grand dark steampunk-fantasy empire at dusk, with stormy glowing clouds, ember sparks, gothic towers, iron railings, red banners, and a huge military flag bearing a gold winged crest and crown on the left. In the sky show exactly 5 visible flying war machines: 2 large zeppelin airships and 3 smaller aircraft silhouettes. Use cinematic backlighting from the cloudy sunset, strong rim light on the hair and shoulders, high contrast shadows, intricate gold details, dynamic wind, epic scale, ultra-detailed anime painting style, sharp composition, no text, no watermark, no facial censor block, no blur."
+    },
+    "inputs": [
+      {
+        "name": "model",
+        "label": "Model",
+        "type": "select",
+        "options": [
+          "gpt-image-2"
+        ],
+        "default": "gpt-image-2"
+      },
+      {
+        "name": "aspect",
+        "label": "Aspect ratio",
+        "type": "select",
+        "options": [
+          "1:1",
+          "16:9",
+          "9:16",
+          "4:5",
+          "3:2"
+        ],
+        "default": "1:1"
+      }
+    ],
+    "context": {
+      "assets": [
+        "./template.json"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "image-generate"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "media:image-generate"
+    ],
+    "importedAt": "2026-05-22",
+    "localized": {
+      "ko": {
+        "title": "소셜 미디어 포스트 - 제국 원수 애니메이션 지휘관",
+        "description": "gpt-image-2 이미지 생성을 위한 소셜 미디어 포스트 프롬프트 템플릿입니다. 카드 제목과 설명은 한국어로 표시하지만 프롬프트 본문은 원문을 유지합니다."
+      }
+    }
+  }
+}

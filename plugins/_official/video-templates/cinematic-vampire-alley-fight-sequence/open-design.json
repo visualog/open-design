@@ -30,10 +30,7 @@
       "video": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/e665ecf343c35d97dd64e3b930a96fa5/downloads/default.mp4"
     },
     "useCase": {
-      "query": {
-        "en": "Draev stands in the center of the neon-lit alley, surrounded by multiple vampires positioned on rooftops and street level.\n\nThe vampires attack simultaneously.\nDraev reacts instantly with superhuman speed.\n\nHe dodges the first attacker with a fast sidestep and counters with a brutal punch, sending the vampire crashing into a wall.\n\nSecond vampire lunges from above Draev jumps unnaturally high, grabs him mid-air, and slams him into the ground.\n\nImpact creates a small shockwave on the wet street.\nThe defeated vampire rapidly disintegrates into ash and particles.\n\nCamera moves dynamically:\nstarts frontal wide shot transitions into fast tracking side movement then switches to over-the-shoulder following Draev More vampires rush in.\n\nDraev performs a fast acrobatic kick hitting two enemies at once.\n\nOne vampire is thrown into neon signs, sparks and electricity burst.\n\nAnother gets grabbed by the throat — Draev lifts him with one hand and crushes him, turning him into ash.\nRain reacts to movement, splashes intensify with impacts.\n\nFinal moment:\nDraev stands still in the center, surrounded by falling ash, breathing slightly, eyes glowing red.\nRemaining vampires hesitate, stepping back in fear. No music",
-        "zh-CN": "使用这个插件完成以下任务：Draev stands in the center of the neon-lit alley, surrounded by multiple vampires positioned on rooftops and street level.\n\nThe vampires attack simultaneously.\nDraev reacts instantly with superhuman speed.\n\nHe dodges the first attacker with a fast sidestep and counters with a brutal punch, sending the vampire crashing into a wall.\n\nSecond vampire lunges from above Draev jumps unnaturally high, grabs him mid-air, and slams him into the ground.\n\nImpact creates a small shockwave on the wet street.\nThe defeated vampire rapidly disintegrates into ash and particles.\n\nCamera moves dynamically:\nstarts frontal wide shot transitions into fast tracking side movement then switches to over-the-shoulder following Draev More vampires rush in.\n\nDraev performs a fast acrobatic kick hitting two enemies at once.\n\nOne vampire is thrown into neon signs, sparks and electricity burst.\n\nAnother gets grabbed by the throat — Draev lifts him with one hand and crushes him, turning him into ash.\nRain reacts to movement, splashes intensify with impacts.\n\nFinal moment:\nDraev stands still in the center, surrounded by falling ash, breathing slightly, eyes glowing red.\nRemaining vampires hesitate, stepping back in fear. No music"
-      }
+      "query": "Draev stands in the center of the neon-lit alley, surrounded by multiple vampires positioned on rooftops and street level.\n\nThe vampires attack simultaneously.\nDraev reacts instantly with superhuman speed.\n\nHe dodges the first attacker with a fast sidestep and counters with a brutal punch, sending the vampire crashing into a wall.\n\nSecond vampire lunges from above Draev jumps unnaturally high, grabs him mid-air, and slams him into the ground.\n\nImpact creates a small shockwave on the wet street.\nThe defeated vampire rapidly disintegrates into ash and particles.\n\nCamera moves dynamically:\nstarts frontal wide shot transitions into fast tracking side movement then switches to over-the-shoulder following Draev More vampires rush in.\n\nDraev performs a fast acrobatic kick hitting two enemies at once.\n\nOne vampire is thrown into neon signs, sparks and electricity burst.\n\nAnother gets grabbed by the throat — Draev lifts him with one hand and crushes him, turning him into ash.\nRain reacts to movement, splashes intensify with impacts.\n\nFinal moment:\nDraev stands still in the center, surrounded by falling ash, breathing slightly, eyes glowing red.\nRemaining vampires hesitate, stepping back in fear. No music"
     },
     "inputs": [
       {
@@ -76,6 +73,12 @@
     "capabilities": [
       "prompt:inject",
       "media:video-generate"
-    ]
+    ],
+    "localized": {
+      "ko": {
+        "title": "시네마틱 뱀파이어 골목",
+        "description": "seedance-2.0 비디오 생성을 위한 시네마틱 프롬프트 템플릿입니다. 카드 제목과 설명은 한국어로 표시하지만 프롬프트 본문은 원문을 유지합니다."
+      }
+    }
   }
 }

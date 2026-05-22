@@ -1,0 +1,87 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "image-template-profile-avatar-candid-identity-reference-portrait",
+  "title": "Profile / Avatar - Candid Identity Reference Portrait",
+  "version": "0.1.0",
+  "description": "A realistic, casual smartphone-style portrait that preserves the specific identity of a reference image with natural skin textures and imperfect styling.",
+  "license": "CC-BY-4.0",
+  "author": {
+    "name": "Zohaib Ai",
+    "url": "https://x.com/AiwithZohaib/status/2056835104824312018"
+  },
+  "homepage": "https://github.com/YouMind-OpenLab/awesome-gpt-image-2",
+  "tags": [
+    "image-template",
+    "first-party",
+    "image",
+    "profile-avatar",
+    "portrait",
+    "cinematic",
+    "fantasy"
+  ],
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "image",
+    "scenario": "image",
+    "surface": "image",
+    "preview": {
+      "type": "image",
+      "poster": "https://cms-assets.youmind.com/media/1779268039744_ixm1i5_HItYn1IaMAACJIR.jpg"
+    },
+    "useCase": {
+      "query": "Ultra-realistic, almost indistinguishable-from-real close-up portrait in a casual phone photo style.\n\nUse the uploaded image as the identity reference, fully preserving the natural appearance and atmosphere of the same woman.\nThe face and overall appearance must remain 100% identical to the reference image, without altering any facial proportions or features.\n\nDo not change:\n\nLip shape or lip size\n\nEyes\n\nNose\n\nFace shape\n\nOverall facial harmony and identity\n\nFull photorealism.\nNo AI-generated feeling — it should look like a random candid photo taken on a mobile phone.\nNot a polished glossy beauty shoot, but a natural, slightly imperfect phone snapshot.\n\nClose-up portrait framed to shoulder level.\nSoft and elegant pose.\nFace slightly turned to the side.\nNo direct eye contact with the camera — natural sideways gaze.\nExpression calm, natural, almost neutral.\nThe image should feel like a spontaneously captured moment rather than a posed photoshoot.\n\nHair styled in a natural slightly messy updo.\nFace-framing bangs and loose strands around the face.\nA few flyaway hairs and subtle disheveled texture.\nEffortless beauty aesthetic with imperfectly styled hair.\n\nUltra-natural skin texture with realistic pores and subtle imperfections.\nSoft mobile-phone lighting, realistic shadows, natural tonal range, authentic candid atmosphere.\n\nThe overall result should resemble a genuine smartphone portrait captured casually in real life, with cinematic realism and natural feminine elegance."
+    },
+    "inputs": [
+      {
+        "name": "model",
+        "label": "Model",
+        "type": "select",
+        "options": [
+          "gpt-image-2"
+        ],
+        "default": "gpt-image-2"
+      },
+      {
+        "name": "aspect",
+        "label": "Aspect ratio",
+        "type": "select",
+        "options": [
+          "1:1",
+          "16:9",
+          "9:16",
+          "4:5",
+          "3:2"
+        ],
+        "default": "1:1"
+      }
+    ],
+    "context": {
+      "assets": [
+        "./template.json"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "image-generate"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "media:image-generate"
+    ],
+    "importedAt": "2026-05-22",
+    "localized": {
+      "ko": {
+        "title": "프로필 / 아바타 - 캔디드 아이덴티티 레퍼런스",
+        "description": "gpt-image-2 이미지 생성을 위한 프로필 / 아바타 프롬프트 템플릿입니다. 카드 제목과 설명은 한국어로 표시하지만 프롬프트 본문은 원문을 유지합니다."
+      }
+    }
+  }
+}

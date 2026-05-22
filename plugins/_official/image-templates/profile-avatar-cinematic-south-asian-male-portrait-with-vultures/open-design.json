@@ -31,10 +31,7 @@
       "poster": "https://cms-assets.youmind.com/media/1777453132629_dmkonb_HG9Und1aYAAyo9g.jpg"
     },
     "useCase": {
-      "query": {
-        "en": "A highly detailed cinematic portrait of a handsome {argument name=\"ethnicity\" default=\"South Asian\"} man in his late 20s or early 30s, sitting on a metal railing with a soccer goal net behind him. He has sharp facial features, dark styled hair, light stubble, and intense dark eyes. He is wearing a {argument name=\"clothing\" default=\"black zip-up hoodie, black sweatpants, and white speckled sneakers\"}. His hands are clasped together resting on his knees as he looks directly at the viewer with a confident, slightly brooding expression.\n\nHe is surrounded by a dramatic flock of large black vultures and ravens. Some vultures are flying with wings spread in a dark stormy sky, while others are perched on the railing and goalpost near him. The atmosphere is {argument name=\"atmosphere\" default=\"dark, moody, and cinematic\"} with heavy storm clouds, dramatic lighting, and a mysterious, powerful vibe. High contrast, moody color grading, ultra-realistic, photorealistic, epic composition, dark fantasy aesthetic.",
-        "zh-CN": "使用这个插件完成以下任务：A highly detailed cinematic portrait of a handsome {argument name=\"ethnicity\" default=\"South Asian\"} man in his late 20s or early 30s, sitting on a metal railing with a soccer goal net behind him. He has sharp facial features, dark styled hair, light stubble, and intense dark eyes. He is wearing a {argument name=\"clothing\" default=\"black zip-up hoodie, black sweatpants, and white speckled sneakers\"}. His hands are clasped together resting on his knees as he looks directly at the viewer with a confident, slightly brooding expression.\n\nHe is surrounded by a dramatic flock of large black vultures and ravens. Some vultures are flying with wings spread in a dark stormy sky, while others are perched on the railing and goalpost near him. The atmosphere is {argument name=\"atmosphere\" default=\"dark, moody, and cinematic\"} with heavy storm clouds, dramatic lighting, and a mysterious, powerful vibe. High contrast, moody color grading, ultra-realistic, photorealistic, epic composition, dark fantasy aesthetic."
-      }
+      "query": "A highly detailed cinematic portrait of a handsome {argument name=\"ethnicity\" default=\"South Asian\"} man in his late 20s or early 30s, sitting on a metal railing with a soccer goal net behind him. He has sharp facial features, dark styled hair, light stubble, and intense dark eyes. He is wearing a {argument name=\"clothing\" default=\"black zip-up hoodie, black sweatpants, and white speckled sneakers\"}. His hands are clasped together resting on his knees as he looks directly at the viewer with a confident, slightly brooding expression.\n\nHe is surrounded by a dramatic flock of large black vultures and ravens. Some vultures are flying with wings spread in a dark stormy sky, while others are perched on the railing and goalpost near him. The atmosphere is {argument name=\"atmosphere\" default=\"dark, moody, and cinematic\"} with heavy storm clouds, dramatic lighting, and a mysterious, powerful vibe. High contrast, moody color grading, ultra-realistic, photorealistic, epic composition, dark fantasy aesthetic."
     },
     "inputs": [
       {
@@ -78,6 +75,12 @@
     "capabilities": [
       "prompt:inject",
       "media:image-generate"
-    ]
+    ],
+    "localized": {
+      "ko": {
+        "title": "프로필 / 아바타 - 시네마틱 남아시아 아시아 남성",
+        "description": "gpt-image-2 이미지 생성을 위한 프로필 / 아바타 프롬프트 템플릿입니다. 카드 제목과 설명은 한국어로 표시하지만 프롬프트 본문은 원문을 유지합니다."
+      }
+    }
   }
 }

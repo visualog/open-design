@@ -439,6 +439,7 @@ export interface PromptTemplateSummary {
   aspect?: MediaAspect;
   previewImageUrl?: string;
   previewVideoUrl?: string;
+  importedAt?: string;
   source: PromptTemplateSource;
 }
 

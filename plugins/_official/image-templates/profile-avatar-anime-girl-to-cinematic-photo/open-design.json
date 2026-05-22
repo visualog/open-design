@@ -31,10 +31,7 @@
       "poster": "https://cms-assets.youmind.com/media/1777453169843_ceq758_HG-nC89aQAApDXC.jpg"
     },
     "useCase": {
-      "query": {
-        "en": "Using the provided reference image, recreate the same girl and black cat in the same seated pose, but transform the flat anime drawing into a realistic cinematic photo. Keep the orange-and-black gothic dress, white frills, lightning armband, headpiece, black cat lying across her knees, white socks, and black Mary Jane shoes consistent with the reference. Place her in a moody vintage interior with a worn wooden floor, aged plaster walls, and 1 tall softly glowing window with sheer curtains on the left casting warm late-afternoon light. Use a nostalgic sepia-orange color grade, subtle film grain, soft shadows, and shallow depth of field for a photoreal editorial look.",
-        "zh-CN": "使用这个插件完成以下任务：Using the provided reference image, recreate the same girl and black cat in the same seated pose, but transform the flat anime drawing into a realistic cinematic photo. Keep the orange-and-black gothic dress, white frills, lightning armband, headpiece, black cat lying across her knees, white socks, and black Mary Jane shoes consistent with the reference. Place her in a moody vintage interior with a worn wooden floor, aged plaster walls, and 1 tall softly glowing window with sheer curtains on the left casting warm late-afternoon light. Use a nostalgic sepia-orange color grade, subtle film grain, soft shadows, and shallow depth of field for a photoreal editorial look."
-      }
+      "query": "Using the provided reference image, recreate the same girl and black cat in the same seated pose, but transform the flat anime drawing into a realistic cinematic photo. Keep the orange-and-black gothic dress, white frills, lightning armband, headpiece, black cat lying across her knees, white socks, and black Mary Jane shoes consistent with the reference. Place her in a moody vintage interior with a worn wooden floor, aged plaster walls, and 1 tall softly glowing window with sheer curtains on the left casting warm late-afternoon light. Use a nostalgic sepia-orange color grade, subtle film grain, soft shadows, and shallow depth of field for a photoreal editorial look."
     },
     "inputs": [
       {
@@ -78,6 +75,12 @@
     "capabilities": [
       "prompt:inject",
       "media:image-generate"
-    ]
+    ],
+    "localized": {
+      "ko": {
+        "title": "프로필 / 아바타 - 애니메이션 소녀 to 시네마틱 사진",
+        "description": "gpt-image-2 이미지 생성을 위한 프로필 / 아바타 프롬프트 템플릿입니다. 카드 제목과 설명은 한국어로 표시하지만 프롬프트 본문은 원문을 유지합니다."
+      }
+    }
   }
 }

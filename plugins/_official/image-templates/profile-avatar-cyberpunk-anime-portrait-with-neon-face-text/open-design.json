@@ -32,10 +32,7 @@
       "poster": "https://cms-assets.youmind.com/media/1777453164993_mt5b69_HHDoWfeaUAEA6Vt.jpg"
     },
     "useCase": {
-      "query": {
-        "en": "A dramatic cyberpunk anime close-up portrait of a white-haired young man in side profile facing right, with spiky silver hair, pale skin, and a black blindfold covering his eyes. He wears a high-collar dark coat and stands in a neon-lit futuristic city at night. Bright electric-blue glowing text is projected across the side of his face, reading exactly {argument name=\"face text\" default=\"GPT IMAGE 2\"} in three stacked lines. The mood is cool, mysterious, and high-energy, with deep black shadows, saturated blue and violet lighting, reflective highlights on the skin and hair, and a cinematic anime look reminiscent of modern supernatural action series. The background is a blurred urban street with dense vertical neon signs and holographic billboards; include 1 large vertical sign on the right with Japanese characters, plus at least 6 additional smaller glowing signs scattered in the distance. Use strong rim lighting, soft bloom, shallow depth of field, high contrast, ultra-detailed digital illustration, and a sleek sci-fi atmosphere.",
-        "zh-CN": "使用这个插件完成以下任务：A dramatic cyberpunk anime close-up portrait of a white-haired young man in side profile facing right, with spiky silver hair, pale skin, and a black blindfold covering his eyes. He wears a high-collar dark coat and stands in a neon-lit futuristic city at night. Bright electric-blue glowing text is projected across the side of his face, reading exactly {argument name=\"face text\" default=\"GPT IMAGE 2\"} in three stacked lines. The mood is cool, mysterious, and high-energy, with deep black shadows, saturated blue and violet lighting, reflective highlights on the skin and hair, and a cinematic anime look reminiscent of modern supernatural action series. The background is a blurred urban street with dense vertical neon signs and holographic billboards; include 1 large vertical sign on the right with Japanese characters, plus at least 6 additional smaller glowing signs scattered in the distance. Use strong rim lighting, soft bloom, shallow depth of field, high contrast, ultra-detailed digital illustration, and a sleek sci-fi atmosphere."
-      }
+      "query": "A dramatic cyberpunk anime close-up portrait of a white-haired young man in side profile facing right, with spiky silver hair, pale skin, and a black blindfold covering his eyes. He wears a high-collar dark coat and stands in a neon-lit futuristic city at night. Bright electric-blue glowing text is projected across the side of his face, reading exactly {argument name=\"face text\" default=\"GPT IMAGE 2\"} in three stacked lines. The mood is cool, mysterious, and high-energy, with deep black shadows, saturated blue and violet lighting, reflective highlights on the skin and hair, and a cinematic anime look reminiscent of modern supernatural action series. The background is a blurred urban street with dense vertical neon signs and holographic billboards; include 1 large vertical sign on the right with Japanese characters, plus at least 6 additional smaller glowing signs scattered in the distance. Use strong rim lighting, soft bloom, shallow depth of field, high contrast, ultra-detailed digital illustration, and a sleek sci-fi atmosphere."
     },
     "inputs": [
       {
@@ -79,6 +76,12 @@
     "capabilities": [
       "prompt:inject",
       "media:image-generate"
-    ]
+    ],
+    "localized": {
+      "ko": {
+        "title": "프로필 / 아바타 - 사이버펑크 애니메이션 네온 얼굴 텍스트",
+        "description": "gpt-image-2 이미지 생성을 위한 프로필 / 아바타 프롬프트 템플릿입니다. 카드 제목과 설명은 한국어로 표시하지만 프롬프트 본문은 원문을 유지합니다."
+      }
+    }
   }
 }

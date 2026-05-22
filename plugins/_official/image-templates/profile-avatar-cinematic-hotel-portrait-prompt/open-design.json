@@ -1,0 +1,87 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "image-template-profile-avatar-cinematic-hotel-portrait-prompt",
+  "title": "Profile / Avatar - Cinematic Hotel Portrait Prompt",
+  "version": "0.1.0",
+  "description": "A detailed prompt for generating a realistic and cinematic portrait of a woman in a silver sequin dress at a modern hotel staircase.",
+  "license": "CC-BY-4.0",
+  "author": {
+    "name": "Cyberトータル",
+    "url": "https://x.com/CyberTotal2026/status/2057056869068497261"
+  },
+  "homepage": "https://github.com/YouMind-OpenLab/awesome-gpt-image-2",
+  "tags": [
+    "image-template",
+    "first-party",
+    "image",
+    "profile-avatar",
+    "portrait",
+    "cinematic",
+    "fantasy"
+  ],
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "image",
+    "scenario": "image",
+    "surface": "image",
+    "preview": {
+      "type": "image",
+      "poster": "https://cms-assets.youmind.com/media/1779354361739_0jmu8w_HIwiPkIasAAGi3T.jpg"
+    },
+    "useCase": {
+      "query": "Realistic and cinematic portrait. A fictional {argument name=\"ethnicity\" default=\"Japanese woman\"} approximately {argument name=\"age\" default=\"20 years old\"} is sitting on the marble stairs of a modern hotel at night. She is wearing a {argument name=\"outfit\" default=\"silver sequin mini dress\"}, silver strappy high-heeled sandals, and silver heart-shaped earrings. Her legs are crossed naturally, and she has a calm expression, looking slightly to the right. Roughly styled hair, natural skin texture, and realistic proportions for fingers and body.\n\n16:9 horizontal composition. The subject is placed on the right side of the screen, leaving room on the left with a dark glass background and soft bokeh. Warm indoor light and soft side lighting elegantly showcase the silver reflections of the dress and sandals. Carefully depict the texture of the marble, glass railings, and the quiet luxury of the night.\n\nDo not include text, logos, watermarks, brand names, or meaningless symbols in the image. Avoid excessive skin smoothing, an AI-synthetic look, deformed fingers, extra limbs, low resolution, or over-sharpening."
+    },
+    "inputs": [
+      {
+        "name": "model",
+        "label": "Model",
+        "type": "select",
+        "options": [
+          "gpt-image-2"
+        ],
+        "default": "gpt-image-2"
+      },
+      {
+        "name": "aspect",
+        "label": "Aspect ratio",
+        "type": "select",
+        "options": [
+          "1:1",
+          "16:9",
+          "9:16",
+          "4:5",
+          "3:2"
+        ],
+        "default": "1:1"
+      }
+    ],
+    "context": {
+      "assets": [
+        "./template.json"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "image-generate"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "media:image-generate"
+    ],
+    "importedAt": "2026-05-22",
+    "localized": {
+      "ko": {
+        "title": "프로필 / 아바타 - 시네마틱 호텔 프롬프트",
+        "description": "gpt-image-2 이미지 생성을 위한 프로필 / 아바타 프롬프트 템플릿입니다. 카드 제목과 설명은 한국어로 표시하지만 프롬프트 본문은 원문을 유지합니다."
+      }
+    }
+  }
+}

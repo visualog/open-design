@@ -1,0 +1,22 @@
+{
+  "id": "image2hub-app-icons-xiaoxiang-fast-food",
+  "surface": "image",
+  "title": "Image2 앱 아이콘 - Icons Xiaoxiang Fast Food",
+  "summary": "Image2 Hub의 앱 / 앱 아이콘 카테고리에서 가져온 이미지 생성 스타일입니다. 한국어 텍스트가 필요한 장면은 한국어 라벨과 카피를 사용하도록 조정했습니다.",
+  "category": "App / Web Design",
+  "tags": [
+    "3d-render",
+    "app-showcase",
+    "product"
+  ],
+  "model": "gpt-image-2",
+  "aspect": "1:1",
+  "previewImageUrl": "https://image2hub.netlify.app/assets/app-icons/xiaoxiang-fast-food.webp",
+  "prompt": "A macOS app icon for an app named 'Little Elephant Fast Food'. A single squircle icon with smooth continuous rounded corners, centered on a white canvas with padding, occupying about 80% of the canvas. Modern light skeuomorphic macOS App Store style. Only one icon.",
+  "source": {
+    "repo": "houshifang/image",
+    "license": "Unspecified",
+    "author": "Image2 Hub",
+    "url": "https://image2hub.netlify.app/"
+  }
+}

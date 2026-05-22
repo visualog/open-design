@@ -339,7 +339,11 @@ export const hu: Dict = {
   'promptTemplates.openFullscreen': 'Teljes képernyős előnézet',
   'promptTemplates.closeFullscreen': 'Teljes képernyős előnézet bezárása',
   'promptTemplates.allSources': 'Minden forrás',
-  'promptTemplates.sourceFilterAria': 'Szűrés forrás szerint',
+  'promptTemplates.sourceFilterAria': 'Filter by source',
+  'promptTemplates.sortAria': 'Sort templates',
+  'promptTemplates.sortName': 'Name',
+  'promptTemplates.sortNewest': 'Newest',
+  'promptTemplates.newBadge': 'New',
   'promptTemplates.retry': 'Újra',
 
   'connectors.title': 'Kapcsolók',

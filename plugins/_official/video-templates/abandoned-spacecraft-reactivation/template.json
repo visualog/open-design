@@ -1,0 +1,20 @@
+{
+  "id": "abandoned-spacecraft-reactivation",
+  "surface": "video",
+  "title": "Abandoned Spacecraft Reactivation",
+  "summary": "A narrative-driven prompt describing the tense reactivation of an abandoned spacecraft, featuring gravity shifts and shifting internal layouts.",
+  "category": "General",
+  "tags": [],
+  "model": "seedance-2.0",
+  "aspect": "16:9",
+  "prompt": "Massive abandoned spacecraft, drifting, silent, until sudden partial reactivation creates unstable, shifting internal conditions.  \nDocking approach: small ship attaches carefully, everything still. \nEntry: interior dark, debris floating, no gravity. \nFirst change: lights flicker violently, sections powering up unevenly. \nFloor shift: gravity slams back on in one section, throwing everything down. \nCorridor movement: bulkheads begin sliding, layout changing in real time. \nNear-trap: path closes behind the pilot, forcing a sprint forward. \nSystem surge: doors opening and slamming unpredictably. \nPressure breach: one wrong turn leads to a sudden decompression blast. \nEscape run: pilot navigating a corridor that’s actively reconfiguring. \nFinal moment: ship barely undocks as the entire structure begins moving under its own power. \nClaustrophobic, mechanical instability, constant “wrong place at the wrong time.”",
+  "previewImageUrl": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/bc4733bc32fd06a87f11e1503a3ba7d6/thumbnails/thumbnail.jpg",
+  "previewVideoUrl": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/bc4733bc32fd06a87f11e1503a3ba7d6/downloads/default.mp4",
+  "source": {
+    "repo": "YouMind-OpenLab/awesome-seedance-2-prompts",
+    "license": "CC-BY-4.0",
+    "author": "Alexandra Aisling",
+    "url": "https://x.com/AllaAisling/status/2056742421158085018"
+  },
+  "importedAt": "2026-05-22"
+}

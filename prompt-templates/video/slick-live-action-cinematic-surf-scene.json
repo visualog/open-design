@@ -1,0 +1,23 @@
+{
+  "id": "slick-live-action-cinematic-surf-scene",
+  "surface": "video",
+  "title": "Slick Live-Action Cinematic Surf Scene",
+  "summary": "A prompt designed to adapt a production storyboard into a high-end 65mm film cinematic scene with fine grain.",
+  "category": "Cinematic",
+  "tags": [
+    "cinematic",
+    "product",
+    "action"
+  ],
+  "model": "seedance-2.0",
+  "aspect": "16:9",
+  "prompt": "Adapt this into a high-end, slick live-action cinematic film scene following this production board, faithfully adapted from the provided production storyboard. Shot on location with an high end camera on 65mm film, capturing crisp, ultrafine film grain and dramatic cinematography.",
+  "previewImageUrl": "https://cms-assets.youmind.com/media/1779347908060_9s3j4b_HIuUdIkbIAAOoOQ.jpg",
+  "source": {
+    "repo": "YouMind-OpenLab/awesome-seedance-2-prompts",
+    "license": "CC-BY-4.0",
+    "author": "Brent Lynch",
+    "url": "https://x.com/BrentLynch/status/2056903725613252820"
+  },
+  "importedAt": "2026-05-22"
+}

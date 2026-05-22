@@ -1,0 +1,21 @@
+{
+  "id": "image2hub-posters-love-confession-balloon",
+  "surface": "image",
+  "title": "Image2 영화 포스터 - Love Confession Balloon",
+  "summary": "Image2 Hub의 포스터 / 영화 포스터 카테고리에서 가져온 이미지 생성 스타일입니다. 한국어 텍스트가 필요한 장면은 한국어 라벨과 카피를 사용하도록 조정했습니다.",
+  "category": "Social Media Post",
+  "tags": [
+    "marketing",
+    "cinematic"
+  ],
+  "model": "gpt-image-2",
+  "aspect": "9:16",
+  "previewImageUrl": "https://image2hub.netlify.app/assets/posters/love-confession-balloon.webp",
+  "prompt": "Emulate a master of cinematic poster design, with international film-poster quality. Create a movie poster. Film title: Love Confession Balloon. Use Korean-language copy, labels, captions, titles, and UI text wherever text appears; keep all text readable and culturally natural for Korean users.",
+  "source": {
+    "repo": "houshifang/image",
+    "license": "Unspecified",
+    "author": "Image2 Hub",
+    "url": "https://image2hub.netlify.app/"
+  }
+}

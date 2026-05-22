@@ -1,0 +1,21 @@
+{
+  "id": "social-media-post-censored-realistic-spa-portrait",
+  "surface": "image",
+  "title": "Social Media Post - Censored Realistic Spa Portrait",
+  "summary": "Generates a hyper-realistic luxury spa portrait of a woman with natural skin texture and an opaque square censor block over the face.",
+  "category": "Profile / Avatar",
+  "tags": [
+    "portrait"
+  ],
+  "model": "gpt-image-2",
+  "aspect": "1:1",
+  "prompt": "Create a hyper-realistic vertical portrait photo of {argument name=\"subject\" default=\"an elegant adult woman\"} in a softly lit luxury bathroom or spa interior. The subject is framed from the upper chest to just above the head, facing slightly to the viewer's right, with long dark brown wavy hair pulled back loosely behind one ear and falling over the left shoulder. She wears a cream satin robe or blouse with a deep V neckline, showing natural collarbones, neck texture, subtle freckles and moles, warm tan skin, realistic pores, fine body hair, and natural highlights from sunlight. Place a large opaque square censor block over the entire face, centered from the forehead to below the mouth, filled with a smooth brown skin-tone gradient, hiding all facial features while leaving the hair, ears, neck, shoulders, and clothing visible. Use {argument name=\"lighting\" default=\"warm late-afternoon natural sunlight\"} with soft shadows and glossy skin highlights. Background: shallow-depth-of-field marble wall panels, muted beige-gray stone, a vertical brass or gold trim line on the right, faint blurred white flowers on the left, and an upscale calm interior mood. Photographic style: realistic editorial beauty portrait, 4:5 vertical crop, 768x1024 composition, natural imperfections, no text, no watermark, no jewelry, no extra people.",
+  "previewImageUrl": "https://cms-assets.youmind.com/media/1779354377327_yedhw8_HIyJZGrWQAA8aOY.jpg",
+  "source": {
+    "repo": "YouMind-OpenLab/awesome-gpt-image-2",
+    "license": "CC-BY-4.0",
+    "author": "Finaltouch 📮",
+    "url": "https://x.com/Finaltoucch/status/2057170388182810928#reversed-0"
+  },
+  "importedAt": "2026-05-22"
+}

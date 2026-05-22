@@ -29,10 +29,7 @@
       "poster": "https://cms-assets.youmind.com/media/1777453151822_tkaefc_HG_wnqGbAAAq416.jpg"
     },
     "useCase": {
-      "query": {
-        "en": "Based on this character info card for a {argument name=\"subject\" default=\"girl\"}, generate a 7-day outfit recommendation guide suitable for her appearance, height, and weight. Use a {argument name=\"platform style\" default=\"Xiaohongshu\"} fashion blogger presentation style. Generate 7 images at once (one for each day), specifically labeling the styles and prices of accessories, shoes, hats, pendants, tops, pants, socks, and other items for easy reference.",
-        "zh-CN": "使用这个插件完成以下任务：Based on this character info card for a {argument name=\"subject\" default=\"girl\"}, generate a 7-day outfit recommendation guide suitable for her appearance, height, and weight. Use a {argument name=\"platform style\" default=\"Xiaohongshu\"} fashion blogger presentation style. Generate 7 images at once (one for each day), specifically labeling the styles and prices of accessories, shoes, hats, pendants, tops, pants, socks, and other items for easy reference."
-      }
+      "query": "Based on this character info card for a {argument name=\"subject\" default=\"girl\"}, generate a 7-day outfit recommendation guide suitable for her appearance, height, and weight. Use a {argument name=\"platform style\" default=\"Xiaohongshu\"} fashion blogger presentation style. Generate 7 images at once (one for each day), specifically labeling the styles and prices of accessories, shoes, hats, pendants, tops, pants, socks, and other items for easy reference."
     },
     "inputs": [
       {
@@ -76,6 +73,12 @@
     "capabilities": [
       "prompt:inject",
       "media:image-generate"
-    ]
+    ],
+    "localized": {
+      "ko": {
+        "title": "소셜 미디어 포스트 - 소셜 패션 의상",
+        "description": "gpt-image-2 이미지 생성을 위한 소셜 미디어 포스트 프롬프트 템플릿입니다. 카드 제목과 설명은 한국어로 표시하지만 프롬프트 본문은 원문을 유지합니다."
+      }
+    }
   }
 }

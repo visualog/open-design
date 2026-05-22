@@ -30,10 +30,7 @@
       "video": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/e614b54b8f60956db3cd9cb765db1d09/downloads/default.mp4"
     },
     "useCase": {
-      "query": {
-        "en": "0s – 4s (Opening Mystery)\nA hidden magical kingdom under heavy rain at night. The girl stands beside a glowing water mirror in an ancient palace courtyard. Blue magical fog surrounds her. The water reflects faint glowing runes. She slowly reaches toward the reflection.\nCamera: Slow push-in close-up, cinematic depth of field\nMood: Mysterious, calm tension, soft rain sounds\n\n4s – 8s (Soul Switch Event)\nHer fingers touch the water reflection suddenly the surface shatters into glowing blue energy. A magical pulse spreads. Her eyes flash with light as her soul violently switches with the crown prince.\nCamera: Fast magical shockwave transition, close-up eye zoom\nVFX: Soul transfer glow, water turning into floating light particles\nMood: Intense, dramatic awakening\n\n8s – 12s (Living as the Prince)\nNow inside the crown prince’s body (her consciousness), she stands in a royal throne room. Nobles bow before her, unaware of the switch. She struggles to act like him while hiding panic. Subtle expressions of confusion and fear.\nCamera: Slow tracking shot through palace hall\nLighting: Cold golden royal lighting with shadows\nMood: Suspense, identity tension, hidden fear\n\n12s – 16s (Hidden Truth + Cliffhanger)\nBack in the courtyard mirror, the prince (in her body) looks back at her real form from the reflection. The magical water starts cracking again, suggesting unstable soul connection. Blue energy rises violently.",
-        "zh-CN": "使用这个插件完成以下任务：0s – 4s (Opening Mystery)\nA hidden magical kingdom under heavy rain at night. The girl stands beside a glowing water mirror in an ancient palace courtyard. Blue magical fog surrounds her. The water reflects faint glowing runes. She slowly reaches toward the reflection.\nCamera: Slow push-in close-up, cinematic depth of field\nMood: Mysterious, calm tension, soft rain sounds\n\n4s – 8s (Soul Switch Event)\nHer fingers touch the water reflection suddenly the surface shatters into glowing blue energy. A magical pulse spreads. Her eyes flash with light as her soul violently switches with the crown prince.\nCamera: Fast magical shockwave transition, close-up eye zoom\nVFX: Soul transfer glow, water turning into floating light particles\nMood: Intense, dramatic awakening\n\n8s – 12s (Living as the Prince)\nNow inside the crown prince’s body (her consciousness), she stands in a royal throne room. Nobles bow before her, unaware of the switch. She struggles to act like him while hiding panic. Subtle expressions of confusion and fear.\nCamera: Slow tracking shot through palace hall\nLighting: Cold golden royal lighting with shadows\nMood: Suspense, identity tension, hidden fear\n\n12s – 16s (Hidden Truth + Cliffhanger)\nBack in the courtyard mirror, the prince (in her body) looks back at her real form from the reflection. The magical water starts cracking again, suggesting unstable soul connection. Blue energy rises violently."
-      }
+      "query": "0s – 4s (Opening Mystery)\nA hidden magical kingdom under heavy rain at night. The girl stands beside a glowing water mirror in an ancient palace courtyard. Blue magical fog surrounds her. The water reflects faint glowing runes. She slowly reaches toward the reflection.\nCamera: Slow push-in close-up, cinematic depth of field\nMood: Mysterious, calm tension, soft rain sounds\n\n4s – 8s (Soul Switch Event)\nHer fingers touch the water reflection suddenly the surface shatters into glowing blue energy. A magical pulse spreads. Her eyes flash with light as her soul violently switches with the crown prince.\nCamera: Fast magical shockwave transition, close-up eye zoom\nVFX: Soul transfer glow, water turning into floating light particles\nMood: Intense, dramatic awakening\n\n8s – 12s (Living as the Prince)\nNow inside the crown prince’s body (her consciousness), she stands in a royal throne room. Nobles bow before her, unaware of the switch. She struggles to act like him while hiding panic. Subtle expressions of confusion and fear.\nCamera: Slow tracking shot through palace hall\nLighting: Cold golden royal lighting with shadows\nMood: Suspense, identity tension, hidden fear\n\n12s – 16s (Hidden Truth + Cliffhanger)\nBack in the courtyard mirror, the prince (in her body) looks back at her real form from the reflection. The magical water starts cracking again, suggesting unstable soul connection. Blue energy rises violently."
     },
     "inputs": [
       {
@@ -76,6 +73,12 @@
     "capabilities": [
       "prompt:inject",
       "media:video-generate"
-    ]
+    ],
+    "localized": {
+      "ko": {
+        "title": "영혼 전환 거울 마법",
+        "description": "seedance-2.0 비디오 생성을 위한 VFX 프롬프트 템플릿입니다. 카드 제목과 설명은 한국어로 표시하지만 프롬프트 본문은 원문을 유지합니다."
+      }
+    }
   }
 }

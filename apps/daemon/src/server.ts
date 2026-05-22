@@ -1211,6 +1211,7 @@ const CRITIQUE_ARTIFACTS_DIR = path.join(RUNTIME_DATA_DIR, 'critique-artifacts')
 const PROJECTS_DIR = path.join(RUNTIME_DATA_DIR, 'projects');
 const USER_SKILLS_DIR = path.join(RUNTIME_DATA_DIR, 'skills');
 const USER_DESIGN_SYSTEMS_DIR = path.join(RUNTIME_DATA_DIR, 'design-systems');
+const USER_PROMPT_TEMPLATES_DIR = path.join(RUNTIME_DATA_DIR, 'prompt-templates');
 const PLUGIN_REGISTRY_ROOTS = registryRootsForDataDir(RUNTIME_DATA_DIR);
 // User-imported design templates mirror USER_SKILLS_DIR but are scanned
 // against DESIGN_TEMPLATES_DIR rather than SKILLS_DIR so the EntryView
@@ -1224,6 +1225,7 @@ const USER_DESIGN_TEMPLATES_DIR = path.join(RUNTIME_DATA_DIR, 'design-templates'
 // can resolve to either root after the split.
 const SKILL_ROOTS = [USER_SKILLS_DIR, SKILLS_DIR];
 const DESIGN_TEMPLATE_ROOTS = [USER_DESIGN_TEMPLATES_DIR, DESIGN_TEMPLATES_DIR];
+const PROMPT_TEMPLATE_ROOTS = [USER_PROMPT_TEMPLATES_DIR, PROMPT_TEMPLATES_DIR];
 const ALL_SKILL_LIKE_ROOTS = [
   USER_SKILLS_DIR,
   USER_DESIGN_TEMPLATES_DIR,
@@ -1231,7 +1233,7 @@ const ALL_SKILL_LIKE_ROOTS = [
   DESIGN_TEMPLATES_DIR,
 ];
 fs.mkdirSync(PROJECTS_DIR, { recursive: true });
-for (const dir of [USER_SKILLS_DIR, USER_DESIGN_SYSTEMS_DIR, USER_DESIGN_TEMPLATES_DIR, PLUGIN_REGISTRY_ROOTS.userPluginsRoot]) {
+for (const dir of [USER_SKILLS_DIR, USER_DESIGN_SYSTEMS_DIR, USER_PROMPT_TEMPLATES_DIR, USER_DESIGN_TEMPLATES_DIR, PLUGIN_REGISTRY_ROOTS.userPluginsRoot]) {
   fs.mkdirSync(dir, { recursive: true });
 }
 fs.mkdirSync(CRITIQUE_ARTIFACTS_DIR, { recursive: true });
@@ -4184,6 +4186,7 @@ export async function startServer({
     SKILLS_DIR,
     USER_SKILLS_DIR,
     PROMPT_TEMPLATES_DIR,
+    USER_PROMPT_TEMPLATES_DIR,
     BUNDLED_PETS_DIR,
     OD_BIN,
   };
@@ -6635,7 +6638,7 @@ export async function startServer({
 
   app.get('/api/prompt-templates', async (_req, res) => {
     try {
-      const templates = await listPromptTemplates(PROMPT_TEMPLATES_DIR);
+      const templates = await listPromptTemplates(PROMPT_TEMPLATE_ROOTS);
       res.json({
         promptTemplates: templates.map(({ prompt: _prompt, localizedPrompts: _localizedPrompts, ...rest }) => rest),
       });
@@ -6647,7 +6650,7 @@ export async function startServer({
   app.get('/api/prompt-templates/:surface/:id', async (req, res) => {
     try {
       const tpl = await readPromptTemplate(
-        PROMPT_TEMPLATES_DIR,
+        PROMPT_TEMPLATE_ROOTS,
         req.params.surface,
         req.params.id,
       );

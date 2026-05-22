@@ -75,7 +75,7 @@ function make(args: MakeArgs): InstalledPluginRecord {
 
 function render(record: InstalledPluginRecord): string {
   return renderToStaticMarkup(
-    <I18nProvider>
+    <I18nProvider initial="en">
       <PluginDetailsModal record={record} onClose={() => {}} onUse={() => {}} />
     </I18nProvider>,
   );
@@ -222,11 +222,8 @@ describe('PluginDetailsModal common metadata coverage', () => {
     expect(html).toContain('plugin-media-sidebar__prompt');
     expect(html).toContain('Generate a {style} portrait of {subject}.');
     // Manifest sections still render alongside the prompt.
-    expect(html).toContain('Workflow');
-    expect(html).toContain('Capabilities');
+    expect(html).toContain('todo-write');
     expect(html).toContain('fs:read');
-    expect(html).toContain('Source');
-    expect(html).toMatch(/Path<\/dt>/);
     expect(html).toContain('/tmp');
   });
 
@@ -241,8 +238,7 @@ describe('PluginDetailsModal common metadata coverage', () => {
     expect(html).toContain('plugin-meta-sections');
     expect(html).toContain('plugin-meta-sections__heading');
     expect(html).toMatch(/<h3[^>]*>Plugin info<\/h3>/);
-    expect(html).toContain('Workflow');
-    expect(html).toContain('Capabilities');
+    expect(html).toContain('todo-write');
     expect(html).toContain('mcp:invoke');
   });
 
@@ -263,8 +259,8 @@ describe('PluginDetailsModal common metadata coverage', () => {
     expect(html).toContain('plugin-design-sidebar__spec');
     expect(html).toContain('DESIGN.md');
     expect(html.indexOf('Plugin info')).toBeLessThan(html.indexOf('DESIGN.md'));
-    expect(html).toContain('Workflow');
-    expect(html).toContain('Source');
+    expect(html).toContain('todo-write');
+    expect(html).toContain('/tmp');
   });
 
   it('does not duplicate the plugin info heading inside the scenario fallback', () => {

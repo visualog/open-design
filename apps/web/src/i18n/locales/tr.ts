@@ -329,7 +329,11 @@ export const tr: Dict = {
   'promptTemplates.openFullscreen': 'Tam ekran ön izlemeyi aç',
   'promptTemplates.closeFullscreen': 'Tam ekran ön izlemeyi kapat',
   'promptTemplates.allSources': 'Tüm kaynaklar',
-  'promptTemplates.sourceFilterAria': 'Kaynağa göre filtrele',
+  'promptTemplates.sourceFilterAria': 'Filter by source',
+  'promptTemplates.sortAria': 'Sort templates',
+  'promptTemplates.sortName': 'Name',
+  'promptTemplates.sortNewest': 'Newest',
+  'promptTemplates.newBadge': 'New',
   'promptTemplates.retry': 'Yeniden dene',
 
   'connectors.title': 'Bağlayıcılar',

@@ -30,6 +30,8 @@ interface Props {
   onPreview: (tpl: PromptTemplateSummary) => void;
 }
 
+type SortMode = 'name' | 'newest';
+
 // Curated prompt-template gallery — one tab per surface (image / video).
 // Layout mirrors the Examples tab: a category filter row + a responsive
 // card grid that lazy-loads remote thumbnails (the upstream README hosts
@@ -40,6 +42,7 @@ export function PromptTemplatesTab({ surface, templates, onPreview }: Props) {
   const [filter, setFilter] = useState('');
   const [category, setCategory] = useState<string>('All');
   const [source, setSource] = useState<string>('All');
+  const [sort, setSort] = useState<SortMode>('name');
 
   const surfaceScoped = useMemo(
     () => templates.filter((tpl) => tpl.surface === surface),
@@ -61,9 +64,16 @@ export function PromptTemplatesTab({ surface, templates, onPreview }: Props) {
     return ['All', ...Array.from(set).sort()];
   }, [surfaceScoped]);
 
+  const newestImportedAt = useMemo(() => {
+    const dates = surfaceScoped
+      .map((tpl) => tpl.importedAt)
+      .filter((value): value is string => Boolean(value));
+    return dates.sort().at(-1) ?? null;
+  }, [surfaceScoped]);
+
   const filtered = useMemo(() => {
     const q = filter.trim().toLowerCase();
-    return surfaceScoped.filter((tpl) => {
+    const matches = surfaceScoped.filter((tpl) => {
       if (category !== 'All' && (tpl.category || 'General') !== category) {
         return false;
       }
@@ -83,7 +93,8 @@ export function PromptTemplatesTab({ surface, templates, onPreview }: Props) {
         || providerLabel(tpl.source).toLowerCase().includes(q)
       );
     });
-  }, [surfaceScoped, filter, category, source, locale]);
+    return matches.sort((a, b) => compareTemplates(a, b, sort));
+  }, [surfaceScoped, filter, category, source, locale, sort]);
 
   if (surfaceScoped.length === 0) {
     return (
@@ -123,6 +134,14 @@ export function PromptTemplatesTab({ surface, templates, onPreview }: Props) {
             ))}
           </select>
         ) : null}
+        <select
+          value={sort}
+          onChange={(e) => setSort(e.target.value as SortMode)}
+          aria-label={t('promptTemplates.sortAria')}
+        >
+          <option value="name">{t('promptTemplates.sortName')}</option>
+          <option value="newest">{t('promptTemplates.sortNewest')}</option>
+        </select>
         <span className="prompt-templates-count">
           {t('promptTemplates.countLabel', { n: filtered.length })}
         </span>
@@ -137,6 +156,7 @@ export function PromptTemplatesTab({ surface, templates, onPreview }: Props) {
               <PromptTemplateCard
                 key={tpl.id}
                 tpl={localized}
+                isNew={Boolean(newestImportedAt && tpl.importedAt === newestImportedAt)}
                 onPreview={() => onPreview(localized)}
               />
             );
@@ -152,9 +172,11 @@ export function PromptTemplatesTab({ surface, templates, onPreview }: Props) {
 
 function PromptTemplateCard({
   tpl,
+  isNew,
   onPreview,
 }: {
   tpl: PromptTemplateSummary;
+  isNew: boolean;
   onPreview: () => void;
 }) {
   const t = useT();
@@ -191,6 +213,11 @@ function PromptTemplateCard({
             {provider}
           </span>
         ) : null}
+        {isNew ? (
+          <span className="prompt-template-thumb-new">
+            {t('promptTemplates.newBadge')}
+          </span>
+        ) : null}
         {tpl.surface === 'video' && tpl.previewVideoUrl ? (
           <span className="prompt-template-thumb-play" aria-hidden>
             ▶
@@ -214,4 +241,18 @@ function PromptTemplateCard({
       </span>
     </button>
   );
+}
+
+function compareTemplates(a: PromptTemplateSummary, b: PromptTemplateSummary, sort: SortMode): number {
+  if (sort === 'newest') {
+    const byDate = dateRank(b.importedAt) - dateRank(a.importedAt);
+    if (byDate !== 0) return byDate;
+  }
+  return a.title.localeCompare(b.title);
+}
+
+function dateRank(value: string | undefined): number {
+  if (!value) return 0;
+  const parsed = Date.parse(value);
+  return Number.isFinite(parsed) ? parsed : 0;
 }

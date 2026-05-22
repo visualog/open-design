@@ -1140,12 +1140,9 @@ const KO_PROMPT_TEMPLATE_COPY: Record<string, LocalizedPromptTemplateCopy> = {
 const LOCALIZED_CONTENT: Partial<Record<Locale, LocalizedContentBundle>> = {
   ko: {
     skillCopy: {},
-    skillIdsWithEnFallback: [],
     designSystemSummaries: {},
     designSystemCategories: {},
-    designSystemIdsWithEnFallback: [],
     promptTemplateCategories: KO_PROMPT_TEMPLATE_CATEGORIES,
-    promptTemplateIdsWithEnFallback: [],
     promptTemplateTags: KO_PROMPT_TEMPLATE_TAGS,
     promptTemplateCopy: KO_PROMPT_TEMPLATE_COPY,
   },

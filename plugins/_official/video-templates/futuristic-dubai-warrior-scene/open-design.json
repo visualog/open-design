@@ -1,0 +1,87 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "video-template-futuristic-dubai-warrior-scene",
+  "title": "Futuristic Dubai Warrior Scene",
+  "version": "0.1.0",
+  "description": "A high-scale cinematic prompt detailing a futuristic warrior in Dubai at sunrise, featuring complex camera movements and energy activation.",
+  "license": "CC-BY-4.0",
+  "author": {
+    "name": "Noor",
+    "url": "https://x.com/noorlewisx/status/2056719070062612761"
+  },
+  "homepage": "https://github.com/YouMind-OpenLab/awesome-seedance-2-prompts",
+  "tags": [
+    "video-template",
+    "first-party",
+    "video",
+    "general",
+    "cinematic",
+    "cyberpunk",
+    "fantasy"
+  ],
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "video",
+    "scenario": "video",
+    "surface": "video",
+    "preview": {
+      "type": "video",
+      "poster": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/61b83aece3eccc8d620135c0067b42c5/thumbnails/thumbnail.jpg",
+      "video": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/61b83aece3eccc8d620135c0067b42c5/downloads/default.mp4"
+    },
+    "useCase": {
+      "query": "Character:\\nA handsome 25-year-old warrior with a sharp jawline, medium-length black hair flowing in the wind, piercing blue eyes, and a confident expression. Wearing highly detailed black and silver futuristic armor with a long flowing coat. Ultra-realistic skin texture, cinematic appearance, same face as the reference image.\\n\\nLocation:\\nFuturistic Dubai at sunrise, filled with neon lights, massive skyscrapers, flying cars, reflective glass buildings, golden sunlight, luxury atmosphere, glowing streets, and breathtaking skyline above the clouds.\\n\\nCamera:\\nCinematic tracking shot, smooth stabilized movement, realistic motion blur, dynamic drone cinematography, shallow depth of field, movie-quality camera work.\\n\\nStory (15 seconds):\\n\\n0–3s:\\nThe hero walks through a dark neon-lit futuristic city. The camera tracks alongside him in a cinematic side-follow shot. Neon reflections shimmer on wet streets while wind moves his coat and hair naturally.\\n\\n3–6s:\\nGlowing ancient symbols begin appearing across walls and skyscrapers. Golden energy pulses through the city. The camera slowly pushes toward the hero's determined face.\\n\\n6–9s:\\nThe hero arrives at the top of an ancient futuristic tower overlooking the city. The camera performs a smooth 360-degree orbit around him, revealing the vast skyline and flying vehicles below.\\n\\n9–12s:\\nA massive crystal activates, releasing powerful golden energy across the city. Light waves travel through streets and buildings, restoring life and illuminating thousands of lights. Volumetric lighting, realistic reflections, cinematic atmosphere.\\n\\n12–15s:\\nThe camera transitions into an epic drone pull-back and crane-up movement, revealing the entire futuristic Dubai metropolis bathed in golden sunrise light above the clouds. The restored city glows with energy as orchestral music reaches its climax.\\n\\nVisual Style:\\nUltra-realistic, cinematic storytelling, epic scale, volumetric fog, realistic physics, realistic wind simulation, global illumination, ray-traced reflections, dramatic lighting, depth of field, HDR, masterpiece, 4K, movie-quality visuals, highly detailed environment, smooth motion, breathtaking composition."
+    },
+    "inputs": [
+      {
+        "name": "model",
+        "label": "Model",
+        "type": "select",
+        "options": [
+          "seedance-2.0"
+        ],
+        "default": "seedance-2.0"
+      },
+      {
+        "name": "aspect",
+        "label": "Aspect ratio",
+        "type": "select",
+        "options": [
+          "16:9",
+          "9:16",
+          "1:1",
+          "4:5"
+        ],
+        "default": "16:9"
+      }
+    ],
+    "context": {
+      "assets": [
+        "./template.json"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "video-generate"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "media:video-generate"
+    ],
+    "importedAt": "2026-05-22",
+    "localized": {
+      "ko": {
+        "title": "미래적 두바이 전사",
+        "description": "seedance-2.0 비디오 생성을 위한 범용 프롬프트 템플릿입니다. 카드 제목과 설명은 한국어로 표시하지만 프롬프트 본문은 원문을 유지합니다."
+      }
+    }
+  }
+}

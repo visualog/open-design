@@ -19,6 +19,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { InstalledPluginRecord } from '@open-design/contracts';
 import { Icon } from '../Icon';
+import { useI18n } from '../../i18n';
 import { derivePluginSourceLinks } from '../../runtime/plugin-source';
 
 interface Props {
@@ -89,6 +90,7 @@ function buildMarkdownBadge(record: InstalledPluginRecord): string {
 }
 
 export function PluginShareMenu({ record, variant = 'default' }: Props) {
+  const { locale, t } = useI18n();
   const [open, setOpen] = useState(false);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const wrapRef = useRef<HTMLDivElement | null>(null);
@@ -125,28 +127,28 @@ export function PluginShareMenu({ record, variant = 'default' }: Props) {
   const items: ShareItem[] = [
     {
       key: 'install',
-      label: 'Copy install command',
+      label: locale === 'ko' ? '설치 명령 복사' : 'Copy install command',
       icon: 'copy',
       copies: true,
       onSelect: () => copyToClipboard(buildInstallCommand(record), 'install'),
     },
     {
       key: 'id',
-      label: 'Copy plugin ID',
+      label: locale === 'ko' ? '플러그인 ID 복사' : 'Copy plugin ID',
       icon: 'copy',
       copies: true,
       onSelect: () => copyToClipboard(record.id, 'id'),
     },
     {
       key: 'link',
-      label: 'Copy share link',
+      label: locale === 'ko' ? '공유 링크 복사' : 'Copy share link',
       icon: 'link',
       copies: true,
       onSelect: () => copyToClipboard(buildShareUrl(record), 'link'),
     },
     {
       key: 'badge',
-      label: 'Copy markdown badge',
+      label: locale === 'ko' ? 'Markdown 배지 복사' : 'Copy markdown badge',
       icon: 'copy',
       copies: true,
       onSelect: () => copyToClipboard(buildMarkdownBadge(record), 'badge'),
@@ -161,8 +163,8 @@ export function PluginShareMenu({ record, variant = 'default' }: Props) {
       key: 'source',
       label:
         record.sourceKind === 'github' || links.sourceUrl.includes('github.com/')
-          ? 'Open source on GitHub'
-          : 'Open source',
+          ? (locale === 'ko' ? 'GitHub에서 소스 열기' : 'Open source on GitHub')
+          : (locale === 'ko' ? '소스 열기' : 'Open source'),
       icon: links.sourceUrl.includes('github.com/') ? 'github' : 'external-link',
       href: links.sourceUrl,
     });
@@ -170,14 +172,14 @@ export function PluginShareMenu({ record, variant = 'default' }: Props) {
   if (links.homepageUrl) {
     openItems.push({
       key: 'homepage',
-      label: 'Open homepage',
+      label: locale === 'ko' ? '홈페이지 열기' : 'Open homepage',
       icon: 'external-link',
       href: links.homepageUrl,
     });
   }
   openItems.push({
     key: 'marketplace',
-    label: 'Open in marketplace',
+    label: locale === 'ko' ? '마켓플레이스에서 열기' : 'Open in marketplace',
     icon: 'eye',
     href: buildShareUrl(record),
   });
@@ -199,10 +201,10 @@ export function PluginShareMenu({ record, variant = 'default' }: Props) {
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        title="Share plugin"
+        title={t('common.share')}
       >
         <Icon name="share" size={12} />
-        <span>Share</span>
+        <span>{t('common.share')}</span>
       </button>
       {open ? (
         <div className="plugin-share-popover" role="menu">
@@ -220,7 +222,7 @@ export function PluginShareMenu({ record, variant = 'default' }: Props) {
                   size={12}
                 />
                 <span>
-                  {copiedKey === item.key ? 'Copied' : item.label}
+                  {copiedKey === item.key ? t('promptTemplates.copyDone') : item.label}
                 </span>
               </button>
             ))}

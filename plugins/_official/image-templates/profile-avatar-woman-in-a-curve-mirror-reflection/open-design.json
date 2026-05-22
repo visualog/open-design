@@ -1,0 +1,86 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "image-template-profile-avatar-woman-in-a-curve-mirror-reflection",
+  "title": "Profile / Avatar - Woman in a Curve Mirror Reflection",
+  "version": "0.1.0",
+  "description": "A nostalgic and realistic portrait prompt featuring a Japanese woman reflected in a round street mirror in a quiet alley, styled with soft film tones.",
+  "license": "CC-BY-4.0",
+  "author": {
+    "name": "Cyberトータル",
+    "url": "https://x.com/CyberTotal2026/status/2057244756565258604"
+  },
+  "homepage": "https://github.com/YouMind-OpenLab/awesome-gpt-image-2",
+  "tags": [
+    "image-template",
+    "first-party",
+    "image",
+    "profile-avatar",
+    "portrait",
+    "fantasy"
+  ],
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "image",
+    "scenario": "image",
+    "surface": "image",
+    "preview": {
+      "type": "image",
+      "poster": "https://cms-assets.youmind.com/media/1779354366763_b8jpx7_HIzNMhdaAAAJCf4.jpg"
+    },
+    "useCase": {
+      "query": "Subject: A realistic portrait of a Japanese woman {argument name=\"reflection object\" default=\"reflected in a round curve mirror\"} in a quiet Japanese alley.\n\nPerson/Expression: A Japanese woman in her early 20s, {argument name=\"hair style\" default=\"long black hair\"}, thin bangs, natural makeup, transparent skin, calm expression, quietly looking at the camera.\n\nClothing/Pose: {argument name=\"outfit\" default=\"A white dress with light blue flowers\"}, shoulder bag, natural pose as if taking a selfie with one arm outstretched.\n\nBackground/Light: A Japanese residential area with old wooden fences and stone walls, green sunlight filtering through trees, early summer afternoon, soft natural light, background blurred significantly.\n\nComposition/Camera: Composition using reflection from a round curve mirror, wide-angle, slightly looking down angle, centered, shallow depth of field, round bokeh and vignette in the periphery.\n\nTexture/Style: Pale colors, low contrast, soft film tone, natural skin texture, transparent Japanese-style portrait, realistic AI photo.\n\nNegative: Low quality, unnatural hands, distorted face, extra fingers, excessive processing, text, logo, watermark."
+    },
+    "inputs": [
+      {
+        "name": "model",
+        "label": "Model",
+        "type": "select",
+        "options": [
+          "gpt-image-2"
+        ],
+        "default": "gpt-image-2"
+      },
+      {
+        "name": "aspect",
+        "label": "Aspect ratio",
+        "type": "select",
+        "options": [
+          "1:1",
+          "16:9",
+          "9:16",
+          "4:5",
+          "3:2"
+        ],
+        "default": "1:1"
+      }
+    ],
+    "context": {
+      "assets": [
+        "./template.json"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "image-generate"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "media:image-generate"
+    ],
+    "importedAt": "2026-05-22",
+    "localized": {
+      "ko": {
+        "title": "프로필 / 아바타 - 여성 곡면 거울 반사",
+        "description": "gpt-image-2 이미지 생성을 위한 프로필 / 아바타 프롬프트 템플릿입니다. 카드 제목과 설명은 한국어로 표시하지만 프롬프트 본문은 원문을 유지합니다."
+      }
+    }
+  }
+}

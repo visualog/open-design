@@ -436,7 +436,11 @@ export const id: Dict = {
   'promptTemplates.openFullscreen': 'Buka pratinjau layar penuh',
   'promptTemplates.closeFullscreen': 'Tutup pratinjau layar penuh',
   'promptTemplates.allSources': 'Semua sumber',
-  'promptTemplates.sourceFilterAria': 'Filter berdasarkan sumber',
+  'promptTemplates.sourceFilterAria': 'Filter by source',
+  'promptTemplates.sortAria': 'Sort templates',
+  'promptTemplates.sortName': 'Name',
+  'promptTemplates.sortNewest': 'Newest',
+  'promptTemplates.newBadge': 'New',
   'promptTemplates.retry': 'Coba lagi',
 
   'connectors.title': 'Konektor',

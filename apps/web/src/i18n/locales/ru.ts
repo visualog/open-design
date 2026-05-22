@@ -338,7 +338,11 @@ export const ru: Dict = {
   'promptTemplates.openFullscreen': 'Открыть полноэкранный предпросмотр',
   'promptTemplates.closeFullscreen': 'Закрыть полноэкранный предпросмотр',
   'promptTemplates.allSources': 'Все источники',
-  'promptTemplates.sourceFilterAria': 'Фильтр по источнику',
+  'promptTemplates.sourceFilterAria': 'Filter by source',
+  'promptTemplates.sortAria': 'Sort templates',
+  'promptTemplates.sortName': 'Name',
+  'promptTemplates.sortNewest': 'Newest',
+  'promptTemplates.newBadge': 'New',
   'promptTemplates.retry': 'Повторить',
 
   'connectors.title': 'Коннекторы',

@@ -1,0 +1,85 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "video-template-michelin-chef-cat-kitchen-chaos",
+  "title": "Michelin Chef Cat Kitchen Chaos",
+  "version": "0.1.0",
+  "description": "A chaotic and cinematic TikTok-style video prompt featuring a fluffy orange cat acting as a Michelin-star chef in a busy kitchen.",
+  "license": "CC-BY-4.0",
+  "author": {
+    "name": "Aegon",
+    "url": "https://x.com/Fujimoto_hina/status/2057142963441172692"
+  },
+  "homepage": "https://github.com/YouMind-OpenLab/awesome-seedance-2-prompts",
+  "tags": [
+    "video-template",
+    "first-party",
+    "video",
+    "general",
+    "cinematic",
+    "food"
+  ],
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "video",
+    "scenario": "video",
+    "surface": "video",
+    "preview": {
+      "type": "video",
+      "poster": "https://cms-assets.youmind.com/media/1779347910922_4ds4fe_HIxwl_WaAAARt9v.jpg"
+    },
+    "useCase": {
+      "query": "{\"title\": \"POV: Your Cat Runs a Michelin Restaurant\", \"duration\": \"15 seconds\", \"style\": \"Pixar-quality cinematic realism mixed with chaotic TikTok meme pacing and wholesome Reddit humor\", \"prompt\": \"A cinematic ultra detailed 15-second video of a fluffy orange cat running a luxury Michelin-star restaurant during peak dinner chaos. The video opens with a dramatic low-angle hero shot of the cat standing confidently on a kitchen counter wearing a tiny white chef hat and black apron, warm cinematic lighting, steam rising everywhere, realistic fur physics, shallow depth of field. Quick fast-paced cuts show the cat aggressively chopping vegetables with precise paw movements, flipping pasta pans in slow motion, sprinkling salt dramatically like a celebrity chef, and yelling silently at panicking human chefs in the background. The kitchen is alive with fire bursts, flying ingredients, sizzling steak closeups, and intense restaurant energy. Meme-style subtitles appear with exaggerated Gordon Ramsay energy like 'WHERE IS THE PARMESAN?!' and 'TABLE 4 IS CRYING AGAIN'. Mid-scene the cat pauses dramatically, stares directly into the camera with glowing cinematic eyes while opera music intensifies. Final scene shows the cat perfectly plating gourmet pasta in slow motion while customers stand up emotionally clapping and crying tears of joy. Ultra realistic cinematic lighting, chaotic handheld camera movement, beautiful warm color grading, adorable but epic atmosphere, highly detailed textures, trending viral TikTok AI video aesthetic.\", \"camera\": [\"low-angle hero shot\", \"macro food closeups\", \"handheld kitchen chaos shots\", \"slow-motion dramatic plating shot\", \"cinematic push-in during eye contact\"], \"lighting\": \"warm cinematic restaurant lighting with dramatic steam glow and soft orange highlights\", \"audio\": [\"dramatic Italian opera music\", \"kitchen sizzling sounds\", \"crowd panic ambience\", \"comedic bass boosted impacts\", \"emotional applause ending\"], \"effects\": [\"steam simulation\", \"realistic fur movement\", \"slow motion food shots\", \"cinematic motion blur\", \"viral meme subtitles\", \"fire bursts from stove\"]}"
+    },
+    "inputs": [
+      {
+        "name": "model",
+        "label": "Model",
+        "type": "select",
+        "options": [
+          "seedance-2.0"
+        ],
+        "default": "seedance-2.0"
+      },
+      {
+        "name": "aspect",
+        "label": "Aspect ratio",
+        "type": "select",
+        "options": [
+          "16:9",
+          "9:16",
+          "1:1",
+          "4:5"
+        ],
+        "default": "16:9"
+      }
+    ],
+    "context": {
+      "assets": [
+        "./template.json"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "video-generate"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "media:video-generate"
+    ],
+    "importedAt": "2026-05-22",
+    "localized": {
+      "ko": {
+        "title": "셰프 주방 혼돈",
+        "description": "seedance-2.0 비디오 생성을 위한 범용 프롬프트 템플릿입니다. 카드 제목과 설명은 한국어로 표시하지만 프롬프트 본문은 원문을 유지합니다."
+      }
+    }
+  }
+}

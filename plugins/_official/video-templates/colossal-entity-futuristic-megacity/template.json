@@ -1,0 +1,23 @@
+{
+  "id": "colossal-entity-futuristic-megacity",
+  "surface": "video",
+  "title": "Colossal Entity Futuristic Megacity",
+  "summary": "A sci-fi cinematic sequence featuring a gigantic biomechanical creature moving through a foggy cyberpunk city while crowds panic.",
+  "category": "General",
+  "tags": [
+    "cinematic",
+    "cyberpunk"
+  ],
+  "model": "seedance-2.0",
+  "aspect": "16:9",
+  "prompt": "Dense futuristic megacity at night covered in fog.\nA woman moves through crowded elevated walkways while emergency broadcasts interrupt giant holographic screens overhead.\nSuddenly, massive shadows begin moving through the fog between skyscrapers. People stop walking.\nThen a gigantic creature silhouette emerges partially through the mist: enormous biomechanical legs stepping slowly between buildings.\nEvery footstep shakes the city. Cars alarms activate automatically. Glass trembles. Streetlights flicker.\nThe creature is too massive to fully see at once.\nOnly fragments visible through fog: glowing eyes, giant armored limbs, mechanical breathing vents,  cables hanging beneath its body.\nThe woman begins running through packed pedestrian corridors. Behind her, the colossal entity slowly advances through the skyline.\nSkyscraper lights reflect across its metallic surface.\nAs tension escalates: drones fall from the sky, bridge structures vibrate violently, giant holograms distort, crowds panic and stampede.\nThe creature lowers its massive head between towers searching the streets below.\nIts glowing eye scans directly toward her position.\nAt climax, the enormous creature steps over the avenue directly behind her. The frame fills with gigantic mechanical limbs and steam.\nThen suddenly, the creature stops moving. Silence.\nFog slowly hides it again.\nUltra cinematic sci-fi tension, gigantic scale, grounded realism, atmospheric fog, cyberpunk city visuals, environmental panic, cinematic handheld camera, colossal creature design.",
+  "previewImageUrl": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/51d9c4c4b9d844192f47c668c1ba94f0/thumbnails/thumbnail.jpg",
+  "previewVideoUrl": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/51d9c4c4b9d844192f47c668c1ba94f0/downloads/default.mp4",
+  "source": {
+    "repo": "YouMind-OpenLab/awesome-seedance-2-prompts",
+    "license": "CC-BY-4.0",
+    "author": "Alexandra Aisling",
+    "url": "https://x.com/AllaAisling/status/2056897037917135060"
+  },
+  "importedAt": "2026-05-22"
+}

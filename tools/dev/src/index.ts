@@ -390,10 +390,14 @@ async function spawnSidecarRuntime(request: {
 }): Promise<{ pid: number }> {
   const { args: stampArgs, env } = createAppStamp(request.config, request.appName);
   const sidecarConfig = request.config.apps[request.appName];
+  const cwd =
+    request.appName === APP_KEYS.WEB
+      ? path.join(request.config.workspaceRoot, "apps/web")
+      : request.config.workspaceRoot;
   const spawned = await spawnBackgroundProcess({
     args: [request.config.tsxCliPath, sidecarConfig.sidecarEntryPath, ...stampArgs],
     command: process.execPath,
-    cwd: request.config.workspaceRoot,
+    cwd,
     detached: true,
     env: {
       ...process.env,

@@ -1,0 +1,23 @@
+{
+  "id": "bayou-hippo-surge-attack",
+  "surface": "video",
+  "title": "Bayou Hippo Surge Attack",
+  "summary": "A high-tension cinematic video prompt featuring a rogue hippo chasing an airboat through a Louisiana bayou with shaky handheld camera effects.",
+  "category": "General",
+  "tags": [
+    "action",
+    "nature"
+  ],
+  "model": "seedance-2.0",
+  "aspect": "16:9",
+  "prompt": "A small airboat ride in a Louisiana bayou turns into uncontrollable chaos when a rogue hippo uses shallow water and mud to hunt at high speed. The scene is humid, loud, unstable — camera constantly reacting, never in control.\n\nSETTING (LOCKED)\nLouisiana bayou, late afternoon turning to dusk, golden-orange light reflecting off still water, Spanish moss hanging from cypress trees, thick humidity, insects in air, shallow muddy water with reeds and roots, narrow water channels.\n\n0s–2s (HOOK)\nCamera already mounted low on the side of an airboat, skimming fast across shallow swamp water. The prop engine ROARS loudly. Water sprays across lens. Suddenly — the water ahead BULGES violently — a massive hippo head bursts partially out of the surface directly in the boat’s path. The driver jerks the wheel hard — camera whips sideways.\n\n2s–5s\nHandheld chaos inside the airboat. Metal rattling. A passenger nearly falls as the boat fishtails through reeds. Behind them — the water is no longer flat — it’s breaking in a fast-moving line. The hippo is already charging beneath the surface, keeping pace.\n\n5s–8s\nCamera swings rear-facing. The hippo erupts halfway out of the water, mouth wide, pushing a wall of mud and water forward. The boat hits a patch of shallow mud — slows for half a second — dangerous pause.\n\n8s–11s (CONTROLLED CHAOS)\nThe driver forces the throttle — engine SCREAMS — the boat spins outburst partially sideways before catching traction. Camera dips low — almost hitting water — spray floods frame. The hippo veers slightly, then cuts direction sharply, re-aligning.\n\n11s–15s (PAYOFF)\nThe boat bursts into a slightly wider open patch of water. For a split second — space.\n\nThen the water right beside the boat ERUPTS upward again — massive force, close enough to shake the entire frame violently.\n\nCamera spins, horizon lost.\n\nCut hard.",
+  "previewImageUrl": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/cb3bcd7fb5e39c86a727637ae14d95be/thumbnails/thumbnail.jpg",
+  "previewVideoUrl": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/cb3bcd7fb5e39c86a727637ae14d95be/downloads/default.mp4",
+  "source": {
+    "repo": "YouMind-OpenLab/awesome-seedance-2-prompts",
+    "license": "CC-BY-4.0",
+    "author": "Rahul Nanda",
+    "url": "https://x.com/rahulnanda86/status/2057178748907323587"
+  },
+  "importedAt": "2026-05-22"
+}

@@ -64,7 +64,6 @@ export const codexAgentDef = {
       { id: 'gpt-5.3-codex', label: 'gpt-5.3-codex' },
       { id: 'gpt-5.1', label: 'gpt-5.1' },
       { id: 'gpt-5.1-codex-mini', label: 'gpt-5.1-codex-mini' },
-      { id: 'gpt-5-codex', label: 'gpt-5-codex' },
       { id: 'gpt-5', label: 'gpt-5' },
       { id: 'o3', label: 'o3' },
       { id: 'o4-mini', label: 'o4-mini' },

@@ -1,0 +1,21 @@
+{
+  "id": "profile-avatar-character-familiar-selection-logic",
+  "surface": "image",
+  "title": "Profile / Avatar - Character Familiar Selection Logic",
+  "summary": "A complex prompt instruction to analyze a reference character's traits and environment to generate a matching familiar creature in a realistic smartphone-photo style.",
+  "category": "Profile / Avatar",
+  "tags": [
+    "fantasy"
+  ],
+  "model": "gpt-image-2",
+  "aspect": "1:1",
+  "prompt": "Read the familiar that the child is likely to choose from the person, clothing, facial expression, small items, light, place, and atmosphere of the reference image. The goal is to create a sense of inevitability that 'this child would really choose this.' However, easy fixed associations are prohibited. Even with a similar atmosphere, compare similar animals, close ideologies, rival manufacturers, and similar cultures of other countries, and choose the one that strikes the child the most. I want to select a familiar based on this basic philosophy. Familiars include not only {argument name=\"familiar type\" default=\"creatures (animals, birds, insects, plants)\"} but also a wide range of fictional beings such as spirits, gods, demons, and ogres. Chappy may imagine them. With the realism of a photo taken with a smartphone, change the clothing and background to show the relationship between the subject and the familiar at a glance, and take the best shot of the two. The familiar should match the style of the reference image without any sense of incongruity. Write the name and characteristics of the familiar in the photo. Unify the atmosphere of the entire photo based on the theme of that photo.",
+  "previewImageUrl": "https://cms-assets.youmind.com/media/1779354364828_7mw3ue_HIwMvSWbMAAVCot.jpg",
+  "source": {
+    "repo": "YouMind-OpenLab/awesome-gpt-image-2",
+    "license": "CC-BY-4.0",
+    "author": "桜子AI's",
+    "url": "https://x.com/SakurakoAis/status/2057033143551770830"
+  },
+  "importedAt": "2026-05-22"
+}

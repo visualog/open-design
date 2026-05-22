@@ -1,0 +1,25 @@
+{
+  "id": "luxury-cosmetic-campaign-visual",
+  "surface": "image",
+  "title": "Luxury Cosmetic Campaign Visual",
+  "summary": "A premium beauty campaign prompt for Korean cosmetic launches with elegant product staging, skin-light realism, and refined promotional copy.",
+  "category": "Social Media Post",
+  "tags": [
+    "product",
+    "fashion",
+    "cinematic"
+  ],
+  "model": "gpt-image-2",
+  "aspect": "4:5",
+  "previewImageUrl": "/prompt-template-previews/image/luxury-cosmetic-campaign-visual.svg",
+  "prompt": "Design a luxury Korean cosmetic campaign visual for {argument name=\"product\" default=\"a hydrating serum in translucent glass packaging\"}. Build a premium vertical advertising composition with the product clearly visible, elegant reflective surfaces, believable liquid or botanical accents, and soft beauty lighting that flatters skin tones and glass texture. Add concise Korean campaign copy, product benefit callouts, and subtle launch-date or collection text. The result should feel suitable for a department-store beauty brand: refined, tactile, luminous, and trustworthy. Avoid plastic-looking skin, unreadable typography, fake certifications, and overly busy floral decoration.",
+  "localizedPrompts": {
+    "ko": "{argument name=\"product\" default=\"반투명 유리 패키지의 수분 세럼\"}을 위한 럭셔리 한국 코스메틱 캠페인 비주얼을 디자인합니다. 제품이 명확하게 보이는 프리미엄 세로 광고 구성을 만들고, 우아한 반사 표면, 믿을 수 있는 액체 또는 보태니컬 포인트, 피부 톤과 유리 질감을 돋보이게 하는 부드러운 뷰티 조명을 사용하세요. 간결한 한국어 캠페인 카피, 제품 효능 콜아웃, 은은한 출시일 또는 컬렉션 문구를 더합니다. 결과물은 백화점 뷰티 브랜드에 어울리도록 정제되고 촉감이 느껴지며 빛나고 신뢰감 있어야 합니다. 플라스틱처럼 보이는 피부, 읽기 어려운 타이포그래피, 가짜 인증 마크, 지나치게 복잡한 꽃 장식은 피합니다."
+  },
+  "source": {
+    "repo": "nexu-io/open-design",
+    "license": "Apache-2.0",
+    "author": "Open Design",
+    "url": "https://github.com/nexu-io/open-design"
+  }
+}

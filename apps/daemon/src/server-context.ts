@@ -28,6 +28,7 @@ export interface PathDeps {
   RUNTIME_DATA_DIR: string;
   RUNTIME_DATA_DIR_CANONICAL: string;
   SKILLS_DIR: string;
+  USER_PROMPT_TEMPLATES_DIR?: string;
   USER_DESIGN_SYSTEMS_DIR: string;
   // Mirror of USER_SKILLS_DIR rooted at DESIGN_TEMPLATES_DIR so user
   // imports of templates do not collide with imports of functional skills.

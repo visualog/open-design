@@ -7,7 +7,8 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { InstalledPluginRecord } from '@open-design/contracts';
-import { useT } from '../../i18n';
+import { useI18n } from '../../i18n';
+import { localizedPluginDescription, localizedPluginTitle } from '../../runtime/plugin-localization';
 import {
   fetchPluginExampleHtml,
   fetchPluginPreviewHtml,
@@ -33,7 +34,7 @@ export function PluginExampleDetail({
   onUse,
   isApplying,
 }: Props) {
-  const t = useT();
+  const { locale, t } = useI18n();
   const [html, setHtml] = useState<string | null | undefined>(undefined);
   const [error, setError] = useState<string | null>(null);
   const inFlightRef = useRef(false);
@@ -73,12 +74,13 @@ export function PluginExampleDetail({
     void load();
   }, [load]);
 
-  const description = record.manifest?.description ?? '';
+  const title = localizedPluginTitle(record, locale);
+  const description = localizedPluginDescription(record, locale);
   const isDeck = record.manifest?.od?.mode === 'deck';
 
   return (
     <PreviewModal
-      title={record.title}
+      title={title}
       subtitle={description || undefined}
       views={[
         {
@@ -90,7 +92,7 @@ export function PluginExampleDetail({
         },
       ]}
       onView={onView}
-      exportTitleFor={() => record.title}
+      exportTitleFor={() => title}
       onClose={onClose}
       sidebar={{
         // Surface every plugin-common manifest field — workflow, context
@@ -100,7 +102,7 @@ export function PluginExampleDetail({
         // Default open so users see the metadata without an extra click;
         // the iframe stage scales down to fit and Fullscreen still gives
         // them an immersive view when needed.
-        label: 'Plugin info',
+        label: t('pluginDetails.pluginInfo'),
         defaultOpen: true,
         contentKey: record.id,
         content: (
@@ -109,16 +111,16 @@ export function PluginExampleDetail({
               record={record}
               omit={{ description: true }}
               compact
-              heading="Plugin info"
+              heading={t('pluginDetails.pluginInfo')}
             />
           </div>
         ),
       }}
       primaryAction={{
-        label: 'Use plugin',
+        label: t('pluginDetails.usePlugin'),
         onClick: () => onUse(record),
         busy: !!isApplying,
-        busyLabel: 'Applying…',
+        busyLabel: t('homeHero.applying'),
         testId: `plugin-details-use-${record.id}`,
       }}
       headerExtras={<PluginShareMenu record={record} variant="inline" />}

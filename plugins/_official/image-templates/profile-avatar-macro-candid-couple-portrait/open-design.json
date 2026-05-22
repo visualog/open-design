@@ -1,0 +1,87 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "image-template-profile-avatar-macro-candid-couple-portrait",
+  "title": "Profile / Avatar - Macro Candid Couple Portrait",
+  "version": "0.1.0",
+  "description": "A hyper-realistic extreme close-up of a couple laughing together, showing detailed skin textures and authentic emotions.",
+  "license": "CC-BY-4.0",
+  "author": {
+    "name": "Ozair AI",
+    "url": "https://x.com/Ozayrr_irl/status/2057002864246190093"
+  },
+  "homepage": "https://github.com/YouMind-OpenLab/awesome-gpt-image-2",
+  "tags": [
+    "image-template",
+    "first-party",
+    "image",
+    "profile-avatar",
+    "portrait",
+    "cinematic",
+    "fantasy"
+  ],
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "image",
+    "scenario": "image",
+    "surface": "image",
+    "preview": {
+      "type": "image",
+      "poster": "https://cms-assets.youmind.com/media/1779354353071_3e2uqp_HIvxL60a4AAV6dp.jpg"
+    },
+    "useCase": {
+      "query": "Use the couple exactly from reference image, the faces should be exactly same and An extreme close-up, macro portrait of {argument name=\"subjects\" default=\"a young man and a young woman\"} laughing intensely, their faces pressed close together against a {argument name=\"background\" default=\"dark, minimalist background\"}. Captured in a candid, hyper-realistic photography style with high-fidelity skin texture, showing fine pores, subtle freckles, and a natural flush on their cheeks. Their eyes are crinkled and nearly closed from genuine, joyful laughter, displaying realistic teeth with slight natural imperfections and detailed gums. Messy, fine strands of {argument name=\"hair\" default=\"light brown hair\"} are blown across their faces, catching a soft, dramatic directional key light that highlights the contours of their noses and brows. The color grading is moody and cinematic with deep, desaturated tones, contrasting warm, raw skin undertones against dark, textured knit sweaters around their necks. Shot on 35mm film, shallow depth of field, sharp focus on the center of their faces, authentic emotion, high contrast, raw photography, award-winning editorial style. --ar 1:1 --v 6.0"
+    },
+    "inputs": [
+      {
+        "name": "model",
+        "label": "Model",
+        "type": "select",
+        "options": [
+          "gpt-image-2"
+        ],
+        "default": "gpt-image-2"
+      },
+      {
+        "name": "aspect",
+        "label": "Aspect ratio",
+        "type": "select",
+        "options": [
+          "1:1",
+          "16:9",
+          "9:16",
+          "4:5",
+          "3:2"
+        ],
+        "default": "1:1"
+      }
+    ],
+    "context": {
+      "assets": [
+        "./template.json"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "image-generate"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "media:image-generate"
+    ],
+    "importedAt": "2026-05-22",
+    "localized": {
+      "ko": {
+        "title": "프로필 / 아바타 - 매크로 캔디드 커플",
+        "description": "gpt-image-2 이미지 생성을 위한 프로필 / 아바타 프롬프트 템플릿입니다. 카드 제목과 설명은 한국어로 표시하지만 프롬프트 본문은 원문을 유지합니다."
+      }
+    }
+  }
+}

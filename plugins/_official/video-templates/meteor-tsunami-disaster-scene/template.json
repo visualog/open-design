@@ -1,0 +1,22 @@
+{
+  "id": "meteor-tsunami-disaster-scene",
+  "surface": "video",
+  "title": "Meteor Tsunami Disaster Scene",
+  "summary": "An intense handheld disaster movie prompt of a meteor crashing into the ocean and creating a colossal tsunami.",
+  "category": "General",
+  "tags": [
+    "cinematic"
+  ],
+  "model": "seedance-2.0",
+  "aspect": "16:9",
+  "prompt": "A shaky, panicked handheld recording from the balcony of a sea-facing hotel during the day. The person filming suddenly spots something in the distance, does a jerky zoom-in, then quickly refocuses as a massive giant meteor streaks across the sky and crashes into the ocean with enormous force.\nThe impact creates a colossal tsunami that rushes toward the shore. The wave violently annihilates the beach, shacks, and entire coastline in a brutal display of nature’s power. The person filming is in complete panic — camera extremely shaky, breathing heavy.\nWater surges dramatically, rising rapidly until it reaches just a few floors below the balcony. A water droplet splashes onto the camera lens. The building rocks and shakes violently from the shockwave. In the background, people are screaming in terror while emergency sirens blare with back-and-forth intensity.\nCinematic, hyper-realistic, intense documentary-style footage, natural daylight, high tension, raw and chaotic energy.",
+  "previewImageUrl": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/8b5264b96018bf425ce122ffff679de3/thumbnails/thumbnail.jpg",
+  "previewVideoUrl": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/8b5264b96018bf425ce122ffff679de3/downloads/default.mp4",
+  "source": {
+    "repo": "YouMind-OpenLab/awesome-seedance-2-prompts",
+    "license": "CC-BY-4.0",
+    "author": "Rahul Nanda",
+    "url": "https://x.com/rahulnanda86/status/2056827504355381316"
+  },
+  "importedAt": "2026-05-22"
+}

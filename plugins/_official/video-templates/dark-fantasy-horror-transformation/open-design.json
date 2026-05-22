@@ -1,0 +1,86 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "video-template-dark-fantasy-horror-transformation",
+  "title": "Dark Fantasy Horror Transformation",
+  "version": "0.1.0",
+  "description": "A complex multi-scene prompt describing a slow, disturbing transformation of a young woman into a massive shadow creature in a fog-covered wasteland, complete with dialogue and sound direction.",
+  "license": "CC-BY-4.0",
+  "author": {
+    "name": "BMX",
+    "url": "https://x.com/bmx_ai13/status/2056753746131173722"
+  },
+  "homepage": "https://github.com/YouMind-OpenLab/awesome-seedance-2-prompts",
+  "tags": [
+    "video-template",
+    "first-party",
+    "video",
+    "vfx-fantasy",
+    "cinematic",
+    "fantasy"
+  ],
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "video",
+    "scenario": "video",
+    "surface": "video",
+    "preview": {
+      "type": "video",
+      "poster": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/3cebf105a8c5dd1989d0c1cabcb87933/thumbnails/thumbnail.jpg",
+      "video": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/3cebf105a8c5dd1989d0c1cabcb87933/downloads/default.mp4"
+    },
+    "useCase": {
+      "query": "A bleak, wet, fog covered wasteland under cold gray light. A young woman with a pale face, long dark braided hair, and a flowing black dress stands beside a massive shadow creature made of soaked root like strands, torn black tendrils, and glowing white eyes. Keep the woman’s exact face, exact dress, and the creature’s exact design consistent throughout the video. Dark fantasy horror, disturbing, photoreal, ultra cinematic, slow dramatic pacing. Sound design: low horror pulse, deep rumble, cold wind, wet organic texture movement.\n\n[0:00–0:05] Medium shot, slow push in. The girl stands still with one hand resting against the creature, then turns her face slightly toward camera. Her hair and dress move subtly in the wind. Behind her, the towering shadow being breathes almost imperceptibly, its glowing eyes cutting through the fog. The mood is intimate, ominous, and deeply unsettling.\n\n[0:05–0:10] Closer chest up framing as the push in continues. Black tendrils begin spreading from her fingers, arms, shoulders, back, and the edges of her dress. The tendrils wrap around her body like liquid shadow. Her skin gradually darkens into slick shadow texture, her face melts into black organic form, and her hair unravels into root like shredded strands. The transformation is slow, painful, elegant, and disturbing. During this moment, with clear accurate lip sync and a calm eerie delivery, she says: “It was never following me. It was becoming me.”\n\n[0:10–0:15] Final reveal in a medium to wide shot, with the slow push in still continuing. Where the girl stood, there is now the fully formed shadow creature in the exact same design language: soaked, shredded, branch like black mass with glowing white eyes. It stands perfectly still and faces camera, tilting its head slightly with an unnervingly calm awareness, as if her human consciousness remains inside it. End on a disturbing calm final stare, heavy fog thickening around the creature, low rumble deepening, then fade to black.\n\nSound Direction: Low horror pulse with deep sub rumble, distant wind, subtle wet organic movement, minimal dark drone rising during the tendril spread, no melodic music, just oppressive atmospheric tension."
+    },
+    "inputs": [
+      {
+        "name": "model",
+        "label": "Model",
+        "type": "select",
+        "options": [
+          "seedance-2.0"
+        ],
+        "default": "seedance-2.0"
+      },
+      {
+        "name": "aspect",
+        "label": "Aspect ratio",
+        "type": "select",
+        "options": [
+          "16:9",
+          "9:16",
+          "1:1",
+          "4:5"
+        ],
+        "default": "16:9"
+      }
+    ],
+    "context": {
+      "assets": [
+        "./template.json"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "video-generate"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "media:video-generate"
+    ],
+    "importedAt": "2026-05-22",
+    "localized": {
+      "ko": {
+        "title": "다크 호러 변신",
+        "description": "seedance-2.0 비디오 생성을 위한 VFX 프롬프트 템플릿입니다. 카드 제목과 설명은 한국어로 표시하지만 프롬프트 본문은 원문을 유지합니다."
+      }
+    }
+  }
+}

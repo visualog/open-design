@@ -1,0 +1,24 @@
+{
+  "id": "dopamine-3d-cyclist-wheelie-character",
+  "surface": "image",
+  "title": "Dopamine 3D Cyclist Wheelie Character",
+  "summary": "A playful editorial 3D illustration prompt for an exaggerated soft-sculpture cyclist popping a wheelie with high-saturation dopamine colors.",
+  "category": "Illustration",
+  "tags": [
+    "3d-render",
+    "illustration"
+  ],
+  "model": "gpt-image-2",
+  "aspect": "1:1",
+  "previewImageUrl": "/prompt-template-previews/image/dopamine-3d-cyclist-wheelie-character.png",
+  "prompt": "Create a complete single 3D illustration in an exaggerated artistic editorial illustration style. It must be one finished image, not a storyboard, not a collage layout. Theme: {argument name=\"theme\" default=\"a cyclist popping a wheelie on a yellow bike with one hand holding an energy drink during a weekend bike ride trick\"}. The subject is an exaggerated cartoon character with a tiny head, round chubby body, extremely elongated limbs, oversized hands, oversized shoes, an off-balance center of gravity, frozen mid-air in a dramatic jumping pose with strong tension and comedic energy. The overall form should look like a soft sculpture toy: round, chunky, bouncy, exaggerated, and intentionally not anatomically correct. Materials should feel like matte soft rubber, fuzzy fabric, knitted texture, and plasticine, with fine fiber details, slight grain, and a hand-sculpted touch. Avoid a glossy plastic toy look, translucent glass, or high reflections. Use a high-saturation dopamine color palette with bold color clashes, large flat color blocks, bright but not over-glowing. Set the character on a clean white background with minimal space and only a soft oval shadow on the ground, no complex scene. Add floating abstract graphic elements around the character: stars, squiggle lines, balls, cubes, icons, and symbols, all rendered as soft rubber or paper props to enhance motion and design feel. Use soft studio lighting, global illumination, soft shadows, low contrast, and a clean commercial render finish. C4D / Blender 3D illustration, stylized soft sculpture, matte clay material, fuzzy fabric texture, knitted surface detail, playful editorial 3D illustration, high quality.",
+  "localizedPrompts": {
+    "ko": "과장된 아티스틱 에디토리얼 일러스트 스타일의 완성된 단일 3D 일러스트를 만듭니다. 스토리보드나 콜라주 레이아웃이 아니라 하나의 완성 이미지여야 합니다. 테마: {argument name=\"theme\" default=\"노란 자전거로 휠리를 하며 한 손에는 에너지 드링크를 든 주말 자전거 트릭 장면\"}. 주인공은 작은 머리, 둥글고 통통한 몸, 매우 길게 늘어난 팔다리, 큰 손과 큰 신발, 균형이 살짝 무너진 중심, 공중에 멈춘 듯한 극적인 점프 포즈를 가진 과장된 카툰 캐릭터입니다. 강한 긴장감과 코믹한 에너지가 느껴져야 합니다. 전체 형태는 부드러운 조각 장난감처럼 둥글고 두툼하고 탄력 있으며 해부학적으로 정확하지 않아야 합니다. 재질은 매트한 소프트 러버, 보송한 패브릭, 니트 질감, 플라스티신 느낌이며, 미세한 섬유 디테일과 약간의 그레인, 손으로 빚은 듯한 터치를 포함합니다. 광택 플라스틱 장난감 느낌, 반투명 유리, 강한 반사는 피하세요. 고채도 도파민 컬러 팔레트, 대담한 색 충돌, 큰 플랫 컬러 블록을 사용하되 과하게 빛나지 않게 합니다. 배경은 깨끗한 흰색, 최소한의 여백, 바닥에는 부드러운 타원 그림자만 둡니다. 복잡한 장면은 넣지 않습니다. 캐릭터 주변에는 별, 구불구불한 선, 공, 큐브, 아이콘, 심볼 같은 추상 그래픽 요소를 띄우고, 모두 소프트 러버나 종이 소품처럼 렌더링해 움직임과 디자인 감각을 강화합니다. 부드러운 스튜디오 조명, 글로벌 일루미네이션, 부드러운 그림자, 낮은 대비, 깨끗한 커머셜 렌더 마감을 사용하세요. C4D / Blender 3D 일러스트, 스타일라이즈드 소프트 스컬프처, 매트 클레이 재질, 보송한 패브릭 질감, 니트 표면 디테일, 장난기 있는 에디토리얼 3D 일러스트, 고품질."
+  },
+  "source": {
+    "repo": "nexu-io/open-design",
+    "license": "Apache-2.0",
+    "author": "Open Design",
+    "url": "https://github.com/nexu-io/open-design"
+  }
+}

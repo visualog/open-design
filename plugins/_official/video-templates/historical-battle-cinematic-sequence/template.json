@@ -1,0 +1,23 @@
+{
+  "id": "historical-battle-cinematic-sequence",
+  "surface": "video",
+  "title": "Historical Battle Cinematic Sequence",
+  "summary": "A complex video prompt used to generate a modern blockbuster-style cinematic sequence based on historical tapestry and text inputs.",
+  "category": "Cinematic",
+  "tags": [
+    "cinematic",
+    "fantasy"
+  ],
+  "model": "seedance-2.0",
+  "aspect": "16:9",
+  "prompt": "Create a realistic cinematic shot sequence based on the provided historical inputs, Which include the Bayeux Tapestry @image1 , And the Wikipedia entry for the Battle of Hastings. The output should be a cinematic Modern Blockbuster (Sharp, Rich Color): Shot on Arri Alexa, Kodak",
+  "previewImageUrl": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/9ea6b266dba13bdc4b5c5f629c91b4e1/thumbnails/thumbnail.jpg",
+  "previewVideoUrl": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/9ea6b266dba13bdc4b5c5f629c91b4e1/downloads/default.mp4",
+  "source": {
+    "repo": "YouMind-OpenLab/awesome-seedance-2-prompts",
+    "license": "CC-BY-4.0",
+    "author": "Litany of Ignition",
+    "url": "https://x.com/LitanyXIgnition/status/2056744656621154427"
+  },
+  "importedAt": "2026-05-22"
+}

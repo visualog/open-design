@@ -1,0 +1,22 @@
+{
+  "id": "michelin-chef-cat-kitchen-chaos",
+  "surface": "video",
+  "title": "Michelin Chef Cat Kitchen Chaos",
+  "summary": "A chaotic and cinematic TikTok-style video prompt featuring a fluffy orange cat acting as a Michelin-star chef in a busy kitchen.",
+  "category": "General",
+  "tags": [
+    "cinematic",
+    "food"
+  ],
+  "model": "seedance-2.0",
+  "aspect": "16:9",
+  "prompt": "{\"title\": \"POV: Your Cat Runs a Michelin Restaurant\", \"duration\": \"15 seconds\", \"style\": \"Pixar-quality cinematic realism mixed with chaotic TikTok meme pacing and wholesome Reddit humor\", \"prompt\": \"A cinematic ultra detailed 15-second video of a fluffy orange cat running a luxury Michelin-star restaurant during peak dinner chaos. The video opens with a dramatic low-angle hero shot of the cat standing confidently on a kitchen counter wearing a tiny white chef hat and black apron, warm cinematic lighting, steam rising everywhere, realistic fur physics, shallow depth of field. Quick fast-paced cuts show the cat aggressively chopping vegetables with precise paw movements, flipping pasta pans in slow motion, sprinkling salt dramatically like a celebrity chef, and yelling silently at panicking human chefs in the background. The kitchen is alive with fire bursts, flying ingredients, sizzling steak closeups, and intense restaurant energy. Meme-style subtitles appear with exaggerated Gordon Ramsay energy like 'WHERE IS THE PARMESAN?!' and 'TABLE 4 IS CRYING AGAIN'. Mid-scene the cat pauses dramatically, stares directly into the camera with glowing cinematic eyes while opera music intensifies. Final scene shows the cat perfectly plating gourmet pasta in slow motion while customers stand up emotionally clapping and crying tears of joy. Ultra realistic cinematic lighting, chaotic handheld camera movement, beautiful warm color grading, adorable but epic atmosphere, highly detailed textures, trending viral TikTok AI video aesthetic.\", \"camera\": [\"low-angle hero shot\", \"macro food closeups\", \"handheld kitchen chaos shots\", \"slow-motion dramatic plating shot\", \"cinematic push-in during eye contact\"], \"lighting\": \"warm cinematic restaurant lighting with dramatic steam glow and soft orange highlights\", \"audio\": [\"dramatic Italian opera music\", \"kitchen sizzling sounds\", \"crowd panic ambience\", \"comedic bass boosted impacts\", \"emotional applause ending\"], \"effects\": [\"steam simulation\", \"realistic fur movement\", \"slow motion food shots\", \"cinematic motion blur\", \"viral meme subtitles\", \"fire bursts from stove\"]}",
+  "previewImageUrl": "https://cms-assets.youmind.com/media/1779347910922_4ds4fe_HIxwl_WaAAARt9v.jpg",
+  "source": {
+    "repo": "YouMind-OpenLab/awesome-seedance-2-prompts",
+    "license": "CC-BY-4.0",
+    "author": "Aegon",
+    "url": "https://x.com/Fujimoto_hina/status/2057142963441172692"
+  },
+  "importedAt": "2026-05-22"
+}

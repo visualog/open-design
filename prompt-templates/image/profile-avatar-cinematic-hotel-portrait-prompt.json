@@ -1,0 +1,23 @@
+{
+  "id": "profile-avatar-cinematic-hotel-portrait-prompt",
+  "surface": "image",
+  "title": "Profile / Avatar - Cinematic Hotel Portrait Prompt",
+  "summary": "A detailed prompt for generating a realistic and cinematic portrait of a woman in a silver sequin dress at a modern hotel staircase.",
+  "category": "Profile / Avatar",
+  "tags": [
+    "portrait",
+    "cinematic",
+    "fantasy"
+  ],
+  "model": "gpt-image-2",
+  "aspect": "1:1",
+  "prompt": "Realistic and cinematic portrait. A fictional {argument name=\"ethnicity\" default=\"Japanese woman\"} approximately {argument name=\"age\" default=\"20 years old\"} is sitting on the marble stairs of a modern hotel at night. She is wearing a {argument name=\"outfit\" default=\"silver sequin mini dress\"}, silver strappy high-heeled sandals, and silver heart-shaped earrings. Her legs are crossed naturally, and she has a calm expression, looking slightly to the right. Roughly styled hair, natural skin texture, and realistic proportions for fingers and body.\n\n16:9 horizontal composition. The subject is placed on the right side of the screen, leaving room on the left with a dark glass background and soft bokeh. Warm indoor light and soft side lighting elegantly showcase the silver reflections of the dress and sandals. Carefully depict the texture of the marble, glass railings, and the quiet luxury of the night.\n\nDo not include text, logos, watermarks, brand names, or meaningless symbols in the image. Avoid excessive skin smoothing, an AI-synthetic look, deformed fingers, extra limbs, low resolution, or over-sharpening.",
+  "previewImageUrl": "https://cms-assets.youmind.com/media/1779354361739_0jmu8w_HIwiPkIasAAGi3T.jpg",
+  "source": {
+    "repo": "YouMind-OpenLab/awesome-gpt-image-2",
+    "license": "CC-BY-4.0",
+    "author": "Cyberトータル",
+    "url": "https://x.com/CyberTotal2026/status/2057056869068497261"
+  },
+  "importedAt": "2026-05-22"
+}

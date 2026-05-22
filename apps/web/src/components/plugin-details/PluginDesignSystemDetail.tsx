@@ -15,7 +15,8 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import type { InstalledPluginRecord } from '@open-design/contracts';
-import { useT } from '../../i18n';
+import { useI18n } from '../../i18n';
+import { localizedPluginDescription, localizedPluginTitle } from '../../runtime/plugin-localization';
 import {
   fetchDesignSystemPreview,
   fetchDesignSystemShowcase,
@@ -64,9 +65,11 @@ export function PluginDesignSystemDetail({
   onUse,
   isApplying,
 }: Props) {
-  const t = useT();
+  const { locale, t } = useI18n();
   const dsRef = designSystemRef(record);
   const assetPath = specAssetPath(record);
+  const title = localizedPluginTitle(record, locale);
+  const description = localizedPluginDescription(record, locale);
 
   const [showcaseHtml, setShowcaseHtml] = useState<string | null | undefined>(undefined);
   const [tokensHtml, setTokensHtml] = useState<string | null | undefined>(undefined);
@@ -119,21 +122,21 @@ export function PluginDesignSystemDetail({
         {
           id: 'spec',
           label: 'Spec',
-          html: '<!doctype html><meta charset="utf-8"><body style="font:14px system-ui;color:#666;display:flex;align-items:center;justify-content:center;height:100vh;text-align:center;padding:0 24px;margin:0;">This plugin ships only the design spec — open Plugin info to read DESIGN.md.</body>',
+          html: '<!doctype html><meta charset="utf-8"><body style="font:14px system-ui;color:#666;display:flex;align-items:center;justify-content:center;height:100vh;text-align:center;padding:0 24px;margin:0;">이 플러그인은 디자인 스펙만 포함합니다. 플러그인 정보에서 DESIGN.md를 확인하세요.</body>',
         },
       ];
 
   return (
     <PreviewModal
-      title={record.title}
-      subtitle={record.manifest?.description || dsRef || undefined}
+      title={title}
+      subtitle={description || dsRef || undefined}
       views={views}
       initialViewId={dsRef ? 'showcase' : 'spec'}
       onView={handleView}
-      exportTitleFor={(viewId) => `${record.title} — ${viewId}`}
+      exportTitleFor={(viewId) => `${title} — ${viewId}`}
       onClose={onClose}
       sidebar={{
-        label: 'Plugin info',
+        label: t('pluginDetails.pluginInfo'),
         defaultOpen: true,
         onToggle: handleSidebarToggle,
         contentKey: record.id,
@@ -147,7 +150,7 @@ export function PluginDesignSystemDetail({
                 record={record}
                 omit={{ description: true }}
                 compact
-                heading="Plugin info"
+                heading={t('pluginDetails.pluginInfo')}
               />
             </div>
             <section className="plugin-design-sidebar__spec">
@@ -164,10 +167,10 @@ export function PluginDesignSystemDetail({
         ),
       }}
       primaryAction={{
-        label: 'Use plugin',
+        label: t('pluginDetails.usePlugin'),
         onClick: () => onUse(record),
         busy: !!isApplying,
-        busyLabel: 'Applying…',
+        busyLabel: t('homeHero.applying'),
         testId: `plugin-details-use-${record.id}`,
       }}
       headerExtras={<PluginShareMenu record={record} variant="inline" />}

@@ -1,0 +1,84 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "video-template-hippo-boat-split-charge",
+  "title": "Hippo Boat Split Charge",
+  "version": "0.1.0",
+  "description": "A dramatic multi-shot video prompt depicting a massive hippo invading a boat and causing structural collapse with intense camera movement.",
+  "license": "CC-BY-4.0",
+  "author": {
+    "name": "Rahul Nanda",
+    "url": "https://x.com/rahulnanda86/status/2057204318118576448"
+  },
+  "homepage": "https://github.com/YouMind-OpenLab/awesome-seedance-2-prompts",
+  "tags": [
+    "video-template",
+    "first-party",
+    "video",
+    "general"
+  ],
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "video",
+    "scenario": "video",
+    "surface": "video",
+    "preview": {
+      "type": "video",
+      "poster": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/9234b63dc7c5843810334ef2dc528e72/thumbnails/thumbnail.jpg",
+      "video": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/9234b63dc7c5843810334ef2dc528e72/downloads/default.mp4"
+    },
+    "useCase": {
+      "query": "0s–2s (HOOK — FIRST IMPACT)\n\nCamera already ON the boat mid-turn.\n\nA MASSIVE HIPPO slams THROUGH the side railing — not hitting — already halfway inside.\n\nWood explodes inward.\n\nIts jaws snap right in front of camera.\n\nBoat jerks violently sideways.\n\n2s–5s\n\nCamera gets thrown across deck — hits metal edge.\n\nWater floods in.\n\nThe hippo keeps pushing forward, forcing its bulk into the boat.\n\nFloor cracks slightly down the middle.\n\nPeople lose footing — sliding, grabbing anything.\n\n5s–8s (SCRAMRAMBLE — NO SAFETY)\n\nCamera tries to get up — footing gone.\n\nBoat now tilted.\n\nSomeone climbs toward the engine — slips instantly.\n\nCamera turns — hippo is no longer where it was.\n\nThat’s the problem.\n\n8s–11s (SECOND ATTACK SETUP — NO BREATH)\n\nHalf a second of unstable quiet.\n\nJust water sloshing.\n\nThen—\n\nWater beside the boat starts moving FAST in one direction.\n\nTracking something.\n\nCamera barely reacts.\n\n11s–14s (SECOND HIT — WORSE)\n\nHIPPO erupts from the opposite side — full body surge.\n\nSmashes into what’s left of the boat.\n\nBoat finally gives — structure collapses.\n\nCamera goes with it.\n\nEverything flips.\n\n14s–15s (PAYOFF)\n\nCamera SLAMS into muddy water.\n\nFully submerged.\n\nBrown chaos.\n\nNo visibility.\n\nCut."
+    },
+    "inputs": [
+      {
+        "name": "model",
+        "label": "Model",
+        "type": "select",
+        "options": [
+          "seedance-2.0"
+        ],
+        "default": "seedance-2.0"
+      },
+      {
+        "name": "aspect",
+        "label": "Aspect ratio",
+        "type": "select",
+        "options": [
+          "16:9",
+          "9:16",
+          "1:1",
+          "4:5"
+        ],
+        "default": "16:9"
+      }
+    ],
+    "context": {
+      "assets": [
+        "./template.json"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "video-generate"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "media:video-generate"
+    ],
+    "importedAt": "2026-05-22",
+    "localized": {
+      "ko": {
+        "title": "창작 템플릿",
+        "description": "seedance-2.0 비디오 생성을 위한 범용 프롬프트 템플릿입니다. 카드 제목과 설명은 한국어로 표시하지만 프롬프트 본문은 원문을 유지합니다."
+      }
+    }
+  }
+}

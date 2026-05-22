@@ -1,0 +1,88 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "image-template-profile-avatar-minimalist-anime-couple-watercolor-illustration",
+  "title": "Profile / Avatar - Minimalist Anime Couple Watercolor Illustration",
+  "version": "0.1.0",
+  "description": "A charming watercolor-style prompt for creating romantic and wholesome anime couple portraits with soft textures and a clean aesthetic.",
+  "license": "CC-BY-4.0",
+  "author": {
+    "name": "Maercih",
+    "url": "https://x.com/Maercihh/status/2057015777555894408"
+  },
+  "homepage": "https://github.com/YouMind-OpenLab/awesome-gpt-image-2",
+  "tags": [
+    "image-template",
+    "first-party",
+    "image",
+    "profile-avatar",
+    "portrait",
+    "anime",
+    "cinematic",
+    "fantasy"
+  ],
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "image",
+    "scenario": "image",
+    "surface": "image",
+    "preview": {
+      "type": "image",
+      "poster": "https://cms-assets.youmind.com/media/1779354345861_7gz1r1_HIv88ita0AAU1u6.jpg"
+    },
+    "useCase": {
+      "query": "Prompt 1:\n{\n  \"prompt\": \"cute minimalist anime couple portrait, soft hand-drawn watercolor illustration with clean white background, adorable young couple standing closely together in gentle romantic pose, boy with short dark hair wearing oversized white hoodie and light blue jeans, black sunglasses hanging from hoodie collar, relaxed smile and rosy cheeks, girl leaning her head softly on his shoulder while holding his arm, short black bob haircut with wispy bangs, warm blush expression, wearing black lace camisole dress layered under oversized cream trench coat with tiny embroidered floral detail on sleeve, subtle tiny hearts and golden sparkles floating around them, cozy wholesome mood, delicate pencil sketch texture, pastel color palette, Korean stationery illustration aesthetic, minimal composition, soft shading, innocent romantic energy, elegant simplicity, smooth watercolor blending, highly detailed clothing folds, charming manga-inspired proportions, clean aesthetic suitable for profile art or wallpaper\",\n  \"negative_prompt\": \"low resolution, messy lines, distorted anatomy, extra fingers, harsh contrast, dark shadows, cluttered background, realistic rendering, 3d style, saturated colors, ugly face, asymmetrical eyes, blurry texture, watermark, text, noisy image\",\n  \"aspect_ratio\": \"4:5\",\n  \"style\": \"minimal watercolor anime illustration\",\n  \"camera\": \"medium portrait framing\",\n  \"lighting\": \"soft diffused studio-style lighting\"\n}\n\nPrompt 2\n{\n  \"prompt\": \"masterpiece, ultra-detailed soft anime illustration, cozy romantic slice-of-life scene outside a European-style cafe during golden afternoon sunlight, young couple sitting on warm stone pavement beneath leafy trees, dreamy watercolor texture with delicate pencil-like linework, boy wearing oversized black t-shirt, light denim shorts, white socks, black sneakers, black sunglasses, holding smartphone for selfie while raising a wine glass with peach-colored drink, relaxed playful expression, girl beside him with long dark hair and soft bangs, wearing elegant white puff-sleeve blouse with ribbon details and flowing navy skirt, holding matching wine glass, gazing toward him with shy admiration, flower boxes under black-framed windows, cream-colored textured wall, cafe chalkboard sign reading 'CAFE COFFEE DESSERT BRUNCH', soft sparkles and tiny doodled hearts floating in air, aesthetic tote bags and white handbag beside them, dappled sunlight shadows across ground, highly atmospheric, pastel tones, warm nostalgic mood, Korean webtoon x watercolor anime aesthetic, cinematic composition, subtle grain, realistic fabric folds, soft blush on cheeks, refined lighting, extremely charming and wholesome\",\n  \"negative_prompt\": \"low quality, blurry, distorted anatomy, extra limbs, poorly drawn hands, bad perspective, oversaturated colors, some harsh shadows, cluttered background, text artifacts, watermark, logo, cropped faces, exaggerated expressions, messy composition, unrealistic lighting, 3d render, photorealistic skin, ugly details\",\n  \"aspect_ratio\": \"4:5\",\n  \"style\": \"soft watercolor anime\",\n  \"camera\": \"35mm eye-level composition\",\n  \"lighting\": \"golden hour natural sunlight with soft shadows\"\n}"
+    },
+    "inputs": [
+      {
+        "name": "model",
+        "label": "Model",
+        "type": "select",
+        "options": [
+          "gpt-image-2"
+        ],
+        "default": "gpt-image-2"
+      },
+      {
+        "name": "aspect",
+        "label": "Aspect ratio",
+        "type": "select",
+        "options": [
+          "1:1",
+          "16:9",
+          "9:16",
+          "4:5",
+          "3:2"
+        ],
+        "default": "1:1"
+      }
+    ],
+    "context": {
+      "assets": [
+        "./template.json"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "image-generate"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "media:image-generate"
+    ],
+    "importedAt": "2026-05-22",
+    "localized": {
+      "ko": {
+        "title": "프로필 / 아바타 - 애니메이션 커플",
+        "description": "gpt-image-2 이미지 생성을 위한 프로필 / 아바타 프롬프트 템플릿입니다. 카드 제목과 설명은 한국어로 표시하지만 프롬프트 본문은 원문을 유지합니다."
+      }
+    }
+  }
+}

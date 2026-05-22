@@ -1,0 +1,86 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "video-template-colossal-entity-futuristic-megacity",
+  "title": "Colossal Entity Futuristic Megacity",
+  "version": "0.1.0",
+  "description": "A sci-fi cinematic sequence featuring a gigantic biomechanical creature moving through a foggy cyberpunk city while crowds panic.",
+  "license": "CC-BY-4.0",
+  "author": {
+    "name": "Alexandra Aisling",
+    "url": "https://x.com/AllaAisling/status/2056897037917135060"
+  },
+  "homepage": "https://github.com/YouMind-OpenLab/awesome-seedance-2-prompts",
+  "tags": [
+    "video-template",
+    "first-party",
+    "video",
+    "general",
+    "cinematic",
+    "cyberpunk"
+  ],
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "video",
+    "scenario": "video",
+    "surface": "video",
+    "preview": {
+      "type": "video",
+      "poster": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/51d9c4c4b9d844192f47c668c1ba94f0/thumbnails/thumbnail.jpg",
+      "video": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/51d9c4c4b9d844192f47c668c1ba94f0/downloads/default.mp4"
+    },
+    "useCase": {
+      "query": "Dense futuristic megacity at night covered in fog.\nA woman moves through crowded elevated walkways while emergency broadcasts interrupt giant holographic screens overhead.\nSuddenly, massive shadows begin moving through the fog between skyscrapers. People stop walking.\nThen a gigantic creature silhouette emerges partially through the mist: enormous biomechanical legs stepping slowly between buildings.\nEvery footstep shakes the city. Cars alarms activate automatically. Glass trembles. Streetlights flicker.\nThe creature is too massive to fully see at once.\nOnly fragments visible through fog: glowing eyes, giant armored limbs, mechanical breathing vents,  cables hanging beneath its body.\nThe woman begins running through packed pedestrian corridors. Behind her, the colossal entity slowly advances through the skyline.\nSkyscraper lights reflect across its metallic surface.\nAs tension escalates: drones fall from the sky, bridge structures vibrate violently, giant holograms distort, crowds panic and stampede.\nThe creature lowers its massive head between towers searching the streets below.\nIts glowing eye scans directly toward her position.\nAt climax, the enormous creature steps over the avenue directly behind her. The frame fills with gigantic mechanical limbs and steam.\nThen suddenly, the creature stops moving. Silence.\nFog slowly hides it again.\nUltra cinematic sci-fi tension, gigantic scale, grounded realism, atmospheric fog, cyberpunk city visuals, environmental panic, cinematic handheld camera, colossal creature design."
+    },
+    "inputs": [
+      {
+        "name": "model",
+        "label": "Model",
+        "type": "select",
+        "options": [
+          "seedance-2.0"
+        ],
+        "default": "seedance-2.0"
+      },
+      {
+        "name": "aspect",
+        "label": "Aspect ratio",
+        "type": "select",
+        "options": [
+          "16:9",
+          "9:16",
+          "1:1",
+          "4:5"
+        ],
+        "default": "16:9"
+      }
+    ],
+    "context": {
+      "assets": [
+        "./template.json"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "video-generate"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "media:video-generate"
+    ],
+    "importedAt": "2026-05-22",
+    "localized": {
+      "ko": {
+        "title": "거대 존재 미래적 메가시티",
+        "description": "seedance-2.0 비디오 생성을 위한 범용 프롬프트 템플릿입니다. 카드 제목과 설명은 한국어로 표시하지만 프롬프트 본문은 원문을 유지합니다."
+      }
+    }
+  }
+}

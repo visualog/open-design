@@ -638,6 +638,11 @@ export function extractCategories(record: InstalledPluginRecord): string[] {
 export function extractSubcategories(record: InstalledPluginRecord, parent?: string | null): string[] {
   const primary = parent ?? extractPrimaryCategory(record);
   if (!primary) return [];
+  if (primary === 'create') {
+    const tags = new Set(manifestTagSlugs(record));
+    if (tags.has('image-template')) return ['image'];
+    if (tags.has('video-template')) return ['video'];
+  }
   const match = SUBCATEGORIES.find((c) => c.parent === primary && c.test(record));
   return match ? [match.slug] : [];
 }

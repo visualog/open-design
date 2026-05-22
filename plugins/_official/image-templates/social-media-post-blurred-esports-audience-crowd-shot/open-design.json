@@ -1,0 +1,86 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "image-template-social-media-post-blurred-esports-audience-crowd-shot",
+  "title": "Social Media Post - Blurred Esports Audience Crowd Shot",
+  "version": "0.1.0",
+  "description": "A photorealistic candid crowd image of seated spectators at a blue-lit esports event with anonymized face blur blocks.",
+  "license": "CC-BY-4.0",
+  "author": {
+    "name": "楽園",
+    "url": "https://x.com/dave392750/status/2057169323639308722#reversed-0"
+  },
+  "homepage": "https://github.com/YouMind-OpenLab/awesome-gpt-image-2",
+  "tags": [
+    "image-template",
+    "first-party",
+    "image",
+    "social-media-post",
+    "fantasy",
+    "nature"
+  ],
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "image",
+    "scenario": "image",
+    "surface": "image",
+    "preview": {
+      "type": "image",
+      "poster": "https://cms-assets.youmind.com/media/1779354384856_13vp8h_HIyIY_LbIAAsGZa.jpg"
+    },
+    "useCase": {
+      "query": "Create a realistic candid event-photography image shot from within the seated audience at a dark indoor {argument name=\"event type\" default=\"esports gaming tournament\"}. Use a wide 16:9 landscape frame, cool blue and purple stage lighting, shallow depth of field, high ISO concert-photo atmosphere, and a large blurred LED screen glowing in the background. In the foreground are three main seated spectators: on the left, a young man in a plain white long-sleeve shirt with a black lanyard, relaxed posture, hands low in frame; in the center, a young woman with long dark wavy hair wearing a pale pink ribbed wrap-style knit top, seated with hands folded in her lap; on the right, a young man in a light gray sweatshirt turned slightly toward the stage and holding a smartphone or small camera. Behind them is a dense crowd of spectators, some standing, some cheering. Include exactly 3 visible inflatable cheering sticks: two long white sticks with red tips held upright near the center-left background, and one blue-and-white stick partly visible behind the right spectator. Add privacy anonymization: place exactly 8 soft-edged rectangular purple blur blocks over visible faces, varying in size and opacity, covering the left foreground man, the top-left background person, a small center-left background face, the center-back person in red plaid, the central woman, a small mid-right background face, a bald mid-right background face, and the right foreground man. Make the image feel like an accidental TV broadcast crowd shot at a lively tournament, with natural poses, no readable text, no logos, no watermark, and photorealistic lighting."
+    },
+    "inputs": [
+      {
+        "name": "model",
+        "label": "Model",
+        "type": "select",
+        "options": [
+          "gpt-image-2"
+        ],
+        "default": "gpt-image-2"
+      },
+      {
+        "name": "aspect",
+        "label": "Aspect ratio",
+        "type": "select",
+        "options": [
+          "1:1",
+          "16:9",
+          "9:16",
+          "4:5",
+          "3:2"
+        ],
+        "default": "1:1"
+      }
+    ],
+    "context": {
+      "assets": [
+        "./template.json"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "image-generate"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "media:image-generate"
+    ],
+    "importedAt": "2026-05-22",
+    "localized": {
+      "ko": {
+        "title": "소셜 미디어 포스트 - 블러 e스포츠 관객 군중 샷",
+        "description": "gpt-image-2 이미지 생성을 위한 소셜 미디어 포스트 프롬프트 템플릿입니다. 카드 제목과 설명은 한국어로 표시하지만 프롬프트 본문은 원문을 유지합니다."
+      }
+    }
+  }
+}

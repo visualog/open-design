@@ -1,0 +1,87 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "video-template-baseball-stadium-spectator-shot",
+  "title": "Baseball Stadium Spectator Shot",
+  "version": "0.1.0",
+  "description": "A realistic sports broadcast prompt depicting a spectator at a Korean baseball match with subtle natural movements.",
+  "license": "CC-BY-4.0",
+  "author": {
+    "name": "auqib",
+    "url": "https://x.com/auqibhabib/status/2056789967779905710"
+  },
+  "homepage": "https://github.com/YouMind-OpenLab/awesome-seedance-2-prompts",
+  "tags": [
+    "video-template",
+    "first-party",
+    "video",
+    "advertising",
+    "anime",
+    "cinematic",
+    "fantasy"
+  ],
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "video",
+    "scenario": "video",
+    "surface": "video",
+    "preview": {
+      "type": "video",
+      "poster": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/46acbd484b4830a642bd53fc20c20ecd/thumbnails/thumbnail.jpg",
+      "video": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/46acbd484b4830a642bd53fc20c20ecd/downloads/default.mp4"
+    },
+    "useCase": {
+      "query": "Use the reference image exactly for the face and appearance. Ultra realistic cinematic sports broadcast shot of a handsome young man sitting in the audience during a live Korean baseball match, seriously watching the game while holding an iced coffee cup with straw. Wearing a dark brown plaid flannel shirt over a white t-shirt, messy black hair, light stubble, sharp jawline.\\n\\nVery subtle natural movement only: blinking, slight breathing, tiny eye movement following the match, minimal hand adjustment on the cup. Camera slowly pushes in toward his face like a real TV sports broadcast reaction shot. Background crowd naturally moving and slightly blurred. Authentic stadium atmosphere, shallow depth of field, realistic skin texture, cinematic stadium lighting, candid spectator realism.\\n\\nMood inspired by “Bye” by Alter, calm melancholic aesthetic, emotionally detached vibe.\\n\\nNegative prompt: cartoon, anime, CGI, exaggerated acting, smiling, talking, distorted face, extra fingers, jitter, unrealistic movement, blurry, low quality, fake skin, dramatic gestures."
+    },
+    "inputs": [
+      {
+        "name": "model",
+        "label": "Model",
+        "type": "select",
+        "options": [
+          "seedance-2.0"
+        ],
+        "default": "seedance-2.0"
+      },
+      {
+        "name": "aspect",
+        "label": "Aspect ratio",
+        "type": "select",
+        "options": [
+          "16:9",
+          "9:16",
+          "1:1",
+          "4:5"
+        ],
+        "default": "16:9"
+      }
+    ],
+    "context": {
+      "assets": [
+        "./template.json"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "video-generate"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "media:video-generate"
+    ],
+    "importedAt": "2026-05-22",
+    "localized": {
+      "ko": {
+        "title": "야구 경기장 관중 샷",
+        "description": "seedance-2.0 비디오 생성을 위한 창작 템플릿 프롬프트 템플릿입니다. 카드 제목과 설명은 한국어로 표시하지만 프롬프트 본문은 원문을 유지합니다."
+      }
+    }
+  }
+}

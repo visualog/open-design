@@ -1,0 +1,86 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "image-template-social-media-post-matchstick-architectural-models",
+  "title": "Social Media Post - Matchstick Architectural Models",
+  "version": "0.1.0",
+  "description": "A technical prompt that creates realistic architectural models built from burnt matchsticks and boxes, including detailed textures like wood grain and glue residue.",
+  "license": "CC-BY-4.0",
+  "author": {
+    "name": "Gadgetify",
+    "url": "https://x.com/Gdgtify/status/2057115630663528574"
+  },
+  "homepage": "https://github.com/YouMind-OpenLab/awesome-gpt-image-2",
+  "tags": [
+    "image-template",
+    "first-party",
+    "image",
+    "social-media-post",
+    "cinematic",
+    "3d-render"
+  ],
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "image",
+    "scenario": "image",
+    "surface": "image",
+    "preview": {
+      "type": "image",
+      "poster": "https://cms-assets.youmind.com/media/1779354350449_jydtsk_HIkSJJSXEAE5-VP.jpg"
+    },
+    "useCase": {
+      "query": "2x2 grid, 16:9, do this for {argument name=\"count\" default=\"4 famous landmarks\"} in this style: = { <matchstick_model_render> MATERIAL: Burnt matchsticks and matchboxes (charred heads, pale wood, striker strip). FINISH: PVA glue residue, tiny glue globs, slightly misaligned joints. LIGHTING: Bright table lamp with harsh directional shadows (hobbyist photography). </matchstick_model_render> <transformation> - Convert all architectural detail to a lattice of whole and halved matchsticks, with burnt red‑brown match heads forming decorative accents. - Convert surfaces to raw pine wood grain, occasional sulphur bloom, and matte sticker labels from matchboxes. - Convert light to strong, single-source tungsten casting long, defined shadows and catching glossy glue spots. - Background as a sheet of sandpaper with sulphur bloom, and matte sticker labels from matchboxes. - Background as a sheet of sandpaper with shallow depth-of-field, bokeh catching dust particles. </transformation> rules: no text}"
+    },
+    "inputs": [
+      {
+        "name": "model",
+        "label": "Model",
+        "type": "select",
+        "options": [
+          "gpt-image-2"
+        ],
+        "default": "gpt-image-2"
+      },
+      {
+        "name": "aspect",
+        "label": "Aspect ratio",
+        "type": "select",
+        "options": [
+          "1:1",
+          "16:9",
+          "9:16",
+          "4:5",
+          "3:2"
+        ],
+        "default": "1:1"
+      }
+    ],
+    "context": {
+      "assets": [
+        "./template.json"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "image-generate"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "media:image-generate"
+    ],
+    "importedAt": "2026-05-22",
+    "localized": {
+      "ko": {
+        "title": "소셜 미디어 포스트 - 성냥개비 건축",
+        "description": "gpt-image-2 이미지 생성을 위한 소셜 미디어 포스트 프롬프트 템플릿입니다. 카드 제목과 설명은 한국어로 표시하지만 프롬프트 본문은 원문을 유지합니다."
+      }
+    }
+  }
+}

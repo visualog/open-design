@@ -29,10 +29,7 @@
       "poster": "https://cms-assets.youmind.com/media/1777453149026_gd2k50_HHCSvymboAAVscc.jpg"
     },
     "useCase": {
-      "query": {
-        "en": "Inside an elevator, the metal walls have a slight cold reflection, and the ceiling lights are whitish but uneven. The space is enclosed and quiet. A {argument name=\"subject\" default=\"young Asian girl\"} stands in a corner position of the elevator, with a background of slightly distorted mirrors and floor lights.",
-        "zh-CN": "使用这个插件完成以下任务：Inside an elevator, the metal walls have a slight cold reflection, and the ceiling lights are whitish but uneven. The space is enclosed and quiet. A {argument name=\"subject\" default=\"young Asian girl\"} stands in a corner position of the elevator, with a background of slightly distorted mirrors and floor lights."
-      }
+      "query": "Inside an elevator, the metal walls have a slight cold reflection, and the ceiling lights are whitish but uneven. The space is enclosed and quiet. A {argument name=\"subject\" default=\"young Asian girl\"} stands in a corner position of the elevator, with a background of slightly distorted mirrors and floor lights."
     },
     "inputs": [
       {
@@ -76,6 +73,12 @@
     "capabilities": [
       "prompt:inject",
       "media:image-generate"
-    ]
+    ],
+    "localized": {
+      "ko": {
+        "title": "소셜 미디어 포스트 - 시네마틱 엘리베이터",
+        "description": "gpt-image-2 이미지 생성을 위한 소셜 미디어 포스트 프롬프트 템플릿입니다. 카드 제목과 설명은 한국어로 표시하지만 프롬프트 본문은 원문을 유지합니다."
+      }
+    }
   }
 }

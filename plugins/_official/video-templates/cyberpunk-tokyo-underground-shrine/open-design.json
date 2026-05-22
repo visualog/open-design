@@ -1,0 +1,87 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "video-template-cyberpunk-tokyo-underground-shrine",
+  "title": "Cyberpunk Tokyo Underground Shrine",
+  "version": "0.1.0",
+  "description": "A detailed cinematic prompt for an underground Shinto sanctuary in a futuristic Tokyo, featuring rain-soaked highways and neon reflections.",
+  "license": "CC-BY-4.0",
+  "author": {
+    "name": "LudovicCreator",
+    "url": "https://x.com/LudovicCreator/status/2056802136793510183"
+  },
+  "homepage": "https://github.com/YouMind-OpenLab/awesome-seedance-2-prompts",
+  "tags": [
+    "video-template",
+    "first-party",
+    "video",
+    "general",
+    "anime",
+    "cinematic",
+    "cyberpunk"
+  ],
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "video",
+    "scenario": "video",
+    "surface": "video",
+    "preview": {
+      "type": "video",
+      "poster": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/1cc820f5082d02af95a0ee7125e25c15/thumbnails/thumbnail.jpg",
+      "video": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/1cc820f5082d02af95a0ee7125e25c15/downloads/default.mp4"
+    },
+    "useCase": {
+      "query": "Ultra-cinematic cyber-occult sequence inside a hidden Tokyo shrine buried beneath massive megacity highways and industrial infrastructure at night.\n\nA vast underground Shinto sanctuary exists beneath layers of elevated expressways, train lines, pipes, cables, and neon-lit maintenance corridors. Ancient torii gates stand surrounded by concrete pillars covered in condensation, holographic signage flickers beside weathered prayer tablets, and sacred lanterns glow softly beneath brutalist architecture.\n\nThe camera slowly descends from rain-soaked elevated highways into hidden underground access tunnels illuminated by flickering red emergency lights. Steam rises from vents while distant trains rumble overhead, causing dust and hanging prayer charms to vibrate subtly.\n\nMassive highway support columns tower above the shrine complex like cathedral pillars. Neon reflections ripple across flooded stone pathways. Sacred ropes, paper talismans, and old wooden prayer plaques sway gently in warm underground wind currents.\n\nMonks in dark ceremonial robes move silently through the shrine carrying glowing lanterns while holographic spirits flicker briefly in peripheral darkness. Ancient statues emerge from shadow beside exposed wiring and industrial pipes leaking steam.\n\nThe camera glides continuously through narrow corridors, hidden staircases, flooded maintenance tunnels, and finally into the main shrine chamber where an enormous sacred tree grows through cracked concrete and steel foundations.\n\nLightning flashes from openings far above the megacity ceiling, briefly illuminating drifting incense smoke and thousands of hanging prayer seals. Soft bioluminescent spirits move through the air like glowing embers.\n\nFinal cinematic reveal: the hidden shrine rests directly beneath roaring multilayer expressways while rivers of traffic streak overhead like flowing stars, unaware that an ancient spiritual sanctuary survives below the city.\n\nStyle: ultra cinematic cyberpunk spiritualism, hidden urban shrine aesthetic, dark futuristic Tokyo atmosphere, realistic wet surfaces, volumetric fog, neon reflections, industrial decay mixed with sacred architecture, smooth floating cinematography, grounded environmental realism, atmospheric anime-film quality, no text, no subtitles, no overlays."
+    },
+    "inputs": [
+      {
+        "name": "model",
+        "label": "Model",
+        "type": "select",
+        "options": [
+          "seedance-2.0"
+        ],
+        "default": "seedance-2.0"
+      },
+      {
+        "name": "aspect",
+        "label": "Aspect ratio",
+        "type": "select",
+        "options": [
+          "16:9",
+          "9:16",
+          "1:1",
+          "4:5"
+        ],
+        "default": "16:9"
+      }
+    ],
+    "context": {
+      "assets": [
+        "./template.json"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "video-generate"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "media:video-generate"
+    ],
+    "importedAt": "2026-05-22",
+    "localized": {
+      "ko": {
+        "title": "사이버펑크 도쿄 지하 신사",
+        "description": "seedance-2.0 비디오 생성을 위한 범용 프롬프트 템플릿입니다. 카드 제목과 설명은 한국어로 표시하지만 프롬프트 본문은 원문을 유지합니다."
+      }
+    }
+  }
+}

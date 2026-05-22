@@ -1,0 +1,23 @@
+{
+  "id": "profile-avatar-anime-street-fashion-woman",
+  "surface": "image",
+  "title": "Profile / Avatar - Anime Street Fashion Woman",
+  "summary": "Generates a vertical anime-style full-body street fashion portrait of a headphone-wearing woman in an urban setting.",
+  "category": "Profile / Avatar",
+  "tags": [
+    "anime",
+    "cinematic",
+    "3d-render"
+  ],
+  "model": "gpt-image-2",
+  "aspect": "1:1",
+  "prompt": "Create a vertical full-body anime illustration of {argument name=\"character name\" default=\"a young stylish woman\"} standing casually on a sunlit city sidewalk in front of a modern glass-and-metal building entrance, with a shallow depth-of-field urban background. She has short wavy {argument name=\"hair color\" default=\"pale aqua-blue\"} bob-length hair and wears large retro over-ear headphones in pink, tan, and gold; her face is intentionally covered by a plain soft beige rectangular censor block. Add a small white wispy line near her head suggesting smoke, steam, or breath. Outfit: oversized loose pink haori-style cardigan with wide sleeves, faded blue graphic T-shirt reading “Visit Palm Spring” with a retro motel, road, palm tree, and sunset illustration, high-waisted tan pleated trousers rolled at the cuffs, a brown woven belt, off-white socks, and burgundy leather tassel loafers. She holds one cream canvas tote bag in her left hand, printed with a red circular logo reading “STRAND” and small website text near the bottom. Pose is relaxed and front-facing, one arm down holding the tote, the other mostly hidden by the cardigan, with natural clothing folds and soft shadows. Use cinematic anime rendering with clean line art, muted pastel colors, realistic proportions, subtle film-like lighting, and a contemporary street-fashion editorial feel. Vertical composition, full body centered, no extra people, no watermark.",
+  "previewImageUrl": "https://cms-assets.youmind.com/media/1779354418646_8smkv4_HIvBBZ_bcAAq9J3.jpg",
+  "source": {
+    "repo": "YouMind-OpenLab/awesome-gpt-image-2",
+    "license": "CC-BY-4.0",
+    "author": "A.I.Warper",
+    "url": "https://x.com/AIWarper/status/2056950199369728131#reversed-0"
+  },
+  "importedAt": "2026-05-22"
+}

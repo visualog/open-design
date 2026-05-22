@@ -1,0 +1,24 @@
+{
+  "id": "baseball-stadium-spectator-shot",
+  "surface": "video",
+  "title": "Baseball Stadium Spectator Shot",
+  "summary": "A realistic sports broadcast prompt depicting a spectator at a Korean baseball match with subtle natural movements.",
+  "category": "Advertising",
+  "tags": [
+    "anime",
+    "cinematic",
+    "fantasy"
+  ],
+  "model": "seedance-2.0",
+  "aspect": "16:9",
+  "prompt": "Use the reference image exactly for the face and appearance. Ultra realistic cinematic sports broadcast shot of a handsome young man sitting in the audience during a live Korean baseball match, seriously watching the game while holding an iced coffee cup with straw. Wearing a dark brown plaid flannel shirt over a white t-shirt, messy black hair, light stubble, sharp jawline.\\n\\nVery subtle natural movement only: blinking, slight breathing, tiny eye movement following the match, minimal hand adjustment on the cup. Camera slowly pushes in toward his face like a real TV sports broadcast reaction shot. Background crowd naturally moving and slightly blurred. Authentic stadium atmosphere, shallow depth of field, realistic skin texture, cinematic stadium lighting, candid spectator realism.\\n\\nMood inspired by “Bye” by Alter, calm melancholic aesthetic, emotionally detached vibe.\\n\\nNegative prompt: cartoon, anime, CGI, exaggerated acting, smiling, talking, distorted face, extra fingers, jitter, unrealistic movement, blurry, low quality, fake skin, dramatic gestures.",
+  "previewImageUrl": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/46acbd484b4830a642bd53fc20c20ecd/thumbnails/thumbnail.jpg",
+  "previewVideoUrl": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/46acbd484b4830a642bd53fc20c20ecd/downloads/default.mp4",
+  "source": {
+    "repo": "YouMind-OpenLab/awesome-seedance-2-prompts",
+    "license": "CC-BY-4.0",
+    "author": "auqib",
+    "url": "https://x.com/auqibhabib/status/2056789967779905710"
+  },
+  "importedAt": "2026-05-22"
+}

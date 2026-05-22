@@ -46,20 +46,23 @@
  * All output JSON carries a `source` block so attribution stays intact.
  */
 
-import { mkdir, writeFile, readdir, unlink, readFile } from 'node:fs/promises';
+import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const OUT_IMAGE = path.join(ROOT, 'prompt-templates', 'image');
 const OUT_VIDEO = path.join(ROOT, 'prompt-templates', 'video');
+const IMPORTED_AT = new Date().toISOString().slice(0, 10);
 
-const SOURCES = [
+export const SOURCES = [
   {
     surface: 'image',
     repo: 'YouMind-OpenLab/awesome-gpt-image-2',
     license: 'CC-BY-4.0',
+    licenseUrl:
+      'https://raw.githubusercontent.com/YouMind-OpenLab/awesome-gpt-image-2/main/LICENSE',
     readmeUrl:
       'https://raw.githubusercontent.com/YouMind-OpenLab/awesome-gpt-image-2/main/README.md',
     defaultModel: 'gpt-image-2',
@@ -72,6 +75,8 @@ const SOURCES = [
     surface: 'video',
     repo: 'YouMind-OpenLab/awesome-seedance-2-prompts',
     license: 'CC-BY-4.0',
+    licenseUrl:
+      'https://raw.githubusercontent.com/YouMind-OpenLab/awesome-seedance-2-prompts/main/LICENSE',
     readmeUrl:
       'https://raw.githubusercontent.com/YouMind-OpenLab/awesome-seedance-2-prompts/main/README.md',
     defaultModel: 'seedance-2.0',
@@ -86,6 +91,56 @@ async function fetchText(url) {
     throw new Error(`failed ${url}: ${resp.status}`);
   }
   return resp.text();
+}
+
+export function validateSourceLicense(source, licenseText) {
+  if (source.license !== 'CC-BY-4.0') {
+    throw new Error(`${source.repo}: unsupported license ${source.license}`);
+  }
+  if (!source.licenseUrl || !isSafeHttpUrl(source.licenseUrl)) {
+    throw new Error(`${source.repo}: missing safe licenseUrl`);
+  }
+  if (
+    !licenseText.includes('Creative Commons Attribution 4.0 International License')
+    || !licenseText.includes('CC BY 4.0')
+  ) {
+    throw new Error(`${source.repo}: license file is not CC BY 4.0`);
+  }
+}
+
+export function validateImportedEntry(entry, source) {
+  if (!entry || typeof entry !== 'object') return 'entry must be an object';
+  if (typeof entry.id !== 'string' || !/^[a-z0-9][a-z0-9-]{1,80}$/.test(entry.id)) {
+    return 'id must be a stable slug';
+  }
+  if (entry.surface !== source.surface) return `surface must be ${source.surface}`;
+  if (typeof entry.title !== 'string' || entry.title.trim().length < 3) return 'title is required';
+  if (typeof entry.prompt !== 'string' || entry.prompt.trim().length < 40) {
+    return 'prompt is required and must be descriptive';
+  }
+  if (entry.source?.repo !== source.repo) return `source.repo must be ${source.repo}`;
+  if (entry.source?.license !== source.license) {
+    return `source.license must be ${source.license}`;
+  }
+  for (const field of ['previewImageUrl', 'previewVideoUrl']) {
+    if (entry[field] !== undefined && !isSafeHttpUrl(entry[field]) && !entry[field].startsWith('/')) {
+      return `${field} must be a safe http(s) URL or app-relative path`;
+    }
+  }
+  if (entry.source?.url !== undefined && !isSafeHttpUrl(entry.source.url)) {
+    return 'source.url must be a safe http(s) URL';
+  }
+  return null;
+}
+
+function isSafeHttpUrl(value) {
+  if (typeof value !== 'string') return false;
+  try {
+    const parsed = new URL(value);
+    return parsed.protocol === 'https:' || parsed.protocol === 'http:';
+  } catch {
+    return false;
+  }
 }
 
 function slugify(input) {
@@ -182,6 +237,7 @@ function parseEntryBody(body, title, ctx, featured) {
     model: ctx.defaultModel,
     aspect: ctx.defaultAspect,
     prompt,
+    importedAt: IMPORTED_AT,
     previewImageUrl: previewImage ?? undefined,
     previewVideoUrl: previewVideo ?? undefined,
     source: {
@@ -317,37 +373,12 @@ function inferTags(title, prompt, surface) {
   return Array.from(set).slice(0, lim);
 }
 
-// Remove previously generated JSON files. Hand-authored templates (those
-// whose `source.repo` is not the upstream CC-BY corpus we import from) are
-// preserved so first-party curated prompts aren't wiped on re-run.
-async function clearDir(dir, upstreamRepo) {
-  try {
-    const files = await readdir(dir);
-    for (const f of files) {
-      if (!f.endsWith('.json')) continue;
-      const filePath = path.join(dir, f);
-      let keep = false;
-      try {
-        const parsed = JSON.parse(await readFile(filePath, 'utf8'));
-        const repo = parsed?.source?.repo;
-        if (repo && repo !== upstreamRepo) keep = true;
-      } catch {
-        // Unparseable file — treat as generated and remove.
-      }
-      if (!keep) await unlink(filePath);
-    }
-  } catch {
-    // missing dir is fine — created below.
-  }
-}
-
 async function writeAll(entries, outDir, upstreamRepo) {
   await mkdir(outDir, { recursive: true });
-  await clearDir(outDir, upstreamRepo);
   // De-dup on slug; if two entries collide, keep the first (which is the
-  // featured one — always parsed before "All Prompts"). Hand-authored
-  // templates already on disk (preserved by clearDir) also take priority
-  // so we never overwrite curated first-party prompts.
+  // featured one — always parsed before "All Prompts"). Existing templates
+  // already on disk also take priority so imports never overwrite curated or
+  // previously absorbed prompts.
   const seen = new Set();
   try {
     const existing = await readdir(outDir);
@@ -372,6 +403,8 @@ async function main() {
   let totalImage = 0;
   let totalVideo = 0;
   for (const ctx of SOURCES) {
+    const licenseText = await fetchText(ctx.licenseUrl);
+    validateSourceLicense(ctx, licenseText);
     const md = await fetchText(ctx.readmeUrl);
     const featuredBlock = sliceSection(md, /## 🔥 Featured Prompts/m)
       || sliceSection(md, /## ⭐ Featured Prompts/m)
@@ -386,6 +419,19 @@ async function main() {
       process.exitCode = 1;
       continue;
     }
+    const invalid = entries
+      .map((entry) => ({ entry, reason: validateImportedEntry(entry, ctx) }))
+      .filter((result) => result.reason);
+    if (invalid.length > 0) {
+      for (const result of invalid.slice(0, 10)) {
+        console.error(
+          `[${ctx.repo}] rejected ${result.entry?.id ?? '<unknown>'}: ${result.reason}`,
+        );
+      }
+      console.error(`[${ctx.repo}] ${invalid.length} invalid entr${invalid.length === 1 ? 'y' : 'ies'}; aborting import.`);
+      process.exitCode = 1;
+      continue;
+    }
     const outDir = ctx.surface === 'image' ? OUT_IMAGE : OUT_VIDEO;
     const written = await writeAll(entries, outDir, ctx.repo);
     if (ctx.surface === 'image') totalImage += written;
@@ -397,7 +443,9 @@ async function main() {
   console.log(`\nDone. ${totalImage} image + ${totalVideo} video templates.`);
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main().catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
+}

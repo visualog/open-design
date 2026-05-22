@@ -339,7 +339,11 @@ export const esES: Dict = {
   'promptTemplates.openFullscreen': 'Abrir vista previa en pantalla completa',
   'promptTemplates.closeFullscreen': 'Cerrar vista previa en pantalla completa',
   'promptTemplates.allSources': 'Todas las fuentes',
-  'promptTemplates.sourceFilterAria': 'Filtrar por fuente',
+  'promptTemplates.sourceFilterAria': 'Filter by source',
+  'promptTemplates.sortAria': 'Sort templates',
+  'promptTemplates.sortName': 'Name',
+  'promptTemplates.sortNewest': 'Newest',
+  'promptTemplates.newBadge': 'New',
   'promptTemplates.retry': 'Reintentar',
 
   'newproj.tabPrototype': 'Prototipo',

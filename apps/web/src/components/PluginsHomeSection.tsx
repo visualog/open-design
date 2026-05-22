@@ -15,6 +15,7 @@
 // override live in `./plugins-home/usePluginFacets.ts`. This file
 // owns layout only.
 
+import { useState } from 'react';
 import type { InstalledPluginRecord } from '@open-design/contracts';
 import { useT } from '../i18n';
 import type { PluginShareAction } from '../state/projects';
@@ -26,6 +27,8 @@ import {
 } from './plugins-home/usePluginFacets';
 import type { FacetOption } from './plugins-home/facets';
 import type { PluginUseAction } from './plugins-home/useActions';
+
+type MediaTemplateSort = 'name' | 'newest';
 
 interface Props {
   plugins: InstalledPluginRecord[];
@@ -66,6 +69,7 @@ export function PluginsHomeSection({
   emptyMessage,
 }: Props) {
   const t = useT();
+  const [mediaTemplateSort, setMediaTemplateSort] = useState<MediaTemplateSort>('name');
   const {
     visiblePlugins,
     featuredList,
@@ -88,6 +92,13 @@ export function PluginsHomeSection({
   const showContributionCard =
     contributionTarget !== null &&
     shouldShowContributionCard(filtered.length, selection.category);
+  const showMediaTemplateSort =
+    mode !== 'featured' &&
+    selection.category === 'create' &&
+    (selection.subcategory === 'image' || selection.subcategory === 'video');
+  const sortedFiltered = showMediaTemplateSort
+    ? sortMediaTemplatePlugins(filtered, mediaTemplateSort)
+    : filtered;
 
   return (
     <section className="plugins-home" data-testid="plugins-home-section">
@@ -108,6 +119,18 @@ export function PluginsHomeSection({
             >
               {t('pluginsHome.browseRegistry')}
             </button>
+          ) : null}
+          {showMediaTemplateSort ? (
+            <select
+              className="plugins-home__sort"
+              value={mediaTemplateSort}
+              onChange={(event) => setMediaTemplateSort(event.target.value as MediaTemplateSort)}
+              aria-label={t('promptTemplates.sortAria')}
+              data-testid="plugins-home-media-sort"
+            >
+              <option value="name">{t('promptTemplates.sortName')}</option>
+              <option value="newest">{t('promptTemplates.sortNewest')}</option>
+            </select>
           ) : null}
           <SearchInput value={query} onChange={setQuery} />
           <span className="plugins-home__count">
@@ -153,7 +176,7 @@ export function PluginsHomeSection({
             ) : null}
           </div>
 
-          {filtered.length === 0 && !showContributionCard ? (
+          {sortedFiltered.length === 0 && !showContributionCard ? (
             <div className="plugins-home__empty plugins-home__empty--filtered">
               {t('pluginsHome.emptyFiltered')}{' '}
               <button
@@ -166,7 +189,7 @@ export function PluginsHomeSection({
             </div>
           ) : (
             <div className="plugins-home__grid" role="list">
-              {filtered.map((p) => (
+              {sortedFiltered.map((p) => (
                 <PluginCard
                   key={p.id}
                   record={p}
@@ -194,6 +217,30 @@ export function PluginsHomeSection({
       )}
     </section>
   );
+}
+
+function sortMediaTemplatePlugins<T extends InstalledPluginRecord>(
+  records: readonly T[],
+  sort: MediaTemplateSort,
+): T[] {
+  const annotated = records.map((record, idx) => ({ record, idx }));
+  annotated.sort((a, b) => {
+    if (sort === 'newest') {
+      const dateCmp = mediaTemplateImportedAtRank(b.record) - mediaTemplateImportedAtRank(a.record);
+      if (dateCmp !== 0) return dateCmp;
+    }
+    const titleCmp = (a.record.title || a.record.id).localeCompare(b.record.title || b.record.id);
+    if (titleCmp !== 0) return titleCmp;
+    return a.idx - b.idx;
+  });
+  return annotated.map((entry) => entry.record);
+}
+
+function mediaTemplateImportedAtRank(record: InstalledPluginRecord): number {
+  const value = (record.manifest?.od as { importedAt?: unknown } | undefined)?.importedAt;
+  if (typeof value !== 'string') return 0;
+  const parsed = Date.parse(value);
+  return Number.isFinite(parsed) ? parsed : 0;
 }
 
 function shouldShowContributionCard(count: number, category: string | null): boolean {

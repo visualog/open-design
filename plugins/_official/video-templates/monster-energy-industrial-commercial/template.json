@@ -1,0 +1,22 @@
+{
+  "id": "monster-energy-industrial-commercial",
+  "surface": "video",
+  "title": "Monster Energy Industrial Commercial",
+  "summary": "A cinematic, industrial-style beverage commercial prompt for Monster Energy, focusing on cold, atmospheric shots and psychological tension.",
+  "category": "Advertising",
+  "tags": [
+    "cinematic"
+  ],
+  "model": "seedance-2.0",
+  "aspect": "16:9",
+  "prompt": "MONSTER ENERGY — “AFTER THE LIMIT”\n\nVertical 9:16 cinematic commercial, 14–18 seconds.\nVisual style: luxury fragrance campaign mixed with psychological thriller realism and grounded industrial cinematography.\nTone: restrained, cold, atmospheric, psychologically tense.\nNo fast cuts, no workout montage, no influencer energy, no motivational tone.\nEverything should feel physically cold, exhausted, and ritualistic.\nNatural cinematic realism only. Organic grain, soft shadows, muted highlights, shallow depth of field, realistic lens imperfections, subtle camera drift.\nColor palette: desaturated blacks, cold grays, industrial whites, subtle green contamination in shadows.\nThe green Monster Energy logo should be the ONLY saturated color in the film.\n\nSHOT 1 — EMPTY HOURS\nWide cinematic shot of an industrial gym before sunrise. Empty atmosphere. Cold fluorescent ceiling lights buzz softly overhead with slight flickering. Rain streaks down massive dark windows outside. A loose metal chain sways subtly from weak ventilation airflow. A distant industrial fan rotates slowly with faint mechanical clicking. The gym feels repeatedly used: chalk dust near squat rack, worn grip tape on barbells, rust around steel bolts, abandoned towel blurred in background, mirrors reflecting fragmented darkness. Moist rubber flooring reflects faint fluorescent light. Camera slowly drifts almost imperceptibly. No music. Only fluorescent hum, rain ambience, distant thunder, ventilation noise, metallic building creaks, isolated water drip echoes.\n\nSHOT 2 — THE OBJECT\nSlow cinematic push-in toward a single Monster Energy can resting alone on a black workout bench beneath a dim fluorescent light. Everything remains muted except the bright green Monster claw logo. The fluorescent light subtly pulses every few seconds with low electrical hum. Macro realism: thick condensation droplets crawling down aluminum, tiny water pools beneath can, faint cold vapor drifting around surface, hyper-detailed metallic texture, green reflections bleeding softly onto bench material. Ultra shallow depth of field, natural lens breathing, slight chromatic aberration, soft focus falloff, organic sensor grain. The can should feel unnaturally cold compared to the room.\n\nSHOT 3 — PRESENCE\nA lone figure partially enters frame from darkness. Never fully reveal him. Only fragmented details: oversized rain-damp hoodie sleeve, veined exhausted hand, bruised knuckles, water droplets falling from fabric, gym bag softly hitting floor, distorted silhouette in mirror reflection. A fluorescent flicker briefly reveals part of his jaw before darkness swallows it again. His posture communicates repetition, exhaustion, and discipline repeated too many times. Camera remains emotionally detached and distant.\n\nSHOT 4 — ANTICIPATION\nExtreme macro close-up of the Monster can. Condensation droplets crawl slowly across aluminum in hyper-detail. Tiny ice crackling sounds emerge",
+  "previewImageUrl": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/1ea9cb523e29e31b025b7753926a0cc9/thumbnails/thumbnail.jpg",
+  "previewVideoUrl": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/1ea9cb523e29e31b025b7753926a0cc9/downloads/default.mp4",
+  "source": {
+    "repo": "YouMind-OpenLab/awesome-seedance-2-prompts",
+    "license": "CC-BY-4.0",
+    "author": "Hemayxn.ai",
+    "url": "https://x.com/hemayxn/status/2057078277664116924"
+  },
+  "importedAt": "2026-05-22"
+}

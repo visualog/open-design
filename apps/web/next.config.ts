@@ -1,6 +1,6 @@
 import type { NextConfig } from 'next';
 import { networkInterfaces } from 'node:os';
-import { dirname, isAbsolute, relative } from 'node:path';
+import { dirname, isAbsolute, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 // Daemon port the local Express server binds to (see apps/daemon/src/cli.ts). The
@@ -24,6 +24,7 @@ const shouldStaticExport = isProd && !isServerOutput;
 
 const WEB_ROOT = dirname(fileURLToPath(import.meta.url));
 const WORKSPACE_ROOT = dirname(dirname(WEB_ROOT));
+const HOST_PACKAGE_ENTRY = './apps/web/node_modules/@open-design/host/dist/index.mjs';
 const toPosixPath = (value: string) => value.replaceAll('\\', '/');
 
 function resolveDistDir(defaultValue: string) {
@@ -105,8 +106,12 @@ const nextConfig: NextConfig = {
   allowedDevOrigins: configuredAllowedDevHosts(),
   outputFileTracingRoot: WORKSPACE_ROOT,
   reactStrictMode: true,
+  transpilePackages: ['@open-design/contracts', '@open-design/host'],
   turbopack: {
     root: WORKSPACE_ROOT,
+    resolveAlias: {
+      '@open-design/host': HOST_PACKAGE_ENTRY,
+    },
   },
   ...(DEV_TSCONFIG_PATH ? { typescript: { tsconfigPath: DEV_TSCONFIG_PATH } } : {}),
   // Keep the bundle output predictable so the daemon's STATIC_DIR can point

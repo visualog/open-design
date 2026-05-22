@@ -27,6 +27,7 @@ function makePlugin(overrides: {
   title?: string;
   tags?: string[];
   featured?: boolean;
+  importedAt?: string;
   mode?: string;
   taskKind?: 'new-generation' | 'code-migration' | 'figma-migration' | 'tune-collab';
 }): InstalledPluginRecord {
@@ -48,6 +49,7 @@ function makePlugin(overrides: {
         ...(overrides.taskKind ? { taskKind: overrides.taskKind } : {}),
         ...(overrides.mode ? { mode: overrides.mode } : {}),
         ...(overrides.featured ? { featured: true } : {}),
+        ...(overrides.importedAt ? { importedAt: overrides.importedAt } : {}),
       },
     },
     fsPath: '/tmp',
@@ -287,6 +289,43 @@ describe('PluginsHomeSection (category bar)', () => {
     fireEvent.click(screen.getByTestId('plugins-home-pill-subcategory-create-hyperframes'));
     items = within(screen.getByRole('list')).getAllByRole('listitem');
     expect(items.map((i) => i.getAttribute('data-plugin-id'))).toEqual(['e']);
+  });
+
+  it('shows a newest sort for image and video template buckets', () => {
+    const plugins = [
+      makePlugin({ id: 'old-image', title: 'Alpha old', mode: 'image', importedAt: '2026-05-01' }),
+      makePlugin({ id: 'new-image', title: 'Zulu new', mode: 'image', importedAt: '2026-05-22' }),
+      makePlugin({ id: 'plain-image', title: 'Beta plain', mode: 'image' }),
+      makePlugin({ id: 'video-one', title: 'Video one', mode: 'video', importedAt: '2026-05-22' }),
+    ];
+    render(
+      <PluginsHomeSection
+        plugins={plugins}
+        loading={false}
+        activePluginId={null}
+        pendingApplyId={null}
+        onUse={() => {}}
+        onOpenDetails={() => {}}
+      />,
+    );
+
+    fireEvent.click(screen.getByTestId('plugins-home-pill-subcategory-create-image'));
+    let items = within(screen.getByRole('list')).getAllByRole('listitem');
+    expect(items.map((i) => i.getAttribute('data-plugin-id'))).toEqual([
+      'old-image',
+      'plain-image',
+      'new-image',
+    ]);
+
+    fireEvent.change(screen.getByTestId('plugins-home-media-sort'), {
+      target: { value: 'newest' },
+    });
+    items = within(screen.getByRole('list')).getAllByRole('listitem');
+    expect(items.map((i) => i.getAttribute('data-plugin-id'))).toEqual([
+      'new-image',
+      'old-image',
+      'plain-image',
+    ]);
   });
 
   it('Extend separates plugin authoring from normal creation', () => {

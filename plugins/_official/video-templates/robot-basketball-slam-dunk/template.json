@@ -1,0 +1,22 @@
+{
+  "id": "robot-basketball-slam-dunk",
+  "surface": "video",
+  "title": "Robot Basketball Slam Dunk",
+  "summary": "An action-packed sports video prompt featuring a robot player performing a series of dribbles and a powerful dunk.",
+  "category": "General",
+  "tags": [
+    "fantasy"
+  ],
+  "model": "seedance-2.0",
+  "aspect": "16:9",
+  "prompt": "A basketball game. [Image 1] receives a pass from a teammate. Starts dribbling from the center circle. Bypassing one defender, then another, and finishing with a slam dunk. Multi-shot. Diverse camera work. Shot sizes and camera angles. Effective lighting. Team name is Dogs, opposing team is Cats. Dazzling stadium lights. The stands are full. Effective impact frames. A sense of urgency and tension.",
+  "previewImageUrl": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/8b9d7393dbdb37d82e7c231241e1b287/thumbnails/thumbnail.jpg",
+  "previewVideoUrl": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/8b9d7393dbdb37d82e7c231241e1b287/downloads/default.mp4",
+  "source": {
+    "repo": "YouMind-OpenLab/awesome-seedance-2-prompts",
+    "license": "CC-BY-4.0",
+    "author": "雨雲(Amagumo)806 ｜ AI Animer",
+    "url": "https://x.com/ai_animer/status/2057089104521924777"
+  },
+  "importedAt": "2026-05-22"
+}

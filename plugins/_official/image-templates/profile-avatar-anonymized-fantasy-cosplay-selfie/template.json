@@ -1,0 +1,23 @@
+{
+  "id": "profile-avatar-anonymized-fantasy-cosplay-selfie",
+  "surface": "image",
+  "title": "Profile / Avatar - Anonymized Fantasy Cosplay Selfie",
+  "summary": "A realistic convention selfie of an adult cosplayer in an ornate pale-blue fantasy costume with her face censored for privacy.",
+  "category": "Profile / Avatar",
+  "tags": [
+    "portrait",
+    "anime",
+    "fantasy"
+  ],
+  "model": "gpt-image-2",
+  "aspect": "1:1",
+  "prompt": "Create a highly realistic vertical 3:4 smartphone selfie photo of an adult female cosplayer at a crowded game/anime convention booth, shot from slightly above chest height with both arms extended toward the camera. She wears an ornate ethereal fantasy costume in {argument name=\"costume colors\" default=\"pale icy blue, white, silver, and gold\"}: a low-cut sculptural bodice with metallic gold trim, translucent flowing gauze sleeves, layered sheer fabric, and a central blue flower ornament. Include exactly 6 prominent costume/accessory elements: 1 floral-and-gold hairpiece with pale blue ribbons on the left side of her dark hair, 1 pair of dangling pearl-like earrings, 1 delicate necklace with a long crystal pendant, 1 ornate structured bodice, 2 translucent sleeve drapes, and 1 central flower-and-gold chest ornament. Her face is deliberately anonymized by a large opaque square censor block in {argument name=\"censor block color\" default=\"warm gray-brown\"}, covering the entire face from forehead to chin while leaving the hair and accessories visible. The background is a busy indoor expo hall with harsh overhead lighting, ceiling trusses, many attendees in casual clothing, and exactly 3 visible large fantasy character displays/posters behind her: one tall illustrated banner on the upper left, one bright central fantasy banner, and one smaller dark blue screen/poster on the upper right. Use natural smartphone flash/ambient lighting, realistic skin texture, shallow depth of field, candid convention atmosphere, no text overlay, no watermark.",
+  "previewImageUrl": "https://cms-assets.youmind.com/media/1779354411558_k021ds_HIyhIsgagAApmxr.jpg",
+  "source": {
+    "repo": "YouMind-OpenLab/awesome-gpt-image-2",
+    "license": "CC-BY-4.0",
+    "author": "soda ho",
+    "url": "https://x.com/soda_ho/status/2057196357568598344#reversed-3"
+  },
+  "importedAt": "2026-05-22"
+}

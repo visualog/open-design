@@ -14,7 +14,8 @@ import type {
   InstalledPluginRecord,
   PluginManifest,
 } from '@open-design/contracts';
-import { useT } from '../../i18n';
+import { useI18n } from '../../i18n';
+import { localizedPluginDescription, localizedPluginTitle } from '../../runtime/plugin-localization';
 import { resolvePluginQueryFallback } from '../../state/projects';
 import { Icon } from '../Icon';
 import { PreviewModal, type PreviewView } from '../PreviewModal';
@@ -77,12 +78,13 @@ export function PluginMediaDetail({
   onUse,
   isApplying,
 }: Props) {
-  const t = useT();
+  const { locale, t } = useI18n();
   const [copied, setCopied] = useState(false);
 
   const manifest: PluginManifest = record.manifest ?? ({} as PluginManifest);
   const od = manifest.od ?? {};
-  const description = manifest.description ?? '';
+  const title = localizedPluginTitle(record, locale);
+  const description = localizedPluginDescription(record, locale);
   const query = resolvePluginQueryFallback(od.useCase?.query);
   const media = useMemo(() => readMedia(record), [record]);
   const hasAsset = Boolean(media.poster || media.videoUrl || media.audioUrl);
@@ -130,7 +132,7 @@ export function PluginMediaDetail({
             <img
               className="plugin-media-stage__audio-poster"
               src={media.poster}
-              alt={record.title}
+              alt={title}
               referrerPolicy="no-referrer"
               loading="lazy"
             />
@@ -153,7 +155,7 @@ export function PluginMediaDetail({
         <img
           className="plugin-media-stage__image"
           src={media.poster}
-          alt={record.title}
+          alt={title}
           loading="lazy"
           referrerPolicy="no-referrer"
         />
@@ -199,29 +201,29 @@ export function PluginMediaDetail({
         record={record}
         omit={{ description: true, query: true }}
         compact
-        heading="Plugin info"
+        heading={t('pluginDetails.pluginInfo')}
       />
     </div>
   );
 
   return (
     <PreviewModal
-      title={record.title}
+      title={title}
       subtitle={description || undefined}
       views={views}
-      exportTitleFor={() => record.title}
+      exportTitleFor={() => title}
       onClose={onClose}
       sidebar={{
-        label: 'Plugin info',
+        label: t('pluginDetails.pluginInfo'),
         defaultOpen: true,
         contentKey: record.id,
         content: sidebar,
       }}
       primaryAction={{
-        label: 'Use plugin',
+        label: t('pluginDetails.usePlugin'),
         onClick: () => onUse(record),
         busy: !!isApplying,
-        busyLabel: 'Applying…',
+        busyLabel: t('homeHero.applying'),
         testId: `plugin-details-use-${record.id}`,
       }}
       headerExtras={<PluginShareMenu record={record} variant="inline" />}

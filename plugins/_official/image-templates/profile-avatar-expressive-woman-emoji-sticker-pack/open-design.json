@@ -1,0 +1,85 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "image-template-profile-avatar-expressive-woman-emoji-sticker-pack",
+  "title": "Profile / Avatar - Expressive Woman Emoji Sticker Pack",
+  "version": "0.1.0",
+  "description": "Generates a high-quality 4x3 grid sticker pack featuring 12 different facial expressions of the same character.",
+  "license": "CC-BY-4.0",
+  "author": {
+    "name": "Aijaz",
+    "url": "https://x.com/iamsofiaijaz/status/2057145271675765241"
+  },
+  "homepage": "https://github.com/YouMind-OpenLab/awesome-gpt-image-2",
+  "tags": [
+    "image-template",
+    "first-party",
+    "image",
+    "profile-avatar",
+    "portrait"
+  ],
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "image",
+    "scenario": "image",
+    "surface": "image",
+    "preview": {
+      "type": "image",
+      "poster": "https://cms-assets.youmind.com/media/1779354342034_w7aoga_HIxyuOHaYAA3WzI.jpg"
+    },
+    "useCase": {
+      "query": "A high-quality sticker pack featuring a {argument name=\"subject\" default=\"young beautiful English woman\"} with {argument name=\"hair\" default=\"long soft brown hair\"}, flawless glowing skin, and attractive facial features, shown in 12 different facial expressions and emotions. Arranged in a clean 4x3 grid on a light neutral beige background. Each portrait is cropped around the shoulders and surrounded by a thick white die-cut sticker border. Expressions include: friendly smile, laughing joyfully, cool pose with black sunglasses, angry frowning face, shocked expression with wide eyes and open mouth, thoughtful thinking pose with hand on chin, playful wink, heart hands gesture, suspicious sideways glance, puffed cheeks, excited surprise with hands on face, and casual salute. Consistent character appearance across all stickers. Realistic digital photography style, ultra-detailed skin and hair texture, soft studio lighting, vibrant natural colors, trendy social media emoji/sticker aesthetic, centered composition, high resolution, clean minimal layout, premium sticker sheet design, photorealistic, cute and expressive."
+    },
+    "inputs": [
+      {
+        "name": "model",
+        "label": "Model",
+        "type": "select",
+        "options": [
+          "gpt-image-2"
+        ],
+        "default": "gpt-image-2"
+      },
+      {
+        "name": "aspect",
+        "label": "Aspect ratio",
+        "type": "select",
+        "options": [
+          "1:1",
+          "16:9",
+          "9:16",
+          "4:5",
+          "3:2"
+        ],
+        "default": "1:1"
+      }
+    ],
+    "context": {
+      "assets": [
+        "./template.json"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "image-generate"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "media:image-generate"
+    ],
+    "importedAt": "2026-05-22",
+    "localized": {
+      "ko": {
+        "title": "프로필 / 아바타 - 표정 여성 이모지 스티커 팩",
+        "description": "gpt-image-2 이미지 생성을 위한 프로필 / 아바타 프롬프트 템플릿입니다. 카드 제목과 설명은 한국어로 표시하지만 프롬프트 본문은 원문을 유지합니다."
+      }
+    }
+  }
+}

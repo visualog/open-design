@@ -109,6 +109,7 @@ describe('extractSubcategories', () => {
     expect(extractSubcategories(fixture({ id: 'b', od: { mode: 'deck' } }))).toEqual(['deck']);
     expect(extractSubcategories(fixture({ id: 'c', od: { mode: 'design-system' } }))).toEqual(['design-system']);
     expect(extractSubcategories(fixture({ id: 'd', tags: ['hyperframes'], od: { mode: 'video' } }))).toEqual(['hyperframes']);
+    expect(extractSubcategories(fixture({ id: 'dt', tags: ['video-template', 'hyperframes'], od: { mode: 'video' } }))).toEqual(['video']);
     expect(extractSubcategories(fixture({ id: 'e', od: { mode: 'image' } }))).toEqual(['image']);
   });
 
@@ -249,6 +250,7 @@ describe('applyFacetSelection', () => {
     fixture({ id: 'c', od: { mode: 'image' } }),
     fixture({ id: 'd', od: { mode: 'video' } }),
     fixture({ id: 'e', tags: ['hyperframes'], od: { mode: 'video' } }),
+    fixture({ id: 'dt', tags: ['video-template', 'hyperframes'], od: { mode: 'video' } }),
     fixture({ id: 'f', tags: ['export', 'react'], od: { mode: 'export' } }),
     fixture({ id: 'h', tags: ['html-to-pptx'], od: { mode: 'utility' } }),
     fixture({ id: 'g', od: { taskKind: 'code-migration', mode: 'scenario' } }),
@@ -257,13 +259,13 @@ describe('applyFacetSelection', () => {
   it('returns everything when no category is selected', () => {
     expect(
       applyFacetSelection(plugins, { category: null, subcategory: null }).map((p) => p.id),
-    ).toEqual(['a', 'b', 'c', 'd', 'e', 'f', 'h', 'g']);
+    ).toEqual(['a', 'b', 'c', 'd', 'e', 'dt', 'f', 'h', 'g']);
   });
 
   it('filters by the selected category slug', () => {
     expect(
       applyFacetSelection(plugins, { category: 'create', subcategory: null }).map((p) => p.id),
-    ).toEqual(['a', 'b', 'c', 'd', 'e']);
+    ).toEqual(['a', 'b', 'c', 'd', 'e', 'dt']);
     expect(
       applyFacetSelection(plugins, { category: 'export', subcategory: null }).map((p) => p.id),
     ).toEqual(['f', 'h']);
@@ -279,6 +281,9 @@ describe('applyFacetSelection', () => {
     expect(
       applyFacetSelection(plugins, { category: 'create', subcategory: 'hyperframes' }).map((p) => p.id),
     ).toEqual(['e']);
+    expect(
+      applyFacetSelection(plugins, { category: 'create', subcategory: 'video' }).map((p) => p.id),
+    ).toEqual(['d', 'dt']);
     expect(
       applyFacetSelection(plugins, { category: 'export', subcategory: 'reactjs' }).map((p) => p.id),
     ).toEqual(['f']);

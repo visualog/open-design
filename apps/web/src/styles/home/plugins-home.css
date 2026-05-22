@@ -49,6 +49,21 @@
   gap: 10px;
   flex: 0 0 auto;
 }
+.plugins-home__sort {
+  height: 30px;
+  min-width: 92px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--bg-panel);
+  color: var(--text);
+  font: inherit;
+  font-size: 12px;
+  padding: 0 28px 0 12px;
+}
+.plugins-home__sort:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
 .plugins-home__search {
   position: relative;
   display: inline-flex;
@@ -133,6 +148,7 @@
   }
   .plugins-home__head-tools {
     justify-content: space-between;
+    flex-wrap: wrap;
   }
   .plugins-home__search {
     width: 100%;

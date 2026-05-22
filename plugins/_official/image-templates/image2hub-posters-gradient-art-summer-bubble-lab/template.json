@@ -1,0 +1,21 @@
+{
+  "id": "image2hub-posters-gradient-art-summer-bubble-lab",
+  "surface": "image",
+  "title": "Image2 그라디언트 아트 - Gradient Art Summer Bubble Lab",
+  "summary": "Image2 Hub의 포스터 / 그라디언트 아트 카테고리에서 가져온 이미지 생성 스타일입니다. 한국어 텍스트가 필요한 장면은 한국어 라벨과 카피를 사용하도록 조정했습니다.",
+  "category": "Social Media Post",
+  "tags": [
+    "marketing",
+    "social"
+  ],
+  "model": "gpt-image-2",
+  "aspect": "9:16",
+  "previewImageUrl": "https://image2hub.netlify.app/assets/posters/gradient-art/summer-bubble-lab.webp",
+  "prompt": "Swiss International style, modern minimalist flat vector poster, 9:16 aspect ratio, diagonal sliced layout. Top-left: Traditional Korean title in serif type paired with elegant connected script serif English. Bottom-right: core symbolic graphic for the poster — abstract flat vector illustration, fluorescent color gradients, subtle grain noise, decorative pixel icons, contemporary cultural festival poster, modern design exhibition quality. Theme: Summer Bubble Lab. 4K. Use Korean-language copy, labels, captions, titles, and UI text wherever text appears; keep all text readable and culturally natural for Korean users.",
+  "source": {
+    "repo": "houshifang/image",
+    "license": "Unspecified",
+    "author": "Image2 Hub",
+    "url": "https://image2hub.netlify.app/"
+  }
+}

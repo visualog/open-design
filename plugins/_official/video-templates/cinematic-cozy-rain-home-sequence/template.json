@@ -1,0 +1,23 @@
+{
+  "id": "cinematic-cozy-rain-home-sequence",
+  "surface": "video",
+  "title": "Cinematic Cozy Rain Home Sequence",
+  "summary": "A detailed one-take cinematic script featuring a woman arriving at a glowing tiny home during a heavy rainstorm.",
+  "category": "Cinematic",
+  "tags": [
+    "cinematic",
+    "food"
+  ],
+  "model": "seedance-2.0",
+  "aspect": "16:9",
+  "prompt": "Ultra-realistic cinematic one-take cozy lifestyle sequence set during heavy rain in a beautiful quiet modern society surrounded by trees and soft street lights. A small beautiful pastel tiny-home sits peacefully among the rainy neighborhood. The atmosphere feels warm, feminine, calm, peaceful, and emotionally comforting.\n\nA beautiful young woman wearing a floral dress, soft cardigan, rain boots, and holding a transparent umbrella walks quickly through heavy rain carrying a basket full of fresh vegetables and groceries. Her tiny pastel home glows warmly from inside while rain pours heavily outside.\n\nThe ENTIRE video must flow smoothly like one continuous cinematic shot with NO cuts or abrupt transitions.\n\n🎥 CONTINUOUS CINEMATIC FLOW (NO CUTS)\n\n⏱️ 0:00 – 0:02 | RAINY ARRIVAL\n\nHeavy rain pours across a peaceful beautiful society street at evening.\n\nThe girl walks quickly with umbrella toward her tiny glowing home\n\nBasket full of vegetables in her hand\n\nRain droplets reflecting warm street lights\n\nCozy pastel house glowing softly in rainy darkness\n\n🎥 Camera Movement: Smooth cinematic tracking shot following beside her naturally through rain.\n\n🎵 Sound: Heavy rain + soft cozy piano ambience.\n\n⏱️ 0:02 – 0:05 | ENTERING HOME\n\nShe quickly opens the tiny home door and rushes inside warmly laughing softly.\n\nShe closes umbrella beside the door\n\nPlaces vegetable basket onto kitchen counter\n\nWarm fairy lights glow beautifully around room\n\nShe removes her wet cardigan and shoes comfortably\n\n🎥 Camera Movement: Single smooth movement entering home with her naturally.\n\n🎙️ Girl (soft relieved sigh):\n“Finally…”\n\n⏱️ 0:05 – 0:08 | FRESHENING UP\n\nStill in one continuous shot, she walks toward the tiny bathroom area.\n\nWarm mirror lights glowing softly\n\nShe changes from wet clothes into cozy pastel homewear\n\nSoft towel drying wet hair\n\nRain visible through small bathroom window\n\n🎥 Camera Movement: Slow floating cinematic movement around the tiny cozy house.\n\n⏱️ 0:08 – 0:12 | COOKING DINNER\n\nShe begins cooking peacefully in her tiny pastel kitchen.\n\nSteam rising from warm food\n\nSoft fairy lights reflecting around kitchen shelves\n\nCutting vegetables from grocery basket\n\nCozy tea kettle steaming softly\n\nWarm peaceful feminine energy throughout\n\n🎥 Camera Movement: Smooth close-up transitions between food, hands, lights, and cozy details.\n\n🎙️ Girl (soft smile):\n“This weather feels magical.”\n\n⏱️ 0:12 – 0:15 | WINDOW DINNER ENDING\n\nShe sits beside the large rainy window eating peacefully.\n\nWarm food plate beside steaming tea cup\n\nRain sliding beautifully down glass window\n\nCozy blanket around shoulders\n\nShe quietly enjoys rainy weather while smiling softly\n\nTiny pastel home glowing warmly inside rainy evening",
+  "previewImageUrl": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/afa5bc76201f7fb2cee3f00e4eaf9266/thumbnails/thumbnail.jpg",
+  "previewVideoUrl": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/afa5bc76201f7fb2cee3f00e4eaf9266/downloads/default.mp4",
+  "source": {
+    "repo": "YouMind-OpenLab/awesome-seedance-2-prompts",
+    "license": "CC-BY-4.0",
+    "author": "Julia Clark",
+    "url": "https://x.com/JuliaClarky/status/2057063748037173385"
+  },
+  "importedAt": "2026-05-22"
+}

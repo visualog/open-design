@@ -1,0 +1,22 @@
+{
+  "id": "profile-avatar-woman-in-a-curve-mirror-reflection",
+  "surface": "image",
+  "title": "Profile / Avatar - Woman in a Curve Mirror Reflection",
+  "summary": "A nostalgic and realistic portrait prompt featuring a Japanese woman reflected in a round street mirror in a quiet alley, styled with soft film tones.",
+  "category": "Profile / Avatar",
+  "tags": [
+    "portrait",
+    "fantasy"
+  ],
+  "model": "gpt-image-2",
+  "aspect": "1:1",
+  "prompt": "Subject: A realistic portrait of a Japanese woman {argument name=\"reflection object\" default=\"reflected in a round curve mirror\"} in a quiet Japanese alley.\n\nPerson/Expression: A Japanese woman in her early 20s, {argument name=\"hair style\" default=\"long black hair\"}, thin bangs, natural makeup, transparent skin, calm expression, quietly looking at the camera.\n\nClothing/Pose: {argument name=\"outfit\" default=\"A white dress with light blue flowers\"}, shoulder bag, natural pose as if taking a selfie with one arm outstretched.\n\nBackground/Light: A Japanese residential area with old wooden fences and stone walls, green sunlight filtering through trees, early summer afternoon, soft natural light, background blurred significantly.\n\nComposition/Camera: Composition using reflection from a round curve mirror, wide-angle, slightly looking down angle, centered, shallow depth of field, round bokeh and vignette in the periphery.\n\nTexture/Style: Pale colors, low contrast, soft film tone, natural skin texture, transparent Japanese-style portrait, realistic AI photo.\n\nNegative: Low quality, unnatural hands, distorted face, extra fingers, excessive processing, text, logo, watermark.",
+  "previewImageUrl": "https://cms-assets.youmind.com/media/1779354366763_b8jpx7_HIzNMhdaAAAJCf4.jpg",
+  "source": {
+    "repo": "YouMind-OpenLab/awesome-gpt-image-2",
+    "license": "CC-BY-4.0",
+    "author": "Cyberトータル",
+    "url": "https://x.com/CyberTotal2026/status/2057244756565258604"
+  },
+  "importedAt": "2026-05-22"
+}

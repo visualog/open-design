@@ -1,0 +1,86 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "image-template-social-media-post-low-angle-futuristic-fashion-editorial",
+  "title": "Social Media Post - Low-Angle Futuristic Fashion Editorial",
+  "version": "0.1.0",
+  "description": "Creates a cinematic full-body male fashion portrait in a neon-lit brutalist corridor for editorial or advertising visuals.",
+  "license": "CC-BY-4.0",
+  "author": {
+    "name": "Dilshad Hussain",
+    "url": "https://x.com/DilshadAI1/status/2057109663657939071#reversed-0"
+  },
+  "homepage": "https://github.com/YouMind-OpenLab/awesome-gpt-image-2",
+  "tags": [
+    "image-template",
+    "first-party",
+    "image",
+    "social-media-post",
+    "cinematic",
+    "cyberpunk"
+  ],
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "image",
+    "scenario": "image",
+    "surface": "image",
+    "preview": {
+      "type": "image",
+      "poster": "https://cms-assets.youmind.com/media/1779354422174_6fcf9v_HIxSNrCbMAAd3vp.jpg"
+    },
+    "useCase": {
+      "query": "A cinematic low-angle 35mm fashion editorial photograph of a confident {argument name=\"subject\" default=\"male model\"} standing full-body in the center of a futuristic concrete-and-glass corridor. He poses with both hands in his front jean pockets, legs apart in a powerful stance, looking down toward the camera. He wears a pale mint green vertical-striped button-down shirt with ornate embroidered floral designs across both chest areas, dark blue denim jeans, and polished brown leather boots. The setting is a tall brutalist architectural passage with raw gray concrete walls, large dark reflective glass panels on both sides, a rectangular skylight overhead, and a series of nested geometric doorway frames receding into the distance. Add exactly 8 prominent cyan-blue neon light strips: 2 long diagonal vertical strips on the near left and right walls, 2 angular frame outlines in the mid-ground, and 4 thinner reflected/receding strips visible through the glass and corridor depth. Use a highly polished stone floor with subtle reflections, symmetrical one-point perspective, dramatic vertical lines, cool teal-blue color grading, soft dust particles floating in the air, and bright daylight from the skylight. Shot from floor level with a wide-angle lens, exaggerated perspective, editorial fashion lighting, crisp realistic textures, shallow atmospheric haze, high contrast, no text, no logos, no watermark."
+    },
+    "inputs": [
+      {
+        "name": "model",
+        "label": "Model",
+        "type": "select",
+        "options": [
+          "gpt-image-2"
+        ],
+        "default": "gpt-image-2"
+      },
+      {
+        "name": "aspect",
+        "label": "Aspect ratio",
+        "type": "select",
+        "options": [
+          "1:1",
+          "16:9",
+          "9:16",
+          "4:5",
+          "3:2"
+        ],
+        "default": "1:1"
+      }
+    ],
+    "context": {
+      "assets": [
+        "./template.json"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "image-generate"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "media:image-generate"
+    ],
+    "importedAt": "2026-05-22",
+    "localized": {
+      "ko": {
+        "title": "소셜 미디어 포스트 - 로우 앵글 미래적 패션 에디토리얼",
+        "description": "gpt-image-2 이미지 생성을 위한 소셜 미디어 포스트 프롬프트 템플릿입니다. 카드 제목과 설명은 한국어로 표시하지만 프롬프트 본문은 원문을 유지합니다."
+      }
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "id": "social-media-post-imperial-marshal-anime-commander",
+  "surface": "image",
+  "title": "Social Media Post - Imperial Marshal Anime Commander",
+  "summary": "Generates a cinematic dark fantasy anime portrait of an ornate male military marshal in a steampunk imperial battlefield setting.",
+  "category": "Social Media Post",
+  "tags": [
+    "anime",
+    "cinematic",
+    "fantasy"
+  ],
+  "model": "gpt-image-2",
+  "aspect": "1:1",
+  "prompt": "Create a dramatic vertical anime fantasy-military illustration of {argument name=\"character name\" default=\"Marshal Berg\"}, an imposing adult male commander standing in a low-angle hero shot. He has {argument name=\"hair color\" default=\"long tousled blond hair\"} blown by the wind, a stern aristocratic presence, and a face visible without obstruction. Dress him in a black imperial marshal uniform with a high structured collar, fitted black jacket, gold piping, ornate epaulettes with heavy fringe, medals, jeweled brooches, layered gold chains, tassels, leather gloves, a wide black belt with a decorative gold buckle, and a deep crimson cape lined in shadow. His right hand holds an ornate black pistol angled downward in the foreground; his other hand rests near his side with confident posture. The setting is a grand dark steampunk-fantasy empire at dusk, with stormy glowing clouds, ember sparks, gothic towers, iron railings, red banners, and a huge military flag bearing a gold winged crest and crown on the left. In the sky show exactly 5 visible flying war machines: 2 large zeppelin airships and 3 smaller aircraft silhouettes. Use cinematic backlighting from the cloudy sunset, strong rim light on the hair and shoulders, high contrast shadows, intricate gold details, dynamic wind, epic scale, ultra-detailed anime painting style, sharp composition, no text, no watermark, no facial censor block, no blur.",
+  "previewImageUrl": "https://cms-assets.youmind.com/media/1779354390438_g4sdpr_HIxmUFPbwAEICdK.jpg",
+  "source": {
+    "repo": "YouMind-OpenLab/awesome-gpt-image-2",
+    "license": "CC-BY-4.0",
+    "author": "AIossansan",
+    "url": "https://x.com/toraaiuser2/status/2057133330165084427#reversed-0"
+  },
+  "importedAt": "2026-05-22"
+}

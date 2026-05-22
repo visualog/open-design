@@ -1,0 +1,23 @@
+{
+  "id": "profile-avatar-golden-hour-privacy-portrait",
+  "surface": "image",
+  "title": "Profile / Avatar - Golden Hour Privacy Portrait",
+  "summary": "A warm backlit outdoor portrait of a woman with her face hidden by a privacy block, useful for anonymized lifestyle photography concepts.",
+  "category": "Profile / Avatar",
+  "tags": [
+    "portrait",
+    "cinematic",
+    "nature"
+  ],
+  "model": "gpt-image-2",
+  "aspect": "1:1",
+  "prompt": "Create a vertical golden-hour portrait photograph of {argument name=\"subject\" default=\"a young woman\"} outdoors in a lush green forest or garden, shown from the shoulders up in left-facing side profile with her face deliberately covered by a large opaque square privacy block in warm medium brown. She has {argument name=\"hair color\" default=\"light brown\"} hair gathered into a loose messy bun at the back of her head, with many fine flyaway strands glowing in strong backlight. She wears a simple {argument name=\"top color\" default=\"white\"} spaghetti-strap tank top, exposing her shoulder and upper back. The scene is lit by low sun behind her head, creating bright rim light, warm amber highlights, lens flare, and circular bokeh throughout a softly blurred green background. Use a realistic DSLR look with shallow depth of field, natural skin texture on the visible neck and shoulder, warm cinematic color grading, and a candid intimate mood. Composition: portrait orientation, subject centered slightly right, head near the top third, shoulder and torso filling the lower half. Add a small subtle signature-like watermark near the bottom right and a small circular social-media-style icon beneath it. Avoid extra people, text, or props.",
+  "previewImageUrl": "https://cms-assets.youmind.com/media/1779354413606_nxouoj_HIwM08vakAEfage.jpg",
+  "source": {
+    "repo": "YouMind-OpenLab/awesome-gpt-image-2",
+    "license": "CC-BY-4.0",
+    "author": "CHAse",
+    "url": "https://x.com/CHAseUnre/status/2057033260077928823#reversed-0"
+  },
+  "importedAt": "2026-05-22"
+}

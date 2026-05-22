@@ -84,7 +84,8 @@ export function resolveSystemLocale(languages: readonly string[]): Locale | null
 
 // First-run defaults to the user's browser/system language when possible.
 // An explicit user pick saved to localStorage always wins; unsupported
-// languages fall back to English.
+// languages fall back to Korean so the local Open Design build starts
+// from the Korean-first surface this repo ships for.
 export function resolveInitialLocale(
   stored: string | null | undefined,
   browserLanguages: readonly string[] = [],
@@ -94,11 +95,11 @@ export function resolveInitialLocale(
   }
   const primary = browserLanguages[0]?.toLowerCase();
   if (primary === 'ko' || primary?.startsWith('ko-')) return 'ko';
-  return resolveSystemLocale(browserLanguages) ?? 'en';
+  return resolveSystemLocale(browserLanguages) ?? 'ko';
 }
 
 function detectInitialLocale(): Locale {
-  if (typeof window === 'undefined') return 'en';
+  if (typeof window === 'undefined') return 'ko';
   let stored: string | null = null;
   try {
     stored = window.localStorage.getItem(LS_KEY);

@@ -1,0 +1,87 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "video-template-giant-walking-nomadic-kingdom",
+  "title": "Giant Walking Nomadic Kingdom",
+  "version": "0.1.0",
+  "description": "A colossal-scale fantasy prompt showing giant creatures carrying entire cities across a vast golden desert with detailed environmental physics.",
+  "license": "CC-BY-4.0",
+  "author": {
+    "name": "LudovicCreator",
+    "url": "https://x.com/LudovicCreator/status/2057023581435883843"
+  },
+  "homepage": "https://github.com/YouMind-OpenLab/awesome-seedance-2-prompts",
+  "tags": [
+    "video-template",
+    "first-party",
+    "video",
+    "advertising",
+    "cinematic",
+    "fantasy",
+    "nature"
+  ],
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "video",
+    "scenario": "video",
+    "surface": "video",
+    "preview": {
+      "type": "video",
+      "poster": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/a0185cfea2d62a297d10fc77f3aea129/thumbnails/thumbnail.jpg",
+      "video": "https://customer-qs6wnyfuv0gcybzj.cloudflarestream.com/a0185cfea2d62a297d10fc77f3aea129/downloads/default.mp4"
+    },
+    "useCase": {
+      "query": "Ultra-cinematic fantasy desert sequence featuring an enormous wandering kingdom carried on the backs of gigantic walking creatures crossing endless dunes beneath a blazing sun.\n\nColossal ancient beasts larger than mountains slowly walk across the desert carrying entire cities, palaces, marketplaces, temples, bridges, and hanging gardens built into massive armored platforms strapped to their backs. Their footsteps shake the sand like earthquakes while dunes ripple outward for miles.\n\nThe camera opens with an aerial view above endless golden desert oceans as multiple giant creatures emerge through heat haze and dust storms. Massive cloth banners whip violently in desert wind while sunlight reflects across gold-plated architecture and weathered stone towers.\n\nThe camera glides low beside one titan creature, revealing gigantic legs crashing into dunes, chains and ceremonial bells swinging beneath enormous platforms. Traders, soldiers, priests, and travelers move through crowded streets built atop the creature’s back while giant sails capture desert wind.\n\nSand cascades continuously from moving architecture like waterfalls. Bridges sway between towers as the creature walks. Ancient engines, water wheels, and glowing blue oasis reservoirs pulse inside the mobile kingdom.\n\nThe camera transitions through bustling bazaars filled with incense smoke, hanging fabrics, bronze lanterns, exotic creatures, and royal guards riding along elevated pathways overlooking endless dunes below.\n\nDuring sunset, the creatures cross through a colossal sandstorm. Golden light cuts through airborne dust while giant shadows move across the desert. Lightning flashes inside distant storm clouds as the kingdom continues marching forward.\n\nFinal cinematic reveal: dozens of walking kingdoms travel together across the horizon like migrating gods beneath twin suns while endless desert winds erase their footprints behind them.\n\nStyle: ultra cinematic fantasy realism, colossal scale, grounded creature physics, atmospheric desert worldbuilding, warm golden lighting, realistic cloth and sand simulation, majestic nomadic empire aesthetic, epic environmental cinematography, AAA fantasy film quality, no text, no overlays."
+    },
+    "inputs": [
+      {
+        "name": "model",
+        "label": "Model",
+        "type": "select",
+        "options": [
+          "seedance-2.0"
+        ],
+        "default": "seedance-2.0"
+      },
+      {
+        "name": "aspect",
+        "label": "Aspect ratio",
+        "type": "select",
+        "options": [
+          "16:9",
+          "9:16",
+          "1:1",
+          "4:5"
+        ],
+        "default": "16:9"
+      }
+    ],
+    "context": {
+      "assets": [
+        "./template.json"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "video-generate"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "media:video-generate"
+    ],
+    "importedAt": "2026-05-22",
+    "localized": {
+      "ko": {
+        "title": "거대 이동 유목 왕국",
+        "description": "seedance-2.0 비디오 생성을 위한 창작 템플릿 프롬프트 템플릿입니다. 카드 제목과 설명은 한국어로 표시하지만 프롬프트 본문은 원문을 유지합니다."
+      }
+    }
+  }
+}

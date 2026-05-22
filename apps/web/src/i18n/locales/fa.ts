@@ -340,7 +340,11 @@ export const fa: Dict = {
   'promptTemplates.openFullscreen': 'باز کردن پیش‌نمایش تمام‌صفحه',
   'promptTemplates.closeFullscreen': 'بستن پیش‌نمایش تمام‌صفحه',
   'promptTemplates.allSources': 'همهٔ منابع',
-  'promptTemplates.sourceFilterAria': 'فیلتر بر اساس منبع',
+  'promptTemplates.sourceFilterAria': 'Filter by source',
+  'promptTemplates.sortAria': 'Sort templates',
+  'promptTemplates.sortName': 'Name',
+  'promptTemplates.sortNewest': 'Newest',
+  'promptTemplates.newBadge': 'New',
   'promptTemplates.retry': 'تلاش دوباره',
 
   'connectors.title': 'اتصال‌دهنده‌ها',
