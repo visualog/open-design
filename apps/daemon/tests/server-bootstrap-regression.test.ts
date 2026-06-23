@@ -200,6 +200,15 @@ describe('server route inventory', () => {
       'GET /api/craft',
       'GET /api/craft/:id',
     ];
+    const brandRouteKeys = [
+      'GET /api/brands',
+      'POST /api/brands',
+      'POST /api/brands/:id/preview',
+      'POST /api/brands/:id/finalize',
+      'GET /api/brands/:id',
+      'DELETE /api/brands/:id',
+      'GET /api/brands/:id/logo',
+    ];
     const staticCatalogRouteKeys = [
       'GET /api/skills/:id/example',
       'GET /api/skills/:id/assets/*splat',
@@ -254,6 +263,7 @@ describe('server route inventory', () => {
     expect(routeKeys.filter((key) => projectArchiveRouteKeys.includes(key))).toEqual(projectArchiveRouteKeys);
     expect(routeKeys.filter((key) => projectTemplateAndArtifactRouteKeys.includes(key))).toEqual(projectTemplateAndArtifactRouteKeys);
     expect(routeKeys.filter((key) => designSystemRouteKeys.includes(key))).toEqual(designSystemRouteKeys);
+    expect(routeKeys.filter((key) => brandRouteKeys.includes(key))).toEqual(brandRouteKeys);
     expect(routeKeys.filter((key) => staticCatalogRouteKeys.includes(key))).toEqual(staticCatalogRouteKeys);
     expect(routeKeys.filter((key) => mediaConfigRouteKeys.includes(key))).toEqual(mediaConfigRouteKeys);
 
@@ -272,6 +282,7 @@ describe('server route inventory', () => {
     expect(routeKeys.filter((key) => key === 'GET /api/atoms')).toHaveLength(1);
     expect(routeKeys.filter((key) => key === 'GET /api/design-systems/:id')).toHaveLength(1);
     expect(routeKeys.filter((key) => key === 'GET /api/design-systems/:id/preview')).toHaveLength(1);
+    expect(routeKeys.filter((key) => key === 'POST /api/brands')).toHaveLength(1);
     expect(routeKeys.filter((key) => key === 'POST /api/projects/:id/upload')).toHaveLength(1);
     expect(routeKeys.filter((key) => key === 'POST /api/runs')).toHaveLength(1);
     expect(routeKeys.filter((key) => key === 'POST /api/chat')).toHaveLength(1);
