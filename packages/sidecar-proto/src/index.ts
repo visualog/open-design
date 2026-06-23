@@ -67,14 +67,27 @@ export const SIDECAR_DEFAULTS = Object.freeze({
   windowsPipePrefix: "open-design",
 } as const);
 
+export const OPEN_DESIGN_PRODUCT_NAME = "Open Design";
+
+export function resolveWindowsReleaseNamespaceToken(value: string): string {
+  return value.replace(/[^A-Za-z0-9._-]+/g, "-");
+}
+
+export function resolveWindowsUninstallRegistryKey(namespace: string): string {
+  const namespaceToken = resolveWindowsReleaseNamespaceToken(namespace);
+  return `Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${OPEN_DESIGN_PRODUCT_NAME}-${namespaceToken}`;
+}
+
 export const SIDECAR_MESSAGES = Object.freeze({
   CLICK: "click",
   CONSOLE: "console",
   EVAL: "eval",
   EXPORT_PDF: "export-pdf",
+  MINT_IMPORT_TOKEN: "mint-import-token",
   REGISTER_DESKTOP_AUTH: "register-desktop-auth",
   SCREENSHOT: "screenshot",
   SHUTDOWN: "shutdown",
+  SHOW: "show",
   STATUS: "status",
   UPDATE: "update",
 } as const);
@@ -97,6 +110,8 @@ export type DesktopUpdateMode = (typeof DESKTOP_UPDATE_MODES)[keyof typeof DESKT
 
 export const DESKTOP_UPDATE_CHANNELS = Object.freeze({
   BETA: "beta",
+  NIGHTLY: "nightly",
+  PREVIEW: "preview",
   STABLE: "stable",
 } as const);
 
@@ -138,6 +153,7 @@ export type ServiceRuntimeState = "idle" | "running" | "starting" | "stopped" | 
 export type DaemonStatusSnapshot = {
   pid?: number | null;
   state: ServiceRuntimeState;
+  trustedWebOriginPort?: number | null;
   updatedAt?: string;
   url: string | null;
   /**
@@ -263,7 +279,12 @@ export type DesktopUpdateErrorSnapshot = {
 };
 
 export type DesktopUpdateInstallResult = {
+  activeVersion?: string;
+  artifactPath?: string;
   dryRun?: boolean;
+  helperLogPath?: string;
+  launcherRuntimePath?: string;
+  launchPath?: string;
   openedAt: string;
   path: string;
 };
@@ -292,12 +313,41 @@ export type DesktopUpdateIncomingSnapshot = {
   version: string;
 };
 
+export type DesktopUpdateCacheLifecycleTrigger = "cold-start" | "next-version-ready";
+
+export type DesktopUpdateReleaseLifecycleState =
+  | "cleanup-deferred"
+  | "cleanup-removed"
+  | "deprecated"
+  | "retained"
+  | "unknown";
+
+export type DesktopUpdateCacheLifecycleSummary = {
+  lastRunAt?: string;
+  lastTrigger?: DesktopUpdateCacheLifecycleTrigger;
+  platform: string;
+  releases: {
+    cleanupDeferred: number;
+    cleanupRemoved: number;
+    deprecated: number;
+    errors: number;
+    retained: number;
+    total: number;
+    unknown: number;
+  };
+};
+
+export type DesktopUpdateCacheSnapshot = {
+  lifecycle?: DesktopUpdateCacheLifecycleSummary;
+};
+
 export type DesktopUpdateStatusSnapshot = {
   active?: DesktopUpdateReleaseSnapshot;
   arch: string;
   artifact?: DesktopUpdateArtifactSnapshot;
   artifactUrl?: string;
   availableVersion?: string;
+  cache?: DesktopUpdateCacheSnapshot;
   capabilities: DesktopUpdateCapabilitySet;
   channel: DesktopUpdateChannel;
   checksum?: DesktopUpdateChecksumSnapshot;
@@ -328,6 +378,7 @@ export type SidecarShutdownMessage = { type: typeof SIDECAR_MESSAGES.SHUTDOWN };
 export type DesktopEvalMessage = { input: DesktopEvalInput; type: typeof SIDECAR_MESSAGES.EVAL };
 export type DesktopScreenshotMessage = { input: DesktopScreenshotInput; type: typeof SIDECAR_MESSAGES.SCREENSHOT };
 export type DesktopConsoleMessage = { type: typeof SIDECAR_MESSAGES.CONSOLE };
+export type DesktopShowMessage = { type: typeof SIDECAR_MESSAGES.SHOW };
 export type DesktopClickMessage = { input: DesktopClickInput; type: typeof SIDECAR_MESSAGES.CLICK };
 export type DesktopExportPdfMessage = { input: DesktopExportPdfInput; type: typeof SIDECAR_MESSAGES.EXPORT_PDF };
 export type DesktopUpdateMessage = { input: DesktopUpdateInput; type: typeof SIDECAR_MESSAGES.UPDATE };
@@ -354,10 +405,25 @@ export type RegisterDesktopAuthResult = {
   accepted: true;
 };
 
+export type MintImportTokenInput = {
+  baseDir: string;
+};
+
+export type MintImportTokenMessage = {
+  input: MintImportTokenInput;
+  type: typeof SIDECAR_MESSAGES.MINT_IMPORT_TOKEN;
+};
+
+export type MintImportTokenResult =
+  | { ok: true; expiresAt: string; token: string }
+  | { ok: false; code: "DESKTOP_AUTH_INACTIVE"; message: string; retryable: false }
+  | { ok: false; code: "DESKTOP_AUTH_PENDING"; message: string; retryable: true };
+
 export type DaemonSidecarMessage =
   | SidecarStatusMessage
   | SidecarShutdownMessage
-  | RegisterDesktopAuthMessage;
+  | RegisterDesktopAuthMessage
+  | MintImportTokenMessage;
 export type WebSidecarMessage = SidecarStatusMessage | SidecarShutdownMessage;
 export type DesktopSidecarMessage =
   | SidecarStatusMessage
@@ -365,6 +431,7 @@ export type DesktopSidecarMessage =
   | DesktopEvalMessage
   | DesktopScreenshotMessage
   | DesktopConsoleMessage
+  | DesktopShowMessage
   | DesktopClickMessage
   | DesktopExportPdfMessage
   | DesktopUpdateMessage;
@@ -549,6 +616,12 @@ function normalizeRegisterDesktopAuthInput(input: unknown): RegisterDesktopAuthI
   return { secret };
 }
 
+function normalizeMintImportTokenInput(input: unknown): MintImportTokenInput {
+  const value = assertObject(input, "mint-import-token input");
+  assertKnownKeys(value, ["baseDir"], "mint-import-token input");
+  return { baseDir: normalizeNonEmptyString(value.baseDir, "mint-import-token baseDir") };
+}
+
 function normalizeBoolean(value: unknown, label: string): boolean {
   if (typeof value !== "boolean") throw new Error(`${label} must be a boolean`);
   return value;
@@ -597,6 +670,10 @@ export function normalizeDaemonSidecarMessage(input: unknown): DaemonSidecarMess
     assertKnownKeys(value, ["input", "type"], "daemon sidecar message");
     return { input: normalizeRegisterDesktopAuthInput(value.input), type };
   }
+  if (type === SIDECAR_MESSAGES.MINT_IMPORT_TOKEN) {
+    assertKnownKeys(value, ["input", "type"], "daemon sidecar message");
+    return { input: normalizeMintImportTokenInput(value.input), type };
+  }
   throw new SidecarContractError(SIDECAR_ERROR_CODES.UNKNOWN_MESSAGE, `unknown daemon sidecar message: ${type}`);
 }
 
@@ -617,6 +694,7 @@ export function normalizeDesktopSidecarMessage(input: unknown): DesktopSidecarMe
     case SIDECAR_MESSAGES.STATUS:
     case SIDECAR_MESSAGES.SHUTDOWN:
     case SIDECAR_MESSAGES.CONSOLE:
+    case SIDECAR_MESSAGES.SHOW:
       assertKnownKeys(value, ["type"], "desktop sidecar message");
       return { type };
     case SIDECAR_MESSAGES.EVAL:

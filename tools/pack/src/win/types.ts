@@ -1,4 +1,6 @@
 import type { DesktopEvalResult, DesktopScreenshotResult, DesktopStatusSnapshot, DesktopUpdateResult } from "@open-design/sidecar-proto";
+import type { ToolPackLauncherRuntimeSnapshot } from "../launcher-runtime-snapshot.js";
+import type { ToolPackUpdateCacheLifecycleSnapshot } from "../update-cache-lifecycle-snapshot.js";
 import type { CacheReport } from "../cache.js";
 import type { ToolPackConfig } from "../config.js";
 import type { INTERNAL_PACKAGES } from "./constants.js";
@@ -63,8 +65,10 @@ export type WinPaths = {
   exePath: string;
   installDir: string;
   installedExePath: string;
-  installerPayloadPath: string;
+  installerBasePayloadPath: string;
+  installerOverlayPayloadPath: string;
   installerScriptPath: string;
+  launcherPayloadPath: string;
   publicDesktopShortcutPath: string;
   latestYmlPath: string;
   installMarkerPath: string;
@@ -76,6 +80,7 @@ export type WinPaths = {
   packagedMainPrebundlePath: string;
   resourceRoot: string;
   setupPath: string;
+  setupZipPath: string;
   startMenuShortcutPath: string;
   tarballsRoot: string;
   userDesktopShortcutPath: string;
@@ -96,9 +101,12 @@ export type WinPackResult = {
   installerPath: string | null;
   latestYmlPath: string | null;
   outputRoot: string;
+  payloadPath: string | null;
+  portableZipPath: string | null;
   resourceRoot: string;
   runtimeNamespaceRoot: string;
   cacheReport: CacheReport;
+  segments: WinPackTiming[];
   sizeReport: WinSizeReport;
   timings: WinPackTiming[];
   to: ToolPackConfig["to"];
@@ -107,6 +115,7 @@ export type WinPackResult = {
 };
 
 export type WinPackTiming = {
+  details?: Record<string, unknown>;
   durationMs: number;
   phase: string;
 };
@@ -123,12 +132,13 @@ export type WinSizeReport = {
     };
     nodeGypRebuild: boolean;
     npmRebuild: boolean;
-    targets: Array<"dir" | "nsis">;
+    targets: Array<"dir" | "nsis" | "zip">;
     webOutputMode: ToolPackConfig["webOutputMode"];
   };
   generatedAt: string;
   installerBytes: number | null;
   outputRootBytes: number;
+  portableZipBytes: number | null;
   resourceRootBytes: number;
   runtimeNamespaceRoot: string;
   topLevel: {
@@ -175,6 +185,7 @@ export type WinInstallResult = {
   desktopShortcutExists: boolean;
   desktopShortcutPath: string;
   installDir: string;
+  lifecycleTimings: WinLifecycleTiming[];
   installerPath: string;
   installPayload: WinInstallPayloadReport;
   markerPath: string;
@@ -197,6 +208,11 @@ export type WinInstallPayloadReport = {
   }>;
 };
 
+export type WinLifecycleTiming = {
+  durationMs: number;
+  step: string;
+};
+
 export type WinStartResult = {
   executablePath: string;
   logPath: string;
@@ -215,9 +231,11 @@ export type WinStopResult = {
 };
 
 export type WinUninstallResult = {
+  lifecycleTimings: WinLifecycleTiming[];
   markerPath: string;
   namespace: string;
   nsisLogPath: string;
+  removedCacheRoot: boolean;
   registryResiduesRemoved: string[];
   removedDataRoot: boolean;
   removedLogsRoot: boolean;
@@ -232,7 +250,9 @@ export type WinUninstallResult = {
 
 export type WinCleanupResult = {
   namespace: string;
+  removedLauncherNamespaceRoot: boolean;
   removedOutputRoot: boolean;
+  removedCacheRoot: boolean;
   removedProductUserDataRoot: boolean;
   removedRuntimeNamespaceRoot: boolean;
   removalPlan: WinRemovalTarget[];
@@ -268,7 +288,7 @@ export type WinResidueObservation = {
 export type WinRemovalTarget = {
   exists: boolean;
   path: string;
-  scope: "data" | "logs" | "product-user-data" | "sidecars";
+  scope: "cache" | "data" | "logs" | "product-user-data" | "sidecars";
   willRemove: boolean;
 };
 
@@ -312,7 +332,19 @@ export type WinResetResult = {
 
 export type WinInspectResult = {
   eval?: DesktopEvalResult;
+  launcher: ToolPackLauncherRuntimeSnapshot;
+  launcherSource: {
+    kind: "tools-pack-runtime";
+    note: string;
+    root: string;
+  };
   screenshot?: DesktopScreenshotResult;
   status: DesktopStatusSnapshot | null;
+  updateCache: ToolPackUpdateCacheLifecycleSnapshot;
+  updateCacheSource: {
+    kind: "tools-pack-runtime";
+    note: string;
+    root: string;
+  };
   update?: DesktopUpdateResult;
 };

@@ -42,15 +42,18 @@ import {
   resolveStopApps,
   resolveTargetApps,
   resolveToolDevConfig,
+  WORKSPACE_ROOT,
   type ToolDevAppName,
   type ToolDevConfig,
   type ToolDevOptions,
 } from "./config.js";
 import {
   appendStartupLogDiagnostics,
+  createUnsupportedNodeRuntimeError,
   createStartupLogDiagnostics,
   detectLogDiagnostics,
   formatLogDiagnostics,
+  isSupportedNodeRuntime,
   type LogDiagnostic,
 } from "./diagnostics.js";
 import {
@@ -61,10 +64,15 @@ import {
   waitForDesktopRuntime,
   waitForWebRuntime,
 } from "./sidecar-client.js";
+import { rewriteCliArgsForDefaultStart } from "./cli-args.js";
 import { ensureDaemonGateForDesktop } from "./desktop-auth-gate.js";
+import { loadWorkspaceLocalEnv } from "./local-env.js";
+import { resolveSharedPortsFromRunningState } from "./shared-ports.js";
 
 type CliOptions = ToolDevOptions & {
+  envFile?: string | string[];
   expr?: string;
+  noEnvFile?: boolean;
   parentPid?: number;
   path?: string;
   selector?: string;
@@ -96,6 +104,10 @@ function output(payload: unknown, options: CliOptions = {}): void {
     return;
   }
   printJson(payload);
+}
+
+function assertSupportedNodeRuntimeForStart(): void {
+  if (!isSupportedNodeRuntime()) throw createUnsupportedNodeRuntimeError();
 }
 
 function normalizeDisplayUrl(url: string): string {
@@ -620,12 +632,29 @@ async function spawnDesktopRuntime(config: ToolDevConfig, options: CliOptions): 
 async function startDaemon(
   config: ToolDevConfig,
   options: CliOptions,
-  startOptions: { requireDesktopAuth?: boolean } = {},
+  startOptions: { refreshWebOrigin?: boolean; requireDesktopAuth?: boolean } = {},
 ) {
   const daemonPort = parsePortOption(options.daemonPort, "--daemon-port");
-  const existing = await inspectDaemonRuntime(runtimeLookup(config));
+  const webPort = parsePortOption(options.webPort, "--web-port");
+  let existing = await inspectDaemonRuntime(runtimeLookup(config));
+  const shouldRefreshWebOrigin = startOptions.refreshWebOrigin === true && webPort != null;
+  const existingWeb = shouldRefreshWebOrigin
+    ? await inspectWebRuntime(runtimeLookup(config))
+    : null;
+  if (existingWeb?.url != null && !statusMatchesForcedPort(existingWeb.url, webPort)) {
+    throw new Error(`${APP_KEYS.WEB} is already running in namespace ${config.namespace} at ${existingWeb.url}; stop it or choose another namespace`);
+  }
+  const daemonTrustedWebOriginPort = existing?.trustedWebOriginPort ?? null;
   if (existing?.url != null && statusMatchesForcedPort(existing.url, daemonPort)) {
-    return { app: APP_KEYS.DAEMON, created: false, logPath: config.apps.daemon.latestLogPath, status: existing };
+    if (shouldRefreshWebOrigin && daemonTrustedWebOriginPort !== webPort) {
+      if (existingWeb?.url != null) {
+        await stopApp(config, APP_KEYS.WEB);
+      }
+      await stopApp(config, APP_KEYS.DAEMON);
+      existing = null;
+    } else {
+      return { app: APP_KEYS.DAEMON, created: false, logPath: config.apps.daemon.latestLogPath, status: existing };
+    }
   }
   if (existing?.url != null) {
     throw new Error(`${APP_KEYS.DAEMON} is already running in namespace ${config.namespace} at ${existing.url}; stop it or choose another namespace`);
@@ -725,6 +754,7 @@ async function startApp(
         // auth gate via env var so the daemon refuses tokenless imports
         // before desktop has had a chance to register. The introspection
         // case (desktop already running) is handled inside startDaemon.
+        refreshWebOrigin: context.targets?.includes(APP_KEYS.WEB) === true,
         requireDesktopAuth: context.targets?.includes(APP_KEYS.DESKTOP) === true,
       });
     case APP_KEYS.WEB:
@@ -744,10 +774,14 @@ async function startApp(
         // across the hardening restart. Without this, a stack started
         // with `--daemon-port`/`--web-port` would silently drift to
         // random ports during the restart, breaking pinned browsers.
-        startDaemonGated: async ({ port }) => {
+        startDaemonGated: async ({ port, webPort }) => {
           const portedOptions: CliOptions =
-            port != null ? { ...options, daemonPort: port } : options;
-          await startDaemon(config, portedOptions, { requireDesktopAuth: true });
+            port != null ? { ...options, daemonPort: port } : { ...options };
+          if (webPort != null) portedOptions.webPort = webPort;
+          await startDaemon(config, portedOptions, {
+            refreshWebOrigin: webPort != null,
+            requireDesktopAuth: true,
+          });
         },
         startWeb: async ({ port }) => {
           const portedOptions: CliOptions =
@@ -854,6 +888,10 @@ async function status(config: ToolDevConfig, appName: string | undefined) {
 async function restartTargets(config: ToolDevConfig, appName: string | undefined, options: CliOptions) {
   const stopTargets = resolveStopApps(appName);
   const startTargets = resolveStartApps(appName);
+  await resolveSharedPortsFromRunningState(startTargets, options, {
+    daemonUrl: async () => (await inspectDaemonRuntime(runtimeLookup(config)))?.url,
+    webUrl: async () => (await inspectWebRuntime(runtimeLookup(config)))?.url,
+  });
   return {
     stop: await runSequential(stopTargets, (target) => stopApp(config, target)),
     start: await runSequential(startTargets, (target) => startApp(config, target, options, { targets: startTargets })),
@@ -1010,6 +1048,10 @@ function stopOrderFor(targets: readonly ToolDevAppName[]): ToolDevAppName[] {
 async function runForeground(config: ToolDevConfig, appName: string | undefined, options: CliOptions) {
   const targets = resolveRunApps(appName);
   const foregroundOptions = { ...options, parentPid: process.pid };
+  await resolveSharedPortsFromRunningState(targets, foregroundOptions, {
+    daemonUrl: async () => (await inspectDaemonRuntime(runtimeLookup(config)))?.url,
+    webUrl: async () => (await inspectWebRuntime(runtimeLookup(config)))?.url,
+  });
   const started = await runSequential(targets, (target) => startApp(config, target, foregroundOptions, { targets }));
   printRunForegroundResult(started, options);
 
@@ -1041,6 +1083,8 @@ function addSharedOptions(command: ReturnType<typeof cli.command>) {
   return command
     .option("--namespace <name>", "runtime namespace (default: default)")
     .option("--tools-dev-root <path>", "tools-dev runtime root")
+    .option("--env-file <path>", "load env file before resolving tools-dev config; repeatable")
+    .option("--no-env-file", "skip automatic .env file loading", { default: false })
     .option("--json", "print JSON");
 }
 
@@ -1053,8 +1097,13 @@ function addPortOptions(command: ReturnType<typeof cli.command>) {
 
 addPortOptions(addSharedOptions(cli.command("start [app]", "Start daemon, web, desktop, or all when app is omitted"))).action(
   async (appName: string | undefined, options: CliOptions) => {
+    assertSupportedNodeRuntimeForStart();
     const config = resolveToolDevConfig(options);
     const targets = resolveStartApps(appName);
+    await resolveSharedPortsFromRunningState(targets, options, {
+      daemonUrl: async () => (await inspectDaemonRuntime(runtimeLookup(config)))?.url,
+      webUrl: async () => (await inspectWebRuntime(runtimeLookup(config)))?.url,
+    });
     const result = await runSequential(targets, (target) => startApp(config, target, options, { targets }));
     printStartResult(result, options);
   },
@@ -1062,6 +1111,7 @@ addPortOptions(addSharedOptions(cli.command("start [app]", "Start daemon, web, d
 
 addPortOptions(addSharedOptions(cli.command("run [app]", "Start apps and keep this command alive until interrupted"))).action(
   async (appName: string | undefined, options: CliOptions) => {
+    assertSupportedNodeRuntimeForStart();
     await runForeground(resolveToolDevConfig(options), appName, options);
   },
 );
@@ -1083,6 +1133,7 @@ addSharedOptions(cli.command("stop [app]", "Stop daemon, web, desktop, or all wh
 
 addPortOptions(addSharedOptions(cli.command("restart [app]", "Restart daemon, web, desktop, or all when app is omitted"))).action(
   async (appName: string | undefined, options: CliOptions) => {
+    assertSupportedNodeRuntimeForStart();
     printRestartResult(await restartTargets(resolveToolDevConfig(options), appName, options), options);
   },
 );
@@ -1128,10 +1179,11 @@ cli.help();
 
 const rawCliArgs = process.argv.slice(2);
 const cliArgs = rawCliArgs[0] === "--" ? rawCliArgs.slice(1) : rawCliArgs;
-process.argv.splice(2, process.argv.length - 2, ...cliArgs);
-
-if (cliArgs.length === 0 || (cliArgs[0]?.startsWith("-") && cliArgs[0] !== "--help" && cliArgs[0] !== "-h")) {
-  process.argv.splice(2, 0, "start");
-}
+loadWorkspaceLocalEnv({
+  args: cliArgs,
+  log: (message) => process.stderr.write(`${message}\n`),
+  workspaceRoot: WORKSPACE_ROOT,
+});
+process.argv.splice(2, process.argv.length - 2, ...rewriteCliArgsForDefaultStart(cliArgs));
 
 cli.parse();

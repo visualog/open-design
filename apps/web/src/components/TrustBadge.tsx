@@ -2,10 +2,16 @@ import type {
   MarketplaceTrust,
   TrustTier,
 } from '@open-design/contracts';
-import { useI18n } from '../i18n';
+import { useT } from '../i18n';
 
 type TrustBadgeTrust = TrustTier | MarketplaceTrust;
 type NormalizedTrustTier = 'official' | 'trusted' | 'restricted';
+
+const TRUST_LABEL_KEY = {
+  official: 'pluginsView.trust.official',
+  trusted: 'pluginsView.trust.trusted',
+  restricted: 'pluginsView.trust.restricted',
+} as const;
 
 interface Props {
   trust: TrustBadgeTrust;
@@ -14,36 +20,23 @@ interface Props {
   variant?: 'default' | 'overlay';
 }
 
-const TRUST_META: Record<
-  NormalizedTrustTier,
-  { label: string; description: string }
-> = {
-  official: {
-    label: 'Official',
-    description: 'Open Design official',
-  },
-  trusted: {
-    label: 'Trusted',
-    description: 'Community trusted',
-  },
-  restricted: {
-    label: 'Restricted',
-    description: 'Restricted source',
-  },
-};
-
 export function TrustBadge({
   trust,
   label,
   className,
   variant = 'default',
 }: Props) {
-  const { locale } = useI18n();
+  const t = useT();
   const tier = normalizeTrustTier(trust);
-  const meta = TRUST_META[tier];
-  const localized = TRUST_META_KO[tier] ?? meta;
-  const displayMeta = locale === 'ko' ? localized : meta;
-  const text = label ?? displayMeta.label;
+  // The visible text, tooltip, and screen-reader text all resolve from the
+  // localized tier key, so non-English locales never see mixed-language
+  // accessibility text leaking through (the old hard-coded English
+  // descriptions did exactly that). When a contextual `label` is supplied the
+  // accessible text keeps the localized tier prefix so assistive tech still
+  // announces the trust level, e.g. "Official: Action plugin".
+  const tierLabel = t(TRUST_LABEL_KEY[tier]);
+  const text = label ?? tierLabel;
+  const accessibleText = label ? `${tierLabel}: ${label}` : tierLabel;
   const classes = [
     'plugin-trust-badge',
     `plugin-trust-badge--${tier}`,
@@ -58,32 +51,14 @@ export function TrustBadge({
       className={classes}
       data-trust-tier={tier}
       data-trust-source={trust}
-      title={displayMeta.description}
-      aria-label={`${displayMeta.description}: ${text}`}
+      title={accessibleText}
+      aria-label={accessibleText}
     >
       <span className="plugin-trust-badge__dot" aria-hidden />
       <span>{text}</span>
     </span>
   );
 }
-
-const TRUST_META_KO: Record<
-  NormalizedTrustTier,
-  { label: string; description: string }
-> = {
-  official: {
-    label: '공식',
-    description: 'Open Design 공식',
-  },
-  trusted: {
-    label: '신뢰됨',
-    description: '커뮤니티 신뢰',
-  },
-  restricted: {
-    label: '제한됨',
-    description: '제한된 출처',
-  },
-};
 
 export function normalizeTrustTier(trust: TrustBadgeTrust): NormalizedTrustTier {
   if (trust === 'bundled' || trust === 'official') return 'official';

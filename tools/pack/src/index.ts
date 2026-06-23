@@ -77,14 +77,16 @@ function addSharedOptions(command: CacCommand) {
 const TO_HELP_BY_PLATFORM: Record<ToolPackPlatform, string> = {
   linux: "build target: all|appimage|dir (default: all)",
   mac: "build target: all|app|dmg|zip (default: all)",
-  win: "build target: all|dir|nsis (default: nsis)",
+  win: "build target: all|dir|nsis|zip (default: nsis). `zip` produces a portable zip from the unpacked build; `all` produces dir+nsis+zip.",
 };
 
 function addBuildOptions(command: CacCommand, platform: ToolPackPlatform) {
   return command
     .option("--app-version <version>", "override packaged app version for release artifacts")
     .option("--portable", "do not bake local tools-pack runtime roots into the packaged config")
-    .option("--signed", "build a signed/notarized mac artifact")
+    .option("--require-vela-cli", "fail packaging when the bundled Vela CLI cannot be resolved")
+    .option("--signed", "build a signed mac artifact")
+    .option("--notarize", "notarize a signed mac artifact")
     .option("--to <target>", TO_HELP_BY_PLATFORM[platform]);
 }
 
@@ -95,6 +97,7 @@ function addMacBuildOptions(command: CacCommand) {
 
 function addWinLifecycleOptions(command: CacCommand) {
   return command
+    .option("--remove-cache", "remove packaged download/cache data during uninstall/reset/cleanup")
     .option("--remove-data", "remove packaged data during uninstall/reset/cleanup")
     .option("--remove-logs", "remove packaged logs during uninstall/reset/cleanup")
     .option("--remove-product-user-data", "remove the public Electron app userData root during Windows uninstall/reset/cleanup")

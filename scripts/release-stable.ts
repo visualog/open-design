@@ -23,6 +23,7 @@ type GitHubRelease = {
 
 type ParsedStableVersion = {
   parsed: [number, number, number];
+  source?: string;
   value: string;
 };
 
@@ -41,6 +42,13 @@ type StableNightlyValidation = {
   nightlyVersion: string;
 };
 
+type ReleaseNamespaces = {
+  linux: string;
+  mac: string;
+  macIntel: string;
+  win: string;
+};
+
 function fail(message: string): never {
   console.error(`[release-stable] ${message}`);
   process.exit(1);
@@ -52,11 +60,55 @@ function parseChannel(value: string | undefined): ReleaseChannel {
   fail(`OPEN_DESIGN_RELEASE_CHANNEL must be stable or nightly; got ${value}`);
 }
 
+function parseBooleanInput(value: string | undefined, name: string): boolean {
+  if (value == null || value.length === 0 || value === "false") return false;
+  if (value === "true") return true;
+  fail(`${name} must be true or false; got ${value}`);
+}
+
 function parseStableVersion(value: string): [number, number, number] | null {
   const match = stableVersionPattern.exec(value);
   if (match == null) return null;
 
   return [Number(match[1]), Number(match[2]), Number(match[3])];
+}
+
+function parseStableVersionInput(value: string | undefined, sourceName: string): ParsedStableVersion | null {
+  const trimmed = value?.trim() ?? "";
+  if (trimmed.length === 0) return null;
+
+  const parsed = parseStableVersion(trimmed);
+  if (parsed == null) {
+    fail(`${sourceName} must be a stable x.y.z version; got ${trimmed}`);
+  }
+
+  return { parsed, source: sourceName, value: trimmed };
+}
+
+function resolveStableBaseVersion(branch: string, inputValue: string | undefined): ParsedStableVersion {
+  const branchMatch = stableReleaseBranchPattern.exec(branch);
+  const branchVersion =
+    branchMatch?.[1] == null
+      ? null
+      : ({
+          parsed: parseStableVersion(branchMatch[1]) ?? fail(`invalid release branch version: ${branchMatch[1]}`),
+          source: "GITHUB_REF_NAME",
+          value: branchMatch[1],
+        } satisfies ParsedStableVersion);
+  const inputVersion = parseStableVersionInput(inputValue, "OPEN_DESIGN_STABLE_VERSION");
+
+  if (branchVersion != null) {
+    if (inputVersion != null && inputVersion.value !== branchVersion.value) {
+      fail(
+        `OPEN_DESIGN_STABLE_VERSION ${inputVersion.value} must match release branch version ${branchVersion.value} when both are provided`,
+      );
+    }
+    return branchVersion;
+  }
+
+  if (inputVersion != null) return inputVersion;
+
+  fail("release-stable requires either a release/vX.Y.Z branch or OPEN_DESIGN_STABLE_VERSION");
 }
 
 function compareVersions(left: [number, number, number], right: [number, number, number]): number {
@@ -74,6 +126,17 @@ function compareVersions(left: [number, number, number], right: [number, number,
   }
 
   return 0;
+}
+
+function releaseNamespaces(channel: ReleaseChannel): ReleaseNamespaces {
+  const mac = channel === "nightly" ? "release-nightly" : "release-stable";
+
+  return {
+    linux: `${mac}-linux`,
+    mac,
+    macIntel: `${mac}-intel`,
+    win: `${mac}-win`,
+  };
 }
 
 function extractStableVersion(release: GitHubRelease): ParsedStableVersion | null {
@@ -432,17 +495,17 @@ function setOutput(name: string, value: string): void {
 
 const repository = process.env.GITHUB_REPOSITORY ?? fail("GITHUB_REPOSITORY is required");
 const channel = parseChannel(process.env.OPEN_DESIGN_RELEASE_CHANNEL);
+const dryRun = parseBooleanInput(process.env.OPEN_DESIGN_RELEASE_DRY_RUN, "OPEN_DESIGN_RELEASE_DRY_RUN");
+const namespaces = releaseNamespaces(channel);
 const packagedVersion = await readPackagedVersion();
-const packagedParsed = parseStableVersion(packagedVersion) ?? fail(`invalid packaged version: ${packagedVersion}`);
 const commit = process.env.GITHUB_SHA ?? "";
 const branch = process.env.GITHUB_REF_NAME ?? "";
-const branchMatch = stableReleaseBranchPattern.exec(branch);
-if (branchMatch?.[1] == null) {
-  fail(`release-stable can only run from release/vX.Y.Z branches; got ${branch || "(empty)"}`);
-}
-const branchVersion = branchMatch[1];
-if (branchVersion !== packagedVersion) {
-  fail(`release branch version ${branchVersion} must match apps/packaged/package.json version ${packagedVersion}`);
+const stableBaseVersion = resolveStableBaseVersion(branch, process.env.OPEN_DESIGN_STABLE_VERSION);
+const packagedParsed = stableBaseVersion.parsed;
+if (stableBaseVersion.value !== packagedVersion) {
+  fail(
+    `${stableBaseVersion.source ?? "release base"} version ${stableBaseVersion.value} must match apps/packaged/package.json version ${packagedVersion}`,
+  );
 }
 
 const releases = await fetchReleases(repository);
@@ -513,9 +576,24 @@ if (channel === "nightly") {
   releaseVersion = `${packagedVersion}.nightly.${nightlyNumber}`;
   releaseName = `Open Design Nightly ${releaseVersion}`;
   console.log(`[release-stable] latest nightly: ${latestNightly.nightlyVersion}`);
+} else if (process.env.OPEN_DESIGN_SKIP_STABLE_NIGHTLY_GATE === "true") {
+  // Escape hatch (skip_nightly_gate input). The stable-promotion gate validates
+  // a long list of fields on the candidate nightly's metadata; when a publisher
+  // gap leaves one missing (e.g. r2.reportZipUrl is hard-coded null), the gate
+  // blocks an otherwise-good release. This bypasses that validation for the run.
+  // The stable build still produces freshly built + signed artifacts and still
+  // runs publish-metadata.ts's own per-platform manifest consistency checks.
+  const skippedNightly = (process.env.OPEN_DESIGN_STABLE_NIGHTLY_VERSION ?? "").trim();
+  stateSource = skippedNightly.length > 0
+    ? `R2 nightly metadata ${skippedNightly} (gate skipped)`
+    : "stable build (nightly gate skipped)";
+  console.warn(
+    `[release-stable] WARNING: stable nightly gate skipped via skip_nightly_gate; not validating nightly ${skippedNightly || "(none)"}`,
+  );
 } else {
+  const stableReleaseBranch = `release/v${stableBaseVersion.value}`;
   const stableNightly = await validateStableNightlyMetadata({
-    branch,
+    branch: stableReleaseBranch,
     commit,
     nightlyVersionInput: process.env.OPEN_DESIGN_STABLE_NIGHTLY_VERSION,
     packagedVersion,
@@ -530,6 +608,8 @@ if (channel === "nightly") {
 console.log(`[release-stable] channel: ${channel}`);
 console.log(`[release-stable] base version: ${packagedVersion}`);
 console.log(`[release-stable] release version: ${releaseVersion}`);
+console.log(`[release-stable] namespace: ${namespaces.mac}`);
+console.log(`[release-stable] dry run: ${String(dryRun)}`);
 if (channel === "stable") console.log(`[release-stable] version tag: ${versionTag}`);
 console.log(`[release-stable] state source: ${stateSource}`);
 if (latestStable != null) console.log(`[release-stable] previous stable: ${latestStable.value}`);
@@ -538,7 +618,11 @@ setOutput("base_version", packagedVersion);
 setOutput("branch", branch);
 setOutput("channel", channel);
 setOutput("commit", commit);
+setOutput("dry_run", dryRun ? "true" : "false");
 setOutput("github_release_enabled", channel === "stable" ? "true" : "false");
+setOutput("linux_namespace", namespaces.linux);
+setOutput("mac_intel_namespace", namespaces.macIntel);
+setOutput("namespace", namespaces.mac);
 setOutput("nightly_number", nightlyNumber);
 setOutput("previous_stable", latestStable?.value ?? "");
 setOutput("release_name", releaseName);
@@ -546,3 +630,4 @@ setOutput("release_version", releaseVersion);
 setOutput("stable_version", packagedVersion);
 setOutput("state_source", stateSource);
 setOutput("version_tag", channel === "stable" ? versionTag : "");
+setOutput("win_namespace", namespaces.win);

@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
+import { Dialog, DialogDescription, DialogFooter, DialogTitle } from "@open-design/components";
 import { projectKindToTracking } from "@open-design/contracts/analytics";
 import { useAnalytics } from "../analytics/provider";
 import {
@@ -15,10 +16,14 @@ import type {
 	LiveArtifactSummary,
 	Project,
 	ProjectDisplayStatus,
+	ProjectFile,
 	SkillSummary,
 } from "../types";
+import { AnimatePresence } from "motion/react";
 import { Icon } from "./Icon";
+import { isDesignSystemProject, isPublishedDesignSystemProject } from "./design-system-project";
 import { LiveArtifactBadges } from "./LiveArtifactBadges";
+import { Toast } from "./Toast";
 
 type SubTab = "recent" | "yours";
 type ViewMode = "grid" | "kanban";
@@ -34,6 +39,7 @@ type DesignListItem =
 	  };
 
 const DESIGNS_VIEW_STORAGE_KEY = "od:designs:view";
+const PROJECTS_AUTO_REFRESH_MS = 15000;
 
 export const STATUS_ORDER = [
 	"not_started",
@@ -63,8 +69,11 @@ interface Props {
 	designSystems: DesignSystemSummary[];
 	onOpen: (id: string) => void;
 	onOpenLiveArtifact: (projectId: string, artifactId: string) => void;
-	onDelete: (id: string) => void;
+	onDelete: (id: string) => Promise<boolean | void> | boolean | void;
 	onRename?: (id: string, name: string) => void;
+	onNewProject?: () => void;
+	onRefresh?: () => Promise<void> | void;
+	isActive?: boolean;
 }
 
 export function DesignsTab({
@@ -75,7 +84,12 @@ export function DesignsTab({
 	onOpenLiveArtifact,
 	onDelete,
 	onRename,
+	onNewProject,
+	onRefresh,
+	isActive = true,
 }: Props) {
+	const renameTitleId = useId();
+	const confirmTitleId = useId();
 	const t = useT();
 	const analytics = useAnalytics();
 	// P0 page_view page_name=projects — fire once when the tab mounts so
@@ -94,12 +108,21 @@ export function DesignsTab({
 		Record<string, LiveArtifactSummary[]>
 	>({});
 	const [coverByProject, setCoverByProject] = useState<
-		Record<string, { kind: "html" | "image" | "video"; name: string } | null>
+		Record<string, { kind: "html" | "image" | "video" | "logo"; name: string } | null>
 	>({});
 	const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
 	const [selectMode, setSelectMode] = useState(false);
 	const [selected, setSelected] = useState<Set<string>>(new Set());
+	const toastIdRef = useRef(0);
+	const [designsToast, setDesignsToast] = useState<{
+		id: number;
+		message: string;
+		role?: "status" | "alert";
+		tone?: "default" | "success" | "error";
+	} | null>(null);
+	const [projectsRefreshing, setProjectsRefreshing] = useState(false);
 	const menuContainerRef = useRef<HTMLDivElement | null>(null);
+	const projectsRefreshInFlightRef = useRef(false);
 	const [renameTarget, setRenameTarget] = useState<{ id: string; original: string } | null>(null);
 	const [renameInput, setRenameInput] = useState("");
 	const [confirmTarget, setConfirmTarget] = useState<{
@@ -151,8 +174,28 @@ export function DesignsTab({
 		}
 		void Promise.all(
 			projects.map(async (project) => {
-				if (project.metadata?.entryFile) return [project.id, null] as const;
-				const files = await fetchProjectFiles(project.id);
+				const designSystemProject = isDesignSystemProject(project);
+				// Brand projects render a generated logo/monogram cover (see
+				// projectCover) instead of a raw HTML file preview, so skip the
+				// file scan entirely for them.
+				if (project.metadata?.kind === "brand") return [project.id, null] as const;
+				if (project.metadata?.entryFile && !designSystemProject) return [project.id, null] as const;
+				let files: Awaited<ReturnType<typeof fetchProjectFiles>>;
+				try {
+					files = await fetchProjectFiles(project.id);
+				} catch {
+					return [project.id, null] as const;
+				}
+				if (designSystemProject) {
+					const logo = findDesignSystemLogoFile(files);
+					if (logo) {
+						return [
+							project.id,
+							{ kind: "logo" as const, name: logo.path ?? logo.name },
+						] as const;
+					}
+					return [project.id, null] as const;
+				}
 				const html =
 					files.find((f) => (f.path ?? f.name) === "index.html") ??
 					files
@@ -234,6 +277,62 @@ export function DesignsTab({
 	useEffect(() => {
 		if (view === "kanban" && selectMode) exitSelectMode();
 	}, [selectMode, view]);
+
+	const refreshProjectsList = useCallback(
+		async (source: "manual" | "auto") => {
+			if (!onRefresh || projectsRefreshInFlightRef.current) return;
+			projectsRefreshInFlightRef.current = true;
+			setProjectsRefreshing(true);
+			if (source === "manual") {
+				trackProjectsListControlsClick(analytics.track, {
+					page_name: "projects",
+					area: "list_controls",
+					element: "refresh",
+				});
+			}
+			try {
+				await onRefresh();
+			} catch {
+				if (source === "manual") {
+					setDesignsToast({
+						id: (toastIdRef.current += 1),
+						message: t("liveArtifact.refresh.networkFailure"),
+						role: "alert",
+						tone: "error",
+					});
+				}
+			} finally {
+				projectsRefreshInFlightRef.current = false;
+				setProjectsRefreshing(false);
+			}
+		},
+		[analytics.track, onRefresh, t],
+	);
+
+	const refreshProjectsListRef = useRef(refreshProjectsList);
+	useEffect(() => {
+		refreshProjectsListRef.current = refreshProjectsList;
+	}, [refreshProjectsList]);
+
+	const hasProjectsRefresh = Boolean(onRefresh);
+	useEffect(() => {
+		if (!isActive || !hasProjectsRefresh) return;
+
+		const refreshIfVisible = () => {
+			if (document.visibilityState !== "visible") return;
+			void refreshProjectsListRef.current("auto");
+		};
+
+		refreshIfVisible();
+		const interval = window.setInterval(refreshIfVisible, PROJECTS_AUTO_REFRESH_MS);
+		window.addEventListener("focus", refreshIfVisible);
+		document.addEventListener("visibilitychange", refreshIfVisible);
+		return () => {
+			window.clearInterval(interval);
+			window.removeEventListener("focus", refreshIfVisible);
+			document.removeEventListener("visibilitychange", refreshIfVisible);
+		};
+	}, [hasProjectsRefresh, isActive]);
 
 	const filtered = useMemo(() => {
 		const q = filter.trim().toLowerCase();
@@ -339,9 +438,29 @@ export function DesignsTab({
 			title: t("designs.deleteTitle"),
 			message: t("designs.deleteSelectedConfirm", { n: ids.length }),
 			confirmLabel: t("designs.deleteSelected"),
-			onConfirm: () => {
-				ids.forEach((id) => onDelete(id));
+			onConfirm: async () => {
+				const results = await Promise.all(
+					ids.map(async (id) => {
+						try {
+							const result = await onDelete(id);
+							return result !== false;
+						} catch {
+							return false;
+						}
+					}),
+				);
+				const deleted = results.filter(Boolean).length;
+				const failed = results.length - deleted;
 				exitSelectMode();
+				const message =
+					failed > 0
+						? t("designs.deleteSelectedPartial", { deleted, failed })
+						: t("designs.deleteSelectedSuccess", { n: deleted });
+				setDesignsToast({
+					id: (toastIdRef.current += 1),
+					message,
+					tone: "success",
+				});
 			},
 		});
 	};
@@ -370,7 +489,7 @@ export function DesignsTab({
 		<div
 			className={`tab-panel${view === "kanban" ? " design-kanban-view" : ""}`}
 		>
-			<div className="tab-panel-toolbar">
+			<div className="tab-panel-toolbar designs-toolbar">
 				<div className="toolbar-left">
 					<div
 						className="subtab-pill"
@@ -428,6 +547,35 @@ export function DesignsTab({
 							}}
 						/>
 					</div>
+					{onRefresh ? (
+						<button
+							type="button"
+							className="designs-refresh-button"
+							onClick={() => void refreshProjectsList("manual")}
+							disabled={projectsRefreshing}
+							title={
+								projectsRefreshing
+									? t("designs.statusRefreshing")
+									: t("designFiles.refresh")
+							}
+							aria-label={
+								projectsRefreshing
+									? t("designs.statusRefreshing")
+									: t("designFiles.refresh")
+							}
+						>
+							<Icon
+								name={projectsRefreshing ? "spinner" : "refresh"}
+								size={13}
+								className={projectsRefreshing ? "icon-spin" : undefined}
+							/>
+							<span>
+								{projectsRefreshing
+									? t("designs.statusRefreshing")
+									: t("designFiles.refresh")}
+							</span>
+						</button>
+					) : null}
 					{view === "grid" && selectMode ? (
 						<div className="designs-select-bar" role="group">
 							<span className="designs-select-count">
@@ -510,9 +658,31 @@ export function DesignsTab({
 			</div>
 			{filtered.length === 0 ? (
 				<div className="tab-empty">
-					{projects.length === 0
-						? t("designs.emptyNoProjects")
-						: t("designs.emptyNoMatch")}
+					{projects.length === 0 ? (
+						<div className="designs-empty-state">
+							<h2 className="designs-empty-title">
+								{t("designs.emptyNoProjects")}
+							</h2>
+							{onNewProject ? (
+								<button
+									type="button"
+									className="primary designs-empty-cta"
+									onClick={() => {
+										trackProjectsListControlsClick(analytics.track, {
+											page_name: "projects",
+											area: "list_controls",
+											element: "create_project",
+										});
+										onNewProject();
+									}}
+								>
+									<span>{t("entry.navNewProject")}</span>
+								</button>
+							) : null}
+						</div>
+					) : (
+						t("designs.emptyNoMatch")
+					)}
 				</div>
 			) : view === "grid" ? (
 				<div className="design-grid">
@@ -582,9 +752,7 @@ export function DesignsTab({
 												t,
 											)}
 											{" · "}
-											{sub === "recent"
-												? relativeTime(item.updatedAt, t)
-												: relativeTime(item.createdAt, t)}
+											{relativeTime(item.updatedAt, t)}
 										</div>
 									</div>
 								</div>
@@ -595,10 +763,12 @@ export function DesignsTab({
 						const status = p.status?.value ?? "not_started";
 						const cover = projectCover(p, coverByProject[p.id] ?? null);
 						const isSelected = selected.has(p.id);
+						const designSystemProject = isDesignSystemProject(p);
+						const publishedDesignSystem = isPublishedDesignSystemProject(p, designSystems);
 						return (
 							<div
 								key={p.id}
-								className={`design-card${isSelected ? " is-selected" : ""}${selectMode ? " select-mode" : ""}`}
+								className={`design-card${isSelected ? " is-selected" : ""}${selectMode ? " select-mode" : ""}${designSystemProject ? " is-design-system-project" : ""}`}
 								role="button"
 								tabIndex={0}
 								onClick={() => {
@@ -606,7 +776,7 @@ export function DesignsTab({
 										toggleSelected(p.id);
 									} else {
 										// P0 ui_click area=list element=project_card.
-										const projectKind = projectKindToTracking(p.metadata?.kind);
+										const projectKind = projectKindToTracking(p.metadata?.kind, p.metadata?.videoModel);
 										trackProjectsListClick(analytics.track, {
 											page_name: "projects",
 											area: "list",
@@ -648,7 +818,7 @@ export function DesignsTab({
 												setMenuOpenId((cur) => {
 													const nextId = cur === p.id ? null : p.id;
 													if (nextId === p.id) {
-														const projectKind = projectKindToTracking(p.metadata?.kind);
+														const projectKind = projectKindToTracking(p.metadata?.kind, p.metadata?.videoModel);
 														trackProjectsListClick(analytics.track, {
 															page_name: "projects",
 															area: "list",
@@ -673,7 +843,7 @@ export function DesignsTab({
 												type="button"
 												role="menuitem"
 												onClick={() => {
-													const projectKind = projectKindToTracking(p.metadata?.kind);
+													const projectKind = projectKindToTracking(p.metadata?.kind, p.metadata?.videoModel);
 													trackProjectsMorePopoverClick(analytics.track, {
 														page_name: "projects",
 														area: "projects_more_popover",
@@ -693,7 +863,7 @@ export function DesignsTab({
 												role="menuitem"
 												className="danger"
 												onClick={() => {
-													const projectKind = projectKindToTracking(p.metadata?.kind);
+													const projectKind = projectKindToTracking(p.metadata?.kind, p.metadata?.videoModel);
 													trackProjectsMorePopoverClick(analytics.track, {
 														page_name: "projects",
 														area: "projects_more_popover",
@@ -717,7 +887,13 @@ export function DesignsTab({
 									style={cover.style}
 									aria-hidden
 								>
-									{cover.kind === "image" && cover.src ? (
+									{cover.kind === "brand" ? (
+										<ProjectBrandCover
+											brandId={cover.brandId}
+											host={cover.brandHost}
+											initial={cover.initial}
+										/>
+									) : (cover.kind === "image" || cover.kind === "logo") && cover.src ? (
 										<img className="thumb-media" src={cover.src} alt="" loading="lazy" />
 									) : cover.kind === "video" && cover.src ? (
 										<video className="thumb-media" src={cover.src} muted preload="metadata" playsInline />
@@ -740,28 +916,36 @@ export function DesignsTab({
 									) : null}
 								</div>
 								<div className="design-card-meta-block">
-									<ProjectTag category={projectCategory(p)} />
+									<div className="design-card-tag-row">
+										{designSystemProject ? (
+											<DesignSystemProjectTag />
+										) : (
+											<ProjectTag category={projectCategory(p)} />
+										)}
+									</div>
 									<div className="design-card-name" title={p.name}>
 										{p.name}
 									</div>
 									<div className="design-card-meta">
-										{ds ? (
-											<span className="ds">{ds}</span>
-										) : (
-											<span>{t("designs.cardFreeform")}</span>
-										)}
-										{skill ? ` · ${skill}` : ""}
-										{" · "}
-										<span
-											className={`design-card-status design-card-status-${status}`}
-										>
-											{statusLabel(status, t)}
+										<span className="design-card-meta-main">
+											{ds ? (
+												<span className="ds">{ds}</span>
+											) : (
+												<span>{t("designs.cardFreeform")}</span>
+											)}
+											{skill ? ` · ${skill}` : ""}
+											{" · "}
+											<span
+												className={`design-card-status design-card-status-${publishedDesignSystem ? "published" : status}`}
+											>
+												{publishedDesignSystem ? t("designs.status.published") : statusLabel(status, t)}
+											</span>
 										</span>
-										{sub === "recent"
-											? ` · ${relativeTime(p.updatedAt, t)}`
-											: sub === "yours"
-												? ` · ${relativeTime(p.createdAt, t)}`
-												: ""}
+										{sub === "recent" || sub === "yours" ? (
+											<span className="design-card-meta-time">
+												{relativeTime(p.updatedAt, t)}
+											</span>
+										) : null}
 									</div>
 								</div>
 							</div>
@@ -793,10 +977,11 @@ export function DesignsTab({
 										colProjects.map(({ project: p }) => {
 											const skill = skillName(p.skillId);
 											const ds = dsName(p.designSystemId);
+											const designSystemProject = isDesignSystemProject(p);
 											return (
 												<div
 													key={p.id}
-													className={`design-kanban-card status-${status}`}
+													className={`design-kanban-card status-${status}${designSystemProject ? " is-design-system-project" : ""}`}
 													role="button"
 													tabIndex={0}
 													onClick={() => onOpen(p.id)}
@@ -826,6 +1011,11 @@ export function DesignsTab({
 													>
 														{p.name}
 													</div>
+													{designSystemProject ? (
+														<div className="design-card-tag-row">
+															<DesignSystemProjectTag />
+														</div>
+													) : null}
 													<div className="design-kanban-card-meta">
 														{ds ? (
 															<span className="ds">{ds}</span>
@@ -833,11 +1023,9 @@ export function DesignsTab({
 															<span>{t("designs.cardFreeform")}</span>
 														)}
 														{skill ? ` · ${skill}` : ""}
-														{sub === "recent"
+														{sub === "recent" || sub === "yours"
 															? ` · ${relativeTime(p.updatedAt, t)}`
-															: sub === "yours"
-																? ` · ${relativeTime(p.createdAt, t)}`
-																: ""}
+															: ""}
 													</div>
 												</div>
 											);
@@ -850,79 +1038,83 @@ export function DesignsTab({
 				</div>
 			)}
 			{renameTarget ? (
-				<div className="modal-backdrop" onClick={cancelRename}>
-					<form
-						className="modal modal-rename"
-						onClick={(e) => e.stopPropagation()}
-						onSubmit={(e) => {
-							e.preventDefault();
-							commitRename();
-						}}
-					>
-						<h2>{t("designs.renameTitle")}</h2>
-						<label>
-							{t("designs.renamePrompt", { name: renameTarget.original })}
-							<input
-								type="text"
-								value={renameInput}
-								autoFocus
-								onChange={(e) => setRenameInput(e.target.value)}
-								onKeyDown={(e) => {
-									if (e.key === "Escape") {
-										e.preventDefault();
-										cancelRename();
-									}
-								}}
-							/>
-						</label>
-						<div className="row">
-							<button type="button" onClick={cancelRename}>
-								{t("designs.renameCancel")}
-							</button>
-							<button
-								type="submit"
-								className="primary"
-								disabled={
-									!renameInput.trim() ||
-									renameInput.trim() === renameTarget.original
-								}
-							>
-								{t("designs.renameSave")}
-							</button>
-						</div>
-					</form>
-				</div>
+				<Dialog
+					as="form"
+					className="modal-rename"
+					onClose={cancelRename}
+					closeOnEscape
+					ariaLabelledBy={renameTitleId}
+					onSubmit={(e) => {
+						e.preventDefault();
+						commitRename();
+					}}
+				>
+					<DialogTitle id={renameTitleId}>{t("designs.renameTitle")}</DialogTitle>
+					<label>
+						{t("designs.renamePrompt", { name: renameTarget.original })}
+						<input
+							type="text"
+							value={renameInput}
+							autoFocus
+							onChange={(e) => setRenameInput(e.target.value)}
+						/>
+					</label>
+					<DialogFooter className="row">
+						<button type="button" onClick={cancelRename}>
+							{t("designs.renameCancel")}
+						</button>
+						<button
+							type="submit"
+							className="primary"
+							disabled={
+								!renameInput.trim() ||
+								renameInput.trim() === renameTarget.original
+							}
+						>
+							{t("designs.renameSave")}
+						</button>
+					</DialogFooter>
+				</Dialog>
 			) : null}
 			{confirmTarget ? (
-				<div className="modal-backdrop" onClick={() => setConfirmTarget(null)}>
-					<div
-						className="modal modal-confirm"
-						onClick={(e) => e.stopPropagation()}
-						role="alertdialog"
-						aria-modal="true"
-					>
-						<h2>{confirmTarget.title}</h2>
-						<p className="modal-confirm-message">{confirmTarget.message}</p>
-						<div className="row">
-							<button type="button" onClick={() => setConfirmTarget(null)}>
-								{t("designs.renameCancel")}
-							</button>
-							<button
-								type="button"
-								className="primary danger"
-								autoFocus
-								onClick={() => {
-									const run = confirmTarget.onConfirm;
-									setConfirmTarget(null);
-									run();
-								}}
-							>
-								{confirmTarget.confirmLabel}
-							</button>
-						</div>
-					</div>
-				</div>
+				<Dialog
+					className="modal-confirm"
+					role="alertdialog"
+					onClose={() => setConfirmTarget(null)}
+					ariaLabelledBy={confirmTitleId}
+				>
+					<DialogTitle id={confirmTitleId}>{confirmTarget.title}</DialogTitle>
+					<DialogDescription className="modal-confirm-message">{confirmTarget.message}</DialogDescription>
+					<DialogFooter className="row">
+						<button type="button" onClick={() => setConfirmTarget(null)}>
+							{t("designs.renameCancel")}
+						</button>
+						<button
+							type="button"
+							className="primary danger"
+							autoFocus
+							onClick={() => {
+								const run = confirmTarget.onConfirm;
+								setConfirmTarget(null);
+								run();
+							}}
+						>
+							{confirmTarget.confirmLabel}
+						</button>
+					</DialogFooter>
+				</Dialog>
 			) : null}
+			<AnimatePresence>
+				{designsToast ? (
+					<Toast
+						key={designsToast.id}
+						message={designsToast.message}
+						role={designsToast.role}
+						tone={designsToast.tone}
+						onDismiss={() => setDesignsToast(null)}
+					/>
+				) : null}
+			</AnimatePresence>
 		</div>
 	);
 }
@@ -987,14 +1179,17 @@ function isOrbitProject(project: Project): boolean {
   return metadata?.kind === 'orbit';
 }
 
+
 function projectCover(
 	project: Project,
-	override: { kind: "html" | "image" | "video"; name: string } | null,
+	override: { kind: "html" | "image" | "video" | "logo"; name: string } | null,
 ): {
-	kind: "image" | "video" | "html" | "fallback";
+	kind: "image" | "video" | "html" | "logo" | "brand" | "fallback";
 	src?: string;
 	style: CSSProperties;
 	initial: string;
+	brandId?: string;
+	brandHost?: string;
 } {
 	let h = 0;
 	for (let i = 0; i < project.id.length; i++) {
@@ -1007,6 +1202,20 @@ function projectCover(
 	};
 	const trimmed = project.name.trim();
 	const initial = (trimmed ? Array.from(trimmed)[0]! : "?").toUpperCase();
+	const meta = project.metadata;
+	// Brand projects get a clean generated cover (extracted logo / site favicon
+	// / monogram) rather than a raw scaled-down HTML page, which reads as broken
+	// clipped text in the card. The brand color gradient mirrors the monogram
+	// cards so brand kits sit consistently in the grid.
+	if (meta?.kind === "brand") {
+		return {
+			kind: "brand",
+			style,
+			initial,
+			brandId: meta.brandId,
+			brandHost: brandHostname(meta.brandSourceUrl),
+		};
+	}
 	if (override) {
 		return {
 			kind: override.kind,
@@ -1015,7 +1224,6 @@ function projectCover(
 			initial,
 		};
 	}
-	const meta = project.metadata;
 	const entry = meta?.entryFile;
 	if (entry) {
 		const src = projectFileUrl(project.id, entry);
@@ -1026,7 +1234,67 @@ function projectCover(
 	return { kind: "fallback", style, initial };
 }
 
-type ProjectCategory = "prototype" | "live-artifact" | "slide" | "media";
+// Best-effort hostname for the brand cover's favicon fallback. Mirrors the
+// helper in BrandsTab; brand source URLs are always present in metadata even
+// before extraction finishes.
+function brandHostname(rawUrl: string | undefined): string | undefined {
+	if (!rawUrl) return undefined;
+	try {
+		return new URL(rawUrl).hostname.replace(/^www\./, "");
+	} catch {
+		const stripped = rawUrl
+			.replace(/^https?:\/\//, "")
+			.replace(/^www\./, "")
+			.split("/")[0];
+		return stripped || undefined;
+	}
+}
+
+// Brand project cover: shows the extracted brand logo when available, falling
+// back to the site favicon, then a monogram. The image error chain lets a card
+// degrade gracefully without leaving a broken image icon on the gradient.
+function ProjectBrandCover({
+	brandId,
+	host,
+	initial,
+}: {
+	brandId?: string;
+	host?: string;
+	initial: string;
+}) {
+	const sources = useMemo(() => {
+		const list: string[] = [];
+		if (brandId) list.push(`/api/brands/${encodeURIComponent(brandId)}/logo`);
+		if (host) {
+			list.push(
+				`https://www.google.com/s2/favicons?domain=${encodeURIComponent(host)}&sz=128`,
+			);
+		}
+		return list;
+	}, [brandId, host]);
+	const sourceKey = sources.join("|");
+	const [index, setIndex] = useState(0);
+	useEffect(() => {
+		setIndex(0);
+	}, [sourceKey]);
+	const src = sources[index];
+	if (!src) {
+		return <span className="project-thumb-glyph">{initial}</span>;
+	}
+	return (
+		<span className="project-thumb-brand-logo">
+			<img
+				className="thumb-media"
+				src={src}
+				alt=""
+				loading="lazy"
+				onError={() => setIndex((current) => current + 1)}
+			/>
+		</span>
+	);
+}
+
+type ProjectCategory = "prototype" | "live-artifact" | "slide" | "media" | "brand";
 
 function projectCategory(project: Project): ProjectCategory {
 	const meta = project.metadata;
@@ -1034,6 +1302,7 @@ function projectCategory(project: Project): ProjectCategory {
 		return "live-artifact";
 	}
 	if (meta?.kind === "deck") return "slide";
+	if (meta?.kind === "brand") return "brand";
 	if (meta?.kind === "image" || meta?.kind === "video" || meta?.kind === "audio") {
 		return "media";
 	}
@@ -1047,10 +1316,32 @@ function ProjectTag({ category }: { category: ProjectCategory }) {
 			? t("designs.tagLiveArtifact")
 			: category === "slide"
 				? t("designs.tagSlide")
+				: category === "brand"
+					? "Brand"
 				: category === "media"
 					? t("designs.tagMedia")
 					: t("designs.tagPrototype");
 	return (
 		<span className={`design-card-tag tag-${category}`}>{label}</span>
+	);
+}
+
+function DesignSystemProjectTag() {
+	return (
+		<span className="design-card-tag tag-design-system">Design System</span>
+	);
+}
+
+function findDesignSystemLogoFile(files: ProjectFile[]): ProjectFile | null {
+	const logoCandidates = files
+		.filter((file) => file.type !== "dir")
+		.filter((file) => {
+			const name = file.path ?? file.name;
+			return file.kind === "image" || /\.(svg|png|jpe?g|webp|gif)$/iu.test(name);
+		});
+	return (
+		logoCandidates.find((file) => (file.path ?? file.name).toLowerCase() === "assets/logo.svg") ??
+		logoCandidates.find((file) => /(^|\/)(logo|wordmark|brand-mark|brandmark|mark|icon|favicon)[^/]*\.(svg|png|jpe?g|webp|gif)$/iu.test(file.path ?? file.name)) ??
+		null
 	);
 }

@@ -8,6 +8,7 @@ import {
   isOrbitRunDisabled,
   isValidApiBaseUrl,
   mergeProviderModelOptions,
+  providerModelsCacheKey,
   sanitizeSettingsSavePayload,
   shouldEnableSettingsSave,
   shouldShowCustomModelInput,
@@ -40,6 +41,24 @@ afterEach(() => {
 });
 
 describe('SettingsDialog API protocol switching', () => {
+  it('builds provider model cache keys without exposing raw API keys', () => {
+    const key = providerModelsCacheKey(
+      'anthropic',
+      'https://api.anthropic.com/',
+      'sk-secret-value',
+    );
+
+    expect(key).toContain('https://api.anthropic.com');
+    expect(key).not.toContain('sk-secret-value');
+    expect(key).toBe(
+      providerModelsCacheKey(
+        'anthropic',
+        'https://api.anthropic.com',
+        'sk-secret-value',
+      ),
+    );
+  });
+
   it('stores the current custom protocol config while preserving custom endpoint details', () => {
     const config: AppConfig = {
       ...baseConfig,
@@ -118,7 +137,7 @@ describe('SettingsDialog API protocol switching', () => {
       apiProtocol: 'google',
       apiKey: '',
       baseUrl: 'https://generativelanguage.googleapis.com',
-      model: 'gemini-2.0-flash',
+      model: 'gemini-3.5-flash',
       apiProviderBaseUrl: 'https://generativelanguage.googleapis.com',
     });
   });
@@ -344,6 +363,86 @@ describe('SettingsDialog agent CLI env settings', () => {
     expect(next.agentCliEnv).toEqual({
       codex: { CODEX_HOME: '~/.codex-alt', CODEX_BIN: '~/bin/codex-next' },
     });
+    expect(next.agentCliEnvIntent).toEqual({});
+  });
+
+  it('marks API key env values as explicit CLI overrides', () => {
+    const config: AppConfig = {
+      ...baseConfig,
+      mode: 'daemon',
+      agentCliEnv: {
+        codex: { CODEX_HOME: '~/.codex-alt' },
+      },
+    };
+
+    const next = updateAgentCliEnvValue(
+      config,
+      'codex',
+      'CODEX_API_KEY',
+      '  sk-codex  ',
+    );
+
+    expect(next.agentCliEnv).toEqual({
+      codex: { CODEX_HOME: '~/.codex-alt', CODEX_API_KEY: 'sk-codex' },
+    });
+    expect(next.agentCliEnvIntent).toEqual({
+      codex: { apiKeyOverride: true },
+    });
+  });
+
+  it('keeps the API key override marker when clearing a base URL with a key present', () => {
+    const config: AppConfig = {
+      ...baseConfig,
+      mode: 'daemon',
+      agentCliEnv: {
+        codex: {
+          CODEX_API_KEY: 'sk-codex',
+          OPENAI_BASE_URL: 'https://proxy.example/openai',
+        },
+      },
+    };
+
+    const next = updateAgentCliEnvValue(
+      config,
+      'codex',
+      'OPENAI_BASE_URL',
+      '',
+    );
+
+    expect(next.agentCliEnv).toEqual({
+      codex: { CODEX_API_KEY: 'sk-codex' },
+    });
+    expect(next.agentCliEnvIntent).toEqual({
+      codex: { apiKeyOverride: true },
+    });
+  });
+
+  it('removes the API key override marker when the last auth key is cleared', () => {
+    const config: AppConfig = {
+      ...baseConfig,
+      mode: 'daemon',
+      agentCliEnv: {
+        claude: {
+          CLAUDE_CONFIG_DIR: '~/.claude-2',
+          ANTHROPIC_API_KEY: 'sk-anthropic',
+        },
+      },
+      agentCliEnvIntent: {
+        claude: { apiKeyOverride: true },
+      },
+    };
+
+    const next = updateAgentCliEnvValue(
+      config,
+      'claude',
+      'ANTHROPIC_API_KEY',
+      '',
+    );
+
+    expect(next.agentCliEnv).toEqual({
+      claude: { CLAUDE_CONFIG_DIR: '~/.claude-2' },
+    });
+    expect(next.agentCliEnvIntent).toEqual({});
   });
 
   it('removes empty per-agent CLI env entries', () => {
@@ -500,6 +599,7 @@ describe('SettingsDialog Orbit run behavior', () => {
       url: '/api/orbit/run',
       method: 'POST',
     });
+    expect(JSON.parse(calls[1]!.body ?? '{}')).toEqual({ locale: null });
   });
 
   it('does not sync an unsaved Composio draft before starting a manual Orbit run', async () => {
@@ -543,6 +643,7 @@ describe('SettingsDialog Orbit run behavior', () => {
       '/api/orbit/run',
     ]);
     expect(JSON.parse(calls[0]!.body ?? '{}')).toMatchObject({ force: false });
+    expect(JSON.parse(calls[2]!.body ?? '{}')).toEqual({ locale: null });
   });
 
   it('does not force an explicit empty media provider map before starting a manual Orbit run', async () => {
@@ -582,6 +683,7 @@ describe('SettingsDialog Orbit run behavior', () => {
       providers: {},
       force: false,
     });
+    expect(JSON.parse(calls[2]!.body ?? '{}')).toEqual({ locale: null });
   });
 
   it('preserves masked daemon media keys before starting a manual Orbit run', async () => {
@@ -693,6 +795,30 @@ describe('SettingsDialog Orbit run behavior', () => {
       { url: '/api/app-config', method: 'PUT' },
       { url: '/api/orbit/run', method: 'POST' },
     ]);
+  });
+
+  it('passes the selected UI locale through to the manual Orbit run', async () => {
+    const calls: Array<{ url: string; method: string; body?: string }> = [];
+    globalThis.fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = typeof input === 'string' ? input : input.toString();
+      const method = init?.method ?? 'GET';
+      const body = typeof init?.body === 'string' ? init.body : undefined;
+      calls.push({ url, method, body });
+
+      if (url === '/api/app-config') {
+        return new Response(null, { status: 204 });
+      }
+      if (url === '/api/orbit/run') {
+        return new Response(JSON.stringify({ projectId: 'orbit-project', agentRunId: 'run-zh' }), { status: 200 });
+      }
+      throw new Error(`Unexpected fetch: ${url}`);
+    }) as typeof fetch;
+
+    await expect(
+      persistConfigAndRunOrbit(baseConfig, { locale: 'zh-CN' }),
+    ).resolves.toEqual({ projectId: 'orbit-project', agentRunId: 'run-zh' });
+
+    expect(JSON.parse(calls[1]!.body ?? '{}')).toEqual({ locale: 'zh-CN' });
   });
 
   it('persists the displayed default template before starting a legacy null-template run', async () => {

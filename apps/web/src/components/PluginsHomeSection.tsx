@@ -1,34 +1,37 @@
 // Plugins discovery section on Home.
 //
-// Renders a curated workflow bar (Lovart-style) over the plugin catalog:
-// Import · Create · Export · Refine · Extend. A scoped child row appears
-// inside the active lane, e.g. Create -> Prototype / Slides / Design
-// system / Media. A small Featured chip sits orthogonal to the rows for
-// quick access to curator-promoted picks.
+// Renders an artifact-kind bar over the plugin catalog: Prototype ·
+// Slides · Image · Video · HyperFrames · Audio. Prototype, Slides,
+// Image, and Video can reveal scene buckets from the user-prompt
+// taxonomy; HyperFrames and Audio stay flat. A small Saved chip
+// sits orthogonal to the rows for quick access to user-saved picks.
 //
 // The category list is curated — finer metadata (surface, role tags,
-// scenario domains) lives on each plugin card and detail surface, not
-// in the filter bar.
+// scenario domains) lives on each plugin card and detail surface.
 //
 // Derivation, catalog building and category-based filtering live in
-// `./plugins-home/facets.ts`; selection state and the Featured
+// `./plugins-home/facets.ts`; selection state and the Saved
 // override live in `./plugins-home/usePluginFacets.ts`. This file
 // owns layout only.
 
-import { useState } from 'react';
+import { Button, Input } from '@open-design/components';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { InstalledPluginRecord } from '@open-design/contracts';
-import { useT } from '../i18n';
+import { useI18n, useT } from '../i18n';
 import type { PluginShareAction } from '../state/projects';
 import { Icon } from './Icon';
 import { PluginCard } from './plugins-home/PluginCard';
-import {
-  usePluginFacets,
-  type FilterMode,
-} from './plugins-home/usePluginFacets';
-import type { FacetOption } from './plugins-home/facets';
+import { isFeaturedPlugin, type FacetOption } from './plugins-home/facets';
+import { localizePluginTitle } from './plugins-home/localization';
+import { usePluginFacets } from './plugins-home/usePluginFacets';
+import { pluginSubfacetLabel } from './plugins-home/subfacetLabel';
+import { useSavedPluginIds } from './plugins-home/savedPlugins';
 import type { PluginUseAction } from './plugins-home/useActions';
+import { Toast } from './Toast';
+import { AnimatePresence } from 'motion/react';
 
-type MediaTemplateSort = 'name' | 'newest';
+const INITIAL_PLUGIN_RENDER_LIMIT = 60;
+const PLUGIN_RENDER_BATCH_SIZE = 60;
 
 interface Props {
   plugins: InstalledPluginRecord[];
@@ -42,15 +45,15 @@ interface Props {
     record: InstalledPluginRecord,
     action: PluginShareAction,
   ) => void;
-  onCreatePlugin?: (goal?: string) => void;
   onBrowseRegistry?: () => void;
   preferDefaultFacet?: boolean;
   title?: string;
   subtitle?: string;
   emptyMessage?: string;
+  // 'gallery' renders each card as a minimal live example.html preview
+  // tile (Community); 'rich' keeps the hover-overlay metadata card.
+  cardLayout?: 'rich' | 'gallery';
 }
-
-const CONTRIBUTION_CARD_THRESHOLD = 3;
 
 export function PluginsHomeSection({
   plugins,
@@ -61,53 +64,89 @@ export function PluginsHomeSection({
   onUse,
   onOpenDetails,
   onPluginShareAction,
-  onCreatePlugin,
   onBrowseRegistry,
   preferDefaultFacet = true,
   title,
   subtitle,
   emptyMessage,
+  cardLayout = 'rich',
 }: Props) {
-  const t = useT();
-  const [mediaTemplateSort, setMediaTemplateSort] = useState<MediaTemplateSort>('name');
+  const { locale, t } = useI18n();
+  const { savedPluginIds, savePluginId } = useSavedPluginIds();
+  const [saveToast, setSaveToast] = useState<string | null>(null);
+  const [renderLimit, setRenderLimit] = useState(INITIAL_PLUGIN_RENDER_LIMIT);
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
   const {
     visiblePlugins,
-    featuredList,
+    savedList,
     filtered,
     catalog,
     selection,
     pickCategory,
     pickSubcategory,
     clearFacets,
-    hasActiveFacet,
     mode,
     setMode,
     query,
     setQuery,
     totalVisible,
-  } = usePluginFacets({ plugins, preferDefaultFacet });
-  const contributionTarget = onCreatePlugin
-    ? resolveContributionTarget(catalog, selection)
-    : null;
-  const showContributionCard =
-    contributionTarget !== null &&
-    shouldShowContributionCard(filtered.length, selection.category);
-  const showMediaTemplateSort =
-    mode !== 'featured' &&
-    selection.category === 'create' &&
-    (selection.subcategory === 'image' || selection.subcategory === 'video');
-  const sortedFiltered = showMediaTemplateSort
-    ? sortMediaTemplatePlugins(filtered, mediaTemplateSort)
-    : filtered;
+  } = usePluginFacets({
+    plugins,
+    savedPluginIds,
+    preferDefaultFacet,
+    locale,
+  });
+  const renderedPlugins = useMemo(
+    () => filtered.slice(0, renderLimit),
+    [filtered, renderLimit],
+  );
+  const hasMorePlugins = renderLimit < filtered.length;
+
+  useEffect(() => {
+    setRenderLimit(INITIAL_PLUGIN_RENDER_LIMIT);
+  }, [filtered]);
+
+  useEffect(() => {
+    if (!hasMorePlugins) return;
+    const node = loadMoreRef.current;
+    if (!node) return;
+    if (typeof IntersectionObserver === 'undefined') {
+      setRenderLimit(filtered.length);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        setRenderLimit((limit) =>
+          Math.min(filtered.length, limit + PLUGIN_RENDER_BATCH_SIZE),
+        );
+      },
+      { rootMargin: '640px' },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [filtered.length, hasMorePlugins]);
+
+  function handleSavePlugin(record: InstalledPluginRecord): void {
+    const result = savePluginId(record.id);
+    const title = localizePluginTitle(locale, record);
+    if (result === 'saved') {
+      setSaveToast(`Saved ${title}.`);
+    } else if (result === 'already-saved') {
+      setSaveToast(`${title} is already saved.`);
+    } else {
+      setSaveToast('Could not save this plugin in this browser.');
+    }
+  }
 
   return (
     <section className="plugins-home" data-testid="plugins-home-section">
       <header className="plugins-home__head">
         <div className="plugins-home__heading">
           <h2 className="plugins-home__title">{title ?? t('pluginsHome.title')}</h2>
-          <p className="plugins-home__subtitle">
-            {subtitle ?? t('pluginsHome.subtitle')}
-          </p>
+          {subtitle ? (
+            <p className="plugins-home__subtitle">{subtitle}</p>
+          ) : null}
         </div>
         <div className="plugins-home__head-tools">
           {onBrowseRegistry ? (
@@ -120,22 +159,6 @@ export function PluginsHomeSection({
               {t('pluginsHome.browseRegistry')}
             </button>
           ) : null}
-          {showMediaTemplateSort ? (
-            <select
-              className="plugins-home__sort"
-              value={mediaTemplateSort}
-              onChange={(event) => setMediaTemplateSort(event.target.value as MediaTemplateSort)}
-              aria-label={t('promptTemplates.sortAria')}
-              data-testid="plugins-home-media-sort"
-            >
-              <option value="name">{t('promptTemplates.sortName')}</option>
-              <option value="newest">{t('promptTemplates.sortNewest')}</option>
-            </select>
-          ) : null}
-          <SearchInput value={query} onChange={setQuery} />
-          <span className="plugins-home__count">
-            {loading ? '…' : t('pluginsHome.count', { filtered: filtered.length, total: totalVisible })}
-          </span>
         </div>
       </header>
 
@@ -147,14 +170,6 @@ export function PluginsHomeSection({
         </div>
       ) : (
         <>
-          <ModeRow
-            mode={mode}
-            featuredCount={featuredList.length}
-            totalVisible={totalVisible}
-            hasActiveFacet={hasActiveFacet}
-            onModeChange={setMode}
-            onClearFacets={clearFacets}
-          />
           <div
             className="plugins-home__facets"
             role="group"
@@ -165,6 +180,17 @@ export function PluginsHomeSection({
               selectedSlug={selection.category}
               totalVisible={totalVisible}
               onPick={pickCategory}
+              // The Saved collection lives on the rich management surface
+              // (PluginsView). The minimal Community gallery has no per-card
+              // save affordance, so the orthogonal Saved chip is hidden there.
+              showSaved={cardLayout === 'rich'}
+              savedCount={savedList.length}
+              savedActive={mode === 'saved'}
+              onToggleSaved={() =>
+                setMode(mode === 'saved' ? 'all' : 'saved')
+              }
+              query={query}
+              onQueryChange={setQuery}
             />
             {selection.category ? (
               <SubcategoryRow
@@ -176,7 +202,7 @@ export function PluginsHomeSection({
             ) : null}
           </div>
 
-          {sortedFiltered.length === 0 && !showContributionCard ? (
+          {filtered.length === 0 ? (
             <div className="plugins-home__empty plugins-home__empty--filtered">
               {t('pluginsHome.emptyFiltered')}{' '}
               <button
@@ -188,8 +214,11 @@ export function PluginsHomeSection({
               </button>
             </div>
           ) : (
-            <div className="plugins-home__grid" role="list">
-              {sortedFiltered.map((p) => (
+            <div
+              className={`plugins-home__grid${cardLayout === 'gallery' ? ' plugins-home__grid--gallery' : ''}`}
+              role="list"
+            >
+              {renderedPlugins.map((p) => (
                 <PluginCard
                   key={p.id}
                   record={p}
@@ -197,169 +226,36 @@ export function PluginsHomeSection({
                   isPending={pendingApplyId === p.id}
                   pendingAny={pendingApplyId !== null}
                   pendingShareAction={pendingShareAction}
-                  isFeatured={featuredList.some((f) => f.id === p.id)}
+                  isFeatured={isFeaturedPlugin(p)}
+                  isSaved={savedPluginIds.has(p.id)}
                   onUse={onUse}
                   onOpenDetails={onOpenDetails}
+                  onSave={handleSavePlugin}
                   onShareAction={onPluginShareAction}
+                  layout={cardLayout}
                 />
               ))}
-              {showContributionCard && contributionTarget ? (
-                <ContributionCard
-                  label={contributionTarget.label}
-                  starterPrompt={contributionTarget.starterPrompt}
-                  onCreatePlugin={() => onCreatePlugin?.(contributionTarget.starterPrompt)}
-                  t={t}
+              {hasMorePlugins ? (
+                <div
+                  ref={loadMoreRef}
+                  className="plugins-home__load-more-sentinel"
+                  aria-hidden
                 />
               ) : null}
             </div>
           )}
         </>
       )}
+      <AnimatePresence>
+        {saveToast ? (
+          <Toast
+            message={saveToast}
+            ttlMs={2200}
+            onDismiss={() => setSaveToast(null)}
+          />
+        ) : null}
+      </AnimatePresence>
     </section>
-  );
-}
-
-function sortMediaTemplatePlugins<T extends InstalledPluginRecord>(
-  records: readonly T[],
-  sort: MediaTemplateSort,
-): T[] {
-  const annotated = records.map((record, idx) => ({ record, idx }));
-  annotated.sort((a, b) => {
-    if (sort === 'newest') {
-      const dateCmp = mediaTemplateImportedAtRank(b.record) - mediaTemplateImportedAtRank(a.record);
-      if (dateCmp !== 0) return dateCmp;
-    }
-    const titleCmp = (a.record.title || a.record.id).localeCompare(b.record.title || b.record.id);
-    if (titleCmp !== 0) return titleCmp;
-    return a.idx - b.idx;
-  });
-  return annotated.map((entry) => entry.record);
-}
-
-function mediaTemplateImportedAtRank(record: InstalledPluginRecord): number {
-  const value = (record.manifest?.od as { importedAt?: unknown } | undefined)?.importedAt;
-  if (typeof value !== 'string') return 0;
-  const parsed = Date.parse(value);
-  return Number.isFinite(parsed) ? parsed : 0;
-}
-
-function shouldShowContributionCard(count: number, category: string | null): boolean {
-  return Boolean(category) && count < CONTRIBUTION_CARD_THRESHOLD;
-}
-
-function resolveContributionTarget(
-  catalog: ReturnType<typeof usePluginFacets>['catalog'],
-  selection: ReturnType<typeof usePluginFacets>['selection'],
-): FacetOption | null {
-  if (!selection.category) return null;
-  if (selection.subcategory) {
-    const sub = catalog.subcategory[selection.category]?.find(
-      (opt) => opt.slug === selection.subcategory,
-    );
-    if (sub) return sub;
-  }
-  return catalog.category.find((opt) => opt.slug === selection.category) ?? null;
-}
-
-function ContributionCard({
-  label,
-  starterPrompt,
-  onCreatePlugin,
-  t,
-}: {
-  label: string;
-  starterPrompt: string;
-  onCreatePlugin: () => void;
-  t: ReturnType<typeof useT>;
-}) {
-  return (
-    <article
-      role="listitem"
-      className="plugins-home__card plugins-home__card--contribute"
-      data-testid="plugins-home-contribution-card"
-    >
-      <div className="plugins-home__contribute-inner">
-        <span className="plugins-home__contribute-icon" aria-hidden>
-          <Icon name="plus" size={18} />
-        </span>
-        <div>
-          <h3>{t('pluginsHome.contributeTitle', { label })}</h3>
-          <p>
-            {t('pluginsHome.contributeBody')}
-          </p>
-          <p className="plugins-home__contribute-template">
-            {t('pluginsHome.starterPrefix', { starter: starterPrompt })}
-          </p>
-        </div>
-        <button
-          type="button"
-          className="plugins-home__action plugins-home__action--primary"
-          onClick={onCreatePlugin}
-          data-testid="plugins-home-contribution-create"
-        >
-          {t('homeHero.chip.createPlugin')}
-        </button>
-      </div>
-    </article>
-  );
-}
-
-interface ModeRowProps {
-  mode: FilterMode;
-  featuredCount: number;
-  totalVisible: number;
-  hasActiveFacet: boolean;
-  onModeChange: (next: FilterMode) => void;
-  onClearFacets: () => void;
-}
-
-// Tiny strip above the category row: Featured override + a clear-link
-// when at least one filter is active. Kept compact so the category
-// bar is what the eye lands on first.
-function ModeRow({
-  mode,
-  featuredCount,
-  totalVisible,
-  hasActiveFacet,
-  onModeChange,
-  onClearFacets,
-}: ModeRowProps) {
-  const t = useT();
-  return (
-    <div className="plugins-home__mode" role="group" aria-label={t('pluginsHome.modeAria')}>
-      {featuredCount > 0 ? (
-        <button
-          type="button"
-          className={[
-            'plugins-home__chip',
-            'plugins-home__chip--featured',
-            mode === 'featured' ? 'is-active' : '',
-          ]
-            .filter(Boolean)
-            .join(' ')}
-          onClick={() => onModeChange(mode === 'featured' ? 'all' : 'featured')}
-          aria-pressed={mode === 'featured'}
-          data-testid="plugins-home-chip-featured"
-        >
-          <Icon name="star" size={11} />
-          <span>{t('pluginsHome.featured')}</span>
-          <span className="plugins-home__chip-count">{featuredCount}</span>
-        </button>
-      ) : null}
-      <span className="plugins-home__mode-total">
-        {t('pluginsHome.totalInCatalog', { n: totalVisible })}
-      </span>
-      {hasActiveFacet ? (
-        <button
-          type="button"
-          className="plugins-home__linkbtn"
-          onClick={onClearFacets}
-          data-testid="plugins-home-clear"
-        >
-          {t('pluginsHome.clearFilters')}
-        </button>
-      ) : null}
-    </div>
   );
 }
 
@@ -368,9 +264,32 @@ interface CategoryRowProps {
   selectedSlug: string | null;
   totalVisible: number;
   onPick: (slug: string | null) => void;
+  // The Saved override chip only renders on the rich management surface
+  // (PluginsView); the minimal Community gallery hides it.
+  showSaved: boolean;
+  savedCount: number;
+  savedActive: boolean;
+  onToggleSaved: () => void;
+  query: string;
+  onQueryChange: (next: string) => void;
 }
 
-function CategoryRow({ options, selectedSlug, totalVisible, onPick }: CategoryRowProps) {
+// Single combined filter bar: an optional Saved override chip + category
+// pills on the left, search field on the right. The "All" pill doubles as a
+// clear-filters affordance, so a separate `X / Y` counter and `Clear` link
+// would just repeat what the pill strip already shows.
+function CategoryRow({
+  options,
+  selectedSlug,
+  totalVisible,
+  onPick,
+  showSaved,
+  savedCount,
+  savedActive,
+  onToggleSaved,
+  query,
+  onQueryChange,
+}: CategoryRowProps) {
   const t = useT();
   if (options.length === 0) return null;
   return (
@@ -383,6 +302,25 @@ function CategoryRow({ options, selectedSlug, totalVisible, onPick }: CategoryRo
         role="tablist"
         aria-label={t('pluginsHome.categoryFilterAria')}
       >
+        {showSaved ? (
+          <button
+            type="button"
+            className={[
+              'plugins-home__chip',
+              'plugins-home__chip--saved',
+              savedActive ? 'is-active' : '',
+            ]
+              .filter(Boolean)
+              .join(' ')}
+            onClick={onToggleSaved}
+            aria-pressed={savedActive}
+            data-testid="plugins-home-chip-saved"
+          >
+            <Icon name="star" size={11} />
+            <span>{t('pluginsHome.featured')}</span>
+            <span className="plugins-home__chip-count">{savedCount}</span>
+          </button>
+        ) : null}
         <CategoryPill
           slug={null}
           label={t('common.all')}
@@ -401,6 +339,9 @@ function CategoryRow({ options, selectedSlug, totalVisible, onPick }: CategoryRo
             onPick={onPick}
           />
         ))}
+      </div>
+      <div className="plugins-home__facet-tools">
+        <SearchInput value={query} onChange={onQueryChange} />
       </div>
     </div>
   );
@@ -478,6 +419,11 @@ function CategoryPill({ slug, label, count, active, variant, testId, onPick }: C
         .filter(Boolean)
         .join(' ')}
       onClick={() => onPick(slug)}
+      // Planned child buckets stay visible even before the catalog
+      // has examples for each scene. The `data-empty` flag gives
+      // those zero-count buckets a lighter treatment without adding
+      // placeholder cards to the starter grid.
+      data-empty={count === 0 ? 'true' : 'false'}
       data-testid={testId ?? `plugins-home-pill-category-${slug ?? 'all'}`}
     >
       <span>{displayLabel}</span>
@@ -514,7 +460,9 @@ function pluginFacetLabel(slug: string, fallback: string, t: ReturnType<typeof u
     case 'public-link': return t('pluginsHome.facet.publicLink');
     case 'github-pr': return t('pluginsHome.facet.githubPr');
     case 'github-gist': return t('pluginsHome.facet.githubGist');
-    default: return fallback;
+    // Subcategory pills render through the same CategoryPill, so unknown
+    // top-level slugs fall through to the subfacet table before giving up.
+    default: return pluginSubfacetLabel(slug, fallback, t);
   }
 }
 
@@ -534,7 +482,7 @@ function SearchInput({ value, onChange }: SearchInputProps) {
   return (
     <div className="plugins-home__search">
       <Icon name="search" size={12} className="plugins-home__search-icon" />
-      <input
+      <Input
         type="search"
         className="plugins-home__search-input"
         value={value}
@@ -546,15 +494,15 @@ function SearchInput({ value, onChange }: SearchInputProps) {
         autoComplete="off"
       />
       {value ? (
-        <button
-          type="button"
+        <Button
+          variant="subtle"
           className="plugins-home__search-clear"
           onClick={() => onChange('')}
           aria-label={t('pluginsHome.clearSearch')}
           data-testid="plugins-home-search-clear"
         >
           <Icon name="close" size={12} />
-        </button>
+        </Button>
       ) : null}
     </div>
   );

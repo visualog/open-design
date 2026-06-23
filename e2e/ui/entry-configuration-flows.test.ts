@@ -1,7 +1,12 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from '@/playwright/suite';
+import { ensureRailOpen } from '@/playwright/rail';
+import { routeAgents } from '@/playwright/mock-factory';
+import { T } from '@/timeouts';
 import type { Locator, Page } from '@playwright/test';
 
 const STORAGE_KEY = 'open-design:config';
+
+test.describe.configure({ timeout: T.xlong });
 
 const CONNECTORS = [
   {
@@ -80,25 +85,19 @@ test.beforeEach(async ({ page }) => {
     );
   }, STORAGE_KEY);
 
-  await page.route('**/api/agents', async (route) => {
-    await route.fulfill({
-      json: {
-        agents: [
-          {
-            id: 'mock',
-            name: 'Mock Agent',
-            bin: 'mock-agent',
-            available: true,
-            version: 'test',
-            models: [{ id: 'default', label: 'Default' }],
-          },
-        ],
-      },
-    });
-  });
+  await routeAgents(page, [
+    {
+      id: 'mock',
+      name: 'Mock Agent',
+      bin: 'mock-agent',
+      available: true,
+      version: 'test',
+      models: [{ id: 'default', label: 'Default' }],
+    },
+  ]);
 });
 
-test('prompt template retry preserves the edited body in project metadata', async ({ page }) => {
+test('[P1] prompt template retry preserves the edited body in project metadata', async ({ page }) => {
   let detailRequests = 0;
   await page.route('**/api/prompt-templates', async (route) => {
     await route.fulfill({ json: { promptTemplates: [IMAGE_TEMPLATE] } });
@@ -120,6 +119,7 @@ test('prompt template retry preserves the edited body in project metadata', asyn
   });
 
   await gotoEntryHome(page);
+  await ensureRailOpen(page);
   await page.getByTestId('entry-nav-new-project').click();
   await expect(page.getByTestId('new-project-modal')).toBeVisible();
   await expect(page.getByTestId('new-project-panel')).toBeVisible();
@@ -159,11 +159,12 @@ test('prompt template retry preserves the edited body in project metadata', asyn
   });
 });
 
-test('live artifact empty connector CTA opens the gated connector setup path', async ({ page }) => {
+test('[P1] live artifact empty connector CTA opens the gated connector setup path', async ({ page }) => {
   await routeConnectors(page, []);
   await routeComposioConfig(page, { configured: false, apiKeyTail: '' });
 
   await gotoEntryHome(page);
+  await ensureRailOpen(page);
   await page.getByTestId('entry-nav-new-project').click();
   await expect(page.getByTestId('new-project-modal')).toBeVisible();
   await expect(page.getByTestId('new-project-panel')).toBeVisible();
@@ -185,7 +186,7 @@ test('live artifact empty connector CTA opens the gated connector setup path', a
   await expect(page.getByTestId('connectors-search-input')).toBeDisabled();
 });
 
-test('connectors search supports empty results and keyboard-closeable details', async ({ page }) => {
+test('[P2] connectors search supports empty results and keyboard-closeable details', async ({ page }) => {
   await routeConnectors(page, CONNECTORS);
   await routeComposioConfig(page, { configured: true, apiKeyTail: '1234' });
   await page.addInitScript((key) => {
@@ -231,7 +232,7 @@ test('connectors search supports empty results and keyboard-closeable details', 
   await expect(page.getByTestId('connector-drawer')).toHaveCount(0);
 });
 
-test('saving a Composio key from Integrations unlocks the connectors gate immediately', async ({ page }) => {
+test('[P0] saving a Composio key from Integrations unlocks the connectors gate immediately', async ({ page }) => {
   const { accountLabel: _unusedAccountLabel, ...slackConnector } = CONNECTORS[1]!;
   await routeConnectors(page, [
     {
@@ -283,9 +284,10 @@ test('saving a Composio key from Integrations unlocks the connectors gate immedi
     apiKeyConfigured: true,
     apiKeyTail: '1234',
   });
+  expect(savedConfig?.composio?.apiKey).toBe('');
 });
 
-test('typing a draft replacement Composio key does not trigger global autosave', async ({ page }) => {
+test('[P1] typing a draft replacement Composio key does not trigger global autosave', async ({ page }) => {
   await routeConnectors(page, CONNECTORS);
   await routeComposioConfig(page, { configured: true, apiKeyTail: '1234' });
   await page.addInitScript((key) => {
@@ -323,6 +325,7 @@ test('typing a draft replacement Composio key does not trigger global autosave',
   await expect(settingsDialog.getByTestId('connector-grid-wrap')).toBeVisible();
   await expect(settingsDialog.getByText('Saved · ••••1234')).toBeVisible();
 
+  await page.waitForTimeout(1200);
   const appConfigPersistCountBeforeDraftEdit = appConfigPersistBodies.length;
 
   const replacementInput = settingsDialog.getByPlaceholder('Paste a new key to replace the saved one');
@@ -331,6 +334,12 @@ test('typing a draft replacement Composio key does not trigger global autosave',
 
   await page.waitForTimeout(900);
   expect(appConfigPersistBodies).toHaveLength(appConfigPersistCountBeforeDraftEdit);
+  const savedConfig = await readSavedConfig(page);
+  expect(savedConfig?.composio).toMatchObject({
+    apiKey: '',
+    apiKeyConfigured: true,
+    apiKeyTail: '1234',
+  });
 });
 
 async function routeConnectors(page: Page, connectors: typeof CONNECTORS) {
@@ -361,11 +370,13 @@ async function routeConnectors(page: Page, connectors: typeof CONNECTORS) {
 
 async function gotoEntryHome(page: Page) {
   await page.goto('/', { waitUntil: 'domcontentloaded' });
-  await expect(page.getByTestId('home-hero')).toBeVisible();
-  await expect(page.getByTestId('home-hero-input')).toBeVisible();
+  await page.getByText('Loading Open Design…').waitFor({ state: 'hidden', timeout: T.long });
+  await expect(page.getByTestId('home-hero')).toBeVisible({ timeout: T.long });
+  await expect(page.getByTestId('home-hero-input')).toBeVisible({ timeout: T.long });
 }
 
 async function openIntegrationsConnectors(page: Page): Promise<Locator> {
+  await ensureRailOpen(page);
   await page.getByTestId('entry-nav-integrations').click();
   await expect(page).toHaveURL(/\/integrations$/);
   await expect(page.getByRole('heading', { name: 'Integrations' })).toBeVisible();

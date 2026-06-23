@@ -5,7 +5,7 @@
 // plugin to apply, which lands them in the generic agent path and
 // stretches the convergence loop. This chip rail exposes high-signal
 // NewProjectModal categories plus a small set of lower-row shortcuts
-// (plugin authoring / Figma / folder / template), so the same Enter
+// (plugin authoring / Figma / template), so the same Enter
 // keystroke can hit a scenario-bound run. The generic "other" path stays
 // in the free-form prompt instead of becoming a redundant chip.
 //
@@ -19,7 +19,7 @@
 //   - `action` — discriminated union the HomeView dispatcher matches
 //     on. The rail component itself stays presentational.
 
-import type { ProjectKind } from '@open-design/contracts';
+import type { ProjectKind, ProjectMetadata } from '@open-design/contracts';
 import type { DefaultScenarioPluginId } from '@open-design/contracts';
 import type { IconName } from '../Icon';
 
@@ -41,16 +41,20 @@ export type ChipAction =
       pluginId: ChipScenarioPluginId;
       projectKind: ProjectKind;
       inputs?: Record<string, unknown>;
+      projectMetadata?: ProjectMetadata;
     }
   | {
       kind: 'apply-figma-migration';
       pluginId: 'od-figma-migration';
       projectKind: ProjectKind;
       inputs?: Record<string, unknown>;
+      projectMetadata?: ProjectMetadata;
     }
   | { kind: 'create-plugin' }
-  | { kind: 'import-folder' }
-  | { kind: 'open-template-picker' };
+  | { kind: 'open-template-picker' }
+  // Routes the user into the Brand Kit tab and opens its New Brand Kit modal,
+  // reusing the same extraction flow as the tab's own "New Brand Kit" button.
+  | { kind: 'create-brand-kit' };
 
 // Two intent groups: "create" = produce a design artifact, "migrate" =
 // lower-row starter shortcuts such as plugin authoring, imports, and
@@ -69,6 +73,21 @@ export interface HomeHeroChip {
 }
 
 export const HOME_HERO_CHIPS: ReadonlyArray<HomeHeroChip> = [
+  {
+    id: 'create-brand-kit',
+    // Inline English fallback only — the rendered label is localized through
+    // the `homeHero.chip.createBrandKit` Dict key (see `homeHeroChipLabel` in
+    // HomeHero.tsx / `homeHeroChipLabelForId` in HomeView.tsx) so the Chinese
+    // UI shows "创建品牌套件".
+    label: 'Create Brand Kit',
+    icon: 'swatchbook',
+    group: 'create',
+    hint: 'Extract a brand kit from a website, then apply it in any chat.',
+    // Distinct from the plugin-bound create chips: this dispatches straight
+    // into the Brand Kit tab's extraction flow instead of binding a scenario
+    // plugin to the composer.
+    action: { kind: 'create-brand-kit' },
+  },
   {
     id: 'prototype',
     label: 'Prototype',
@@ -111,6 +130,35 @@ export const HOME_HERO_CHIPS: ReadonlyArray<HomeHeroChip> = [
     },
   },
   {
+    id: 'hyperframes',
+    label: 'HyperFrames',
+    icon: 'orbit',
+    group: 'create',
+    hint: 'Author HTML-based motion: captions, audio-reactive visuals, scene transitions.',
+    // HyperFrames is its own bundled scenario (motion-graphics
+    // specialisation of Video). It surfaces in PluginsHomeSection's
+    // primary category list, so the rail picks it up too rather than
+    // hiding the specialised bucket behind the generic Video chip.
+    action: { kind: 'apply-scenario', pluginId: 'example-hyperframes', projectKind: 'video' },
+  },
+  {
+    id: 'live-artifact',
+    label: 'Live artifact',
+    icon: 'refresh',
+    group: 'create',
+    hint: 'Build a refreshable artifact backed by connector or local data.',
+    action: {
+      kind: 'apply-scenario',
+      pluginId: 'example-live-artifact',
+      projectKind: 'prototype',
+      projectMetadata: {
+        kind: 'prototype',
+        intent: 'live-artifact',
+        fidelity: 'high-fidelity',
+      },
+    },
+  },
+  {
     id: 'image',
     label: 'Image',
     icon: 'image',
@@ -143,18 +191,6 @@ export const HOME_HERO_CHIPS: ReadonlyArray<HomeHeroChip> = [
         aspect: '16:9',
       },
     },
-  },
-  {
-    id: 'hyperframes',
-    label: 'HyperFrames',
-    icon: 'orbit',
-    group: 'create',
-    hint: 'Author HTML-based motion: captions, audio-reactive visuals, scene transitions.',
-    // HyperFrames is its own bundled scenario (motion-graphics
-    // specialisation of Video). It surfaces in PluginsHomeSection's
-    // primary category list, so the rail picks it up too rather than
-    // hiding the specialised bucket behind the generic Video chip.
-    action: { kind: 'apply-scenario', pluginId: 'example-hyperframes', projectKind: 'video' },
   },
   {
     id: 'audio',
@@ -196,14 +232,6 @@ export const HOME_HERO_CHIPS: ReadonlyArray<HomeHeroChip> = [
         targetStack: 'React 18 + Tailwind',
       },
     },
-  },
-  {
-    id: 'folder',
-    label: 'From folder',
-    icon: 'folder',
-    group: 'migrate',
-    hint: 'Import an existing local folder and continue editing.',
-    action: { kind: 'import-folder' },
   },
   {
     id: 'template',

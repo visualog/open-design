@@ -9,6 +9,7 @@ import type {
   OrbitConfig,
   PetConfig,
 } from '../types';
+import { resolveFixedOriginBaseUrl } from './apiProtocols';
 import {
   DEFAULT_ACCENT_COLOR,
   normalizeAccentColor,
@@ -17,6 +18,7 @@ import {
   DEFAULT_FAILURE_SOUND_ID,
   DEFAULT_SUCCESS_SOUND_ID,
 } from '../utils/notifications';
+import { randomUUID } from '../utils/uuid';
 
 const STORAGE_KEY = 'open-design:config';
 const CONFIG_MIGRATION_VERSION = 1;
@@ -79,9 +81,22 @@ export const DEFAULT_CONFIG: AppConfig = {
   composio: {},
   agentModels: {},
   agentCliEnv: {},
+  agentCliEnvIntent: {},
   pet: DEFAULT_PET,
   notifications: DEFAULT_NOTIFICATIONS,
   orbit: DEFAULT_ORBIT,
+  projectLocations: [],
+  defaultProjectLocationId: 'default',
+  // Telemetry defaults to ON so fresh-install users emit onboarding /
+  // ui_click events from the first frame. The disclosure modal still
+  // appears after `onboardingCompleted` flips, and Settings → Privacy
+  // remains the one-click opt-out. Without these defaults the gate at
+  // `daemon/src/analytics.ts` (`if (telemetry?.metrics !== true) return`)
+  // dropped every event fired during onboarding because no consent
+  // existed yet — observed live on the nightly.10 QA run, which left
+  // zero `page_view pn=onboarding` rows on PostHog despite the user
+  // completing the flow.
+  telemetry: { metrics: true, content: true },
 };
 
 /** Well-known providers with pre-filled base URLs. */
@@ -93,6 +108,8 @@ export interface KnownProvider {
   model: string;
   /** Optional provider-specific model choices shown in Settings. */
   models?: string[];
+  /** Some local/self-hosted endpoints do not require bearer credentials. */
+  requiresApiKey?: boolean;
 }
 
 // Some providers appear more than once because they expose both
@@ -148,6 +165,22 @@ export const KNOWN_PROVIDERS: KnownProvider[] = [
     models: ['gpt-4o', 'gpt-4o-mini', 'o3', 'o4-mini'],
   },
   {
+    label: 'OpenRouter',
+    protocol: 'openai',
+    baseUrl: 'https://openrouter.ai/api/v1',
+    model: 'anthropic/claude-3.7-sonnet',
+    models: [
+      'anthropic/claude-3.7-sonnet',
+      'anthropic/claude-3.5-sonnet',
+      'google/gemini-2.5-flash',
+      'google/gemini-2.5-pro',
+      'openai/gpt-4o',
+      'openai/o3-mini',
+      'deepseek/deepseek-chat',
+      'deepseek/deepseek-r1',
+    ],
+  },
+  {
     label: 'Azure OpenAI',
     protocol: 'azure',
     baseUrl: '',
@@ -158,8 +191,16 @@ export const KNOWN_PROVIDERS: KnownProvider[] = [
     label: 'Google Gemini',
     protocol: 'google',
     baseUrl: 'https://generativelanguage.googleapis.com',
-    model: 'gemini-2.0-flash',
-    models: ['gemini-2.0-flash', 'gemini-2.0-flash-lite', 'gemini-1.5-pro', 'gemini-1.5-flash'],
+    model: 'gemini-3.5-flash',
+    models: [
+      'gemini-3.5-flash',
+      'gemini-3.1-pro-preview',
+      'gemini-3-flash-preview',
+      'gemini-3.1-flash-lite',
+      'gemini-2.5-pro',
+      'gemini-2.5-flash',
+      'gemini-2.5-flash-lite',
+    ],
   },
   {
     label: 'DeepSeek — OpenAI',
@@ -196,7 +237,7 @@ export const KNOWN_PROVIDERS: KnownProvider[] = [
     models: ['mimo-v2.5-pro'],
   },
   {
-    label: 'Ollama Cloud',
+    label: 'Ollama Cloud (managed)',
     protocol: 'ollama',
     baseUrl: 'https://ollama.com',
     model: 'gpt-oss:120b',
@@ -243,6 +284,14 @@ export const KNOWN_PROVIDERS: KnownProvider[] = [
     ],
   },
   {
+    label: 'Ollama Self-hosted (local)',
+    protocol: 'ollama',
+    baseUrl: 'http://localhost:11434',
+    model: 'gemma3:4b',
+    models: ['gemma3:4b', 'gemma3:12b', 'gemma3:27b', 'gpt-oss:20b'],
+    requiresApiKey: false,
+  },
+  {
     label: 'MiMo (Xiaomi) — Anthropic',
     protocol: 'anthropic',
     baseUrl: 'https://token-plan-cn.xiaomimimo.com/anthropic',
@@ -263,6 +312,23 @@ export const KNOWN_PROVIDERS: KnownProvider[] = [
       'kimi-k2.6',
       'MiniMax-M2.7-highspeed',
       'MiniMax-M2.7',
+    ],
+  },
+  {
+    label: 'AIHubMix',
+    protocol: 'aihubmix',
+    baseUrl: 'https://aihubmix.com/v1',
+    model: 'gpt-5.5',
+    models: [
+      'gpt-5.5',
+      'gpt-4o',
+      'gpt-4o-mini',
+      'claude-opus-4-8',
+      'claude-sonnet-4-5',
+      'claude-haiku-4-5',
+      'gemini-2.0-flash',
+      'deepseek-chat',
+      'deepseek-reasoner',
     ],
   },
 ];
@@ -310,6 +376,10 @@ function inferApiProtocol(model: string, baseUrl: string): ApiProtocol {
     // and the BYOK tab UI stay consistent with the protocol the user
     // picked — even though the on-wire shape is OpenAI-compatible.
     if (normalized.includes('senseaudio.cn')) return 'senseaudio';
+    // AIHubMix host routes to its own proxy so the daemon injects the
+    // APP-Code attribution header even though the wire shape is
+    // OpenAI-compatible.
+    if (normalized.includes('aihubmix.com')) return 'aihubmix';
     return isOpenAICompatible(model, baseUrl) ? 'openai' : 'anthropic';
   } catch {
     // Preserve the rest of the user's settings even if an old saved base URL is
@@ -350,6 +420,7 @@ export function loadConfig(): AppConfig {
       composio: { ...(parsed.composio ?? {}) },
       agentModels: { ...(parsed.agentModels ?? {}) },
       agentCliEnv: { ...(parsed.agentCliEnv ?? {}) },
+      agentCliEnvIntent: { ...(parsed.agentCliEnvIntent ?? {}) },
       accentColor: normalizeAccentColor(parsed.accentColor) ?? DEFAULT_CONFIG.accentColor,
       pet: normalizePet(parsed.pet),
       notifications: normalizeNotifications(parsed.notifications),
@@ -383,6 +454,15 @@ export function loadConfig(): AppConfig {
       merged.configMigrationVersion = CONFIG_MIGRATION_VERSION;
     }
 
+    // Fixed-origin gateways (e.g. AIHubMix) hide the Base URL field, so a config
+    // persisted before the origin was auto-resolved can carry an empty baseUrl.
+    // Backfill it here so every consumer (Settings form, top-bar switcher, chat)
+    // sees the canonical origin — an empty value otherwise blocks the live
+    // model-list fetch and leaves only the static suggestion list.
+    if (merged.apiProtocol) {
+      merged.baseUrl = resolveFixedOriginBaseUrl(merged.apiProtocol, merged.baseUrl);
+    }
+
     return merged;
   } catch {
     return {
@@ -401,6 +481,7 @@ interface PublicComposioConfigResponse {
 
 interface PublicMediaProviderConfigEntry {
   configured?: boolean;
+  source?: string;
   apiKeyTail?: string;
   baseUrl?: string;
   model?: string;
@@ -486,16 +567,21 @@ export function buildMediaProvidersForDaemonSave(
   for (const [providerId, currentEntry] of Object.entries(currentProviders ?? {})) {
     const daemonEntry = daemonProviders?.[providerId];
     const apiKey = currentEntry?.apiKey?.trim() ?? '';
+    const hasStoredKeyMarker = Boolean(
+      currentEntry?.apiKeyTail?.trim()
+      || daemonEntry?.apiKeyTail?.trim(),
+    );
     const preserveApiKey = !apiKey && Boolean(
       currentEntry?.apiKeyConfigured
-      && (daemonEntry?.apiKeyConfigured || daemonEntry?.apiKeyTail?.trim()),
+      && hasStoredKeyMarker,
     );
-    const baseUrl =
+    const explicitBaseUrl =
       currentEntry?.baseUrl?.trim()
       || daemonEntry?.baseUrl?.trim()
-      || defaultBaseUrlForProvider(providerId);
+      || '';
     const model = currentEntry?.model?.trim() || daemonEntry?.model?.trim() || '';
-    if (!apiKey && !preserveApiKey && !baseUrl && !model) continue;
+    if (!apiKey && !preserveApiKey && !explicitBaseUrl && !model) continue;
+    const baseUrl = explicitBaseUrl || defaultBaseUrlForProvider(providerId);
     providers[providerId] = {
       ...(apiKey ? { apiKey } : {}),
       ...(preserveApiKey ? { preserveApiKey: true } : {}),
@@ -537,6 +623,9 @@ export async function fetchMediaProvidersFromDaemon(): Promise<DaemonMediaProvid
         apiKeyConfigured: Boolean(entry?.configured),
         apiKeyTail: entry?.apiKeyTail ?? '',
         baseUrl: entry?.baseUrl ?? '',
+        ...(typeof entry?.source === 'string' && entry.source.trim()
+          ? { source: entry.source.trim() }
+          : {}),
         ...(typeof entry?.model === 'string' && entry.model.trim()
           ? { model: entry.model.trim() }
           : {}),
@@ -581,7 +670,12 @@ const DAEMON_OWNED_KEYS = new Set<keyof AppConfig>([
   'privacyDecisionAt',
 ]);
 
-const AGENT_CLI_SECRET_ENV_KEYS = new Set(['ANTHROPIC_API_KEY', 'CODEX_API_KEY', 'OPENAI_API_KEY']);
+const AGENT_CLI_SECRET_ENV_KEYS = new Set([
+  'ANTHROPIC_API_KEY',
+  'ANTHROPIC_AUTH_TOKEN',
+  'CODEX_API_KEY',
+  'OPENAI_API_KEY',
+]);
 
 function sanitizeAgentCliEnv(agentCliEnv: AppConfig['agentCliEnv']): AppConfig['agentCliEnv'] {
   if (!agentCliEnv) return agentCliEnv;
@@ -629,6 +723,7 @@ export function mergeDaemonConfig(
     };
   }
   next.agentCliEnv = daemonConfig.agentCliEnv ?? {};
+  next.agentCliEnvIntent = daemonConfig.agentCliEnvIntent ?? {};
   if (daemonConfig.disabledSkills !== undefined) {
     next.disabledSkills = daemonConfig.disabledSkills;
   }
@@ -655,8 +750,38 @@ export function mergeDaemonConfig(
     // has resolved the first-run prompt and should not see it again.
     next.privacyDecisionAt = Date.now();
   }
+  // Default-on reporting. Unless the user has explicitly opted out
+  // (Settings → "Don't share", which persists telemetry.metrics === false
+  // together with installationId: null), an install reports with the
+  // product's default telemetry channels on and carries a stable
+  // installationId. This is the single source of the "Opted out" state:
+  // previously an upgraded or never-prompted install could sit with
+  // telemetry on but no id (the daemon ships a metrics+content default but
+  // never mints an id), which the Settings → Privacy field rendered as
+  // "Opted out" even though the user never declined. We mint the id and
+  // keep the default channels on so the displayed state matches the product
+  // default — the same metrics+content surface the first-run banner's "I
+  // get it" opt-in enables (artifactManifest stays off, as it does there).
+  // This does NOT override an explicit opt-out: metrics === false short-
+  // circuits the whole block, and any channel the user already turned off
+  // is preserved via the nullish-coalesce.
+  const explicitlyOptedOut = next.telemetry?.metrics === false;
+  if (!explicitlyOptedOut && !next.installationId) {
+    next.installationId = randomUUID();
+    next.telemetry = {
+      metrics: true,
+      content: next.telemetry?.content ?? true,
+      artifactManifest: next.telemetry?.artifactManifest ?? false,
+    };
+  }
   if (daemonConfig.customInstructions !== undefined) {
     next.customInstructions = daemonConfig.customInstructions ?? undefined;
+  }
+  if (daemonConfig.projectLocations !== undefined) {
+    next.projectLocations = daemonConfig.projectLocations;
+  }
+  if (daemonConfig.defaultProjectLocationId !== undefined) {
+    next.defaultProjectLocationId = daemonConfig.defaultProjectLocationId ?? 'default';
   }
   return next;
 }
@@ -664,6 +789,9 @@ export function mergeDaemonConfig(
 export function mergeDaemonMediaProviders(
   localConfig: AppConfig,
   daemonProviders: AppConfig['mediaProviders'] | null,
+  options?: {
+    preserveLocalProviderIds?: ReadonlySet<string>;
+  },
 ): AppConfig {
   if (daemonProviders == null) {
     return { ...localConfig };
@@ -681,7 +809,14 @@ export function mergeDaemonMediaProviders(
   const mediaProviders = { ...(localConfig.mediaProviders ?? {}) };
   for (const [providerId, daemonEntry] of Object.entries(daemonProviders ?? {})) {
     if (!isStoredMediaProviderEntryPresent(daemonEntry)) continue;
-    mediaProviders[providerId] = { ...daemonEntry };
+    const localEntry = mediaProviders[providerId];
+    const preserveLocalPendingEdit = Boolean(
+      options?.preserveLocalProviderIds?.has(providerId)
+      && hasRecoverableLocalMediaProviderFields(localEntry),
+    );
+    mediaProviders[providerId] = preserveLocalPendingEdit
+      ? { ...daemonEntry, ...localEntry }
+      : { ...daemonEntry };
   }
 
   return {
@@ -753,6 +888,7 @@ export async function syncConfigToDaemon(
     agentId: config.agentId,
     agentModels: config.agentModels,
     agentCliEnv: config.agentCliEnv,
+    agentCliEnvIntent: config.agentCliEnvIntent,
     skillId: config.skillId,
     designSystemId: config.designSystemId,
     disabledSkills: config.disabledSkills,
@@ -762,6 +898,8 @@ export async function syncConfigToDaemon(
     telemetry: config.telemetry,
     privacyDecisionAt: config.privacyDecisionAt,
     customInstructions: config.customInstructions ?? null,
+    projectLocations: config.projectLocations ?? [],
+    defaultProjectLocationId: config.defaultProjectLocationId ?? 'default',
   };
   try {
     const response = await fetch('/api/app-config', {

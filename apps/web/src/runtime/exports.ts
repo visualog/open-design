@@ -17,6 +17,7 @@ import { buildReactComponentSrcdoc } from './react-component';
 import { buildZip } from './zip';
 import { randomUUID } from '../utils/uuid';
 import {
+  captureHostPage,
   isOpenDesignHostAvailable,
   printHostPdf,
 } from '@open-design/host';
@@ -32,14 +33,18 @@ function safeFilename(name: string, fallback: string): string {
   return slug || fallback;
 }
 
-function triggerDownload(blob: Blob, filename: string): void {
-  const url = URL.createObjectURL(blob);
+function triggerHrefDownload(href: string, filename: string): void {
   const a = document.createElement('a');
-  a.href = url;
+  a.href = href;
   a.download = filename;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
+}
+
+function triggerDownload(blob: Blob, filename: string): void {
+  const url = URL.createObjectURL(blob);
+  triggerHrefDownload(url, filename);
   // Revoke later — Safari sometimes hasn't finished reading the blob yet
   // when the click handler returns.
   setTimeout(() => URL.revokeObjectURL(url), 60_000);
@@ -49,6 +54,29 @@ export function exportAsHtml(html: string, title: string): void {
   const doc = buildSrcdoc(html);
   const blob = new Blob([doc], { type: 'text/html;charset=utf-8' });
   triggerDownload(blob, `${safeFilename(title, 'artifact')}.html`);
+}
+
+export async function exportProjectAsHtml(opts: {
+  projectId: string;
+  filePath: string;
+  fallbackHtml: string;
+  fallbackTitle: string;
+}): Promise<void> {
+  const segments = opts.filePath
+    .split('/')
+    .filter(Boolean)
+    .map((segment) => encodeURIComponent(segment))
+    .join('/');
+  const url = `/api/projects/${encodeURIComponent(opts.projectId)}/export/${segments}?inline=1`;
+  try {
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error(`html export request failed (${resp.status})`);
+    const blob = await resp.blob();
+    triggerDownload(blob, `${safeFilename(opts.fallbackTitle, 'artifact')}.html`);
+  } catch (err) {
+    console.warn('[exportProjectAsHtml] falling back to source HTML export:', err);
+    exportAsHtml(opts.fallbackHtml, opts.fallbackTitle);
+  }
 }
 
 // A file is treated as a preview-chrome wrapper only when it lives inside
@@ -331,12 +359,18 @@ export function exportAsMd(source: string, title: string): void {
  * injected into a srcdoc preview iframe. Returns null if the bridge is not
  * present (e.g. URL-load mode) or the capture times out.
  */
-export function requestPreviewSnapshot(
+export type PreviewSnapshot = { dataUrl: string; w: number; h: number };
+
+export type PreviewSnapshotResult =
+  | { ok: true; snapshot: PreviewSnapshot }
+  | { ok: false; reason: 'loading' | 'post-message-error' | 'render-error' | 'timeout'; error?: string };
+
+export function requestPreviewSnapshotResult(
   iframe: HTMLIFrameElement,
-  timeout = 2500,
-): Promise<{ dataUrl: string; w: number; h: number } | null> {
+  timeout = 8000,
+): Promise<PreviewSnapshotResult> {
   const win = iframe.contentWindow;
-  if (!win) return Promise.resolve(null);
+  if (!win) return Promise.resolve({ ok: false, reason: 'loading' });
   const id = `snap-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
   return new Promise((resolve) => {
     let done = false;
@@ -354,22 +388,86 @@ export function requestPreviewSnapshot(
       if (done) return;
       done = true;
       window.removeEventListener('message', onMsg);
-      if (d.dataUrl && d.w && d.h) resolve({ dataUrl: d.dataUrl, w: d.w, h: d.h });
-      else resolve(null);
+      if (d.dataUrl && d.w && d.h) resolve({ ok: true, snapshot: { dataUrl: d.dataUrl, w: d.w, h: d.h } });
+      else resolve({ ok: false, reason: 'render-error', error: d.error });
     }
     window.addEventListener('message', onMsg);
     try {
       win.postMessage({ type: 'od:snapshot', id }, '*');
     } catch {
-      /* sandboxed */
+      done = true;
+      window.removeEventListener('message', onMsg);
+      resolve({ ok: false, reason: 'post-message-error' });
     }
     setTimeout(() => {
       if (!done) {
         done = true;
         window.removeEventListener('message', onMsg);
-        resolve(null);
+        resolve({ ok: false, reason: 'timeout' });
       }
     }, timeout);
+  });
+}
+
+export async function requestPreviewSnapshot(
+  iframe: HTMLIFrameElement,
+  timeout = 8000,
+): Promise<PreviewSnapshot | null> {
+  const result = await requestPreviewSnapshotResult(iframe, timeout);
+  return result.ok ? result.snapshot : null;
+}
+
+/**
+ * Capture a rectangle of the on-screen window via the desktop host's
+ * compositor (Electron `webContents.capturePage`). Unlike the in-iframe
+ * SVG-foreignObject bridge, this returns the REAL rendered pixels — fonts,
+ * external CSS, gradients, cross-origin images and embedded <webview> content
+ * all paint faithfully and the canvas is never tainted, so it cannot produce
+ * the black/blank frames the foreignObject path does. Returns null when no
+ * desktop host is present (pure web), so callers fall back to the bridge.
+ *
+ * `clipRect` is in CSS pixels relative to the viewport (e.g. an iframe's
+ * getBoundingClientRect()); capturePage expects DIP page coordinates, which
+ * match 1:1 for the top-level window (it never scrolls).
+ */
+export async function captureHostRegionSnapshot(
+  clipRect: { left: number; top: number; width: number; height: number } | null,
+): Promise<PreviewSnapshot | null> {
+  if (!isOpenDesignHostAvailable()) return null;
+  const clip = clipRect && clipRect.width >= 1 && clipRect.height >= 1
+    ? {
+        x: Math.max(0, Math.round(clipRect.left)),
+        y: Math.max(0, Math.round(clipRect.top)),
+        width: Math.max(1, Math.round(clipRect.width)),
+        height: Math.max(1, Math.round(clipRect.height)),
+      }
+    : undefined;
+  try {
+    const result = await captureHostPage(clip ? { clip } : undefined);
+    if (result.ok && result.dataUrl && result.w >= 1 && result.h >= 1) {
+      return { dataUrl: result.dataUrl, w: result.w, h: result.h };
+    }
+  } catch {
+    /* fall through to null so the caller can use the bridge */
+  }
+  return null;
+}
+
+/**
+ * Capture an iframe's on-screen region through the desktop compositor.
+ * Convenience wrapper over captureHostRegionSnapshot using the iframe's
+ * current bounding rect.
+ */
+export async function captureHostIframeSnapshot(
+  iframe: HTMLIFrameElement | null,
+): Promise<PreviewSnapshot | null> {
+  if (!iframe) return null;
+  const rect = iframe.getBoundingClientRect();
+  return captureHostRegionSnapshot({
+    left: rect.left,
+    top: rect.top,
+    width: rect.width,
+    height: rect.height,
   });
 }
 
@@ -381,9 +479,240 @@ function dataUrlToBlob(dataUrl: string): Blob {
   const [header, base64] = dataUrl.split(',');
   const mime = header?.match(/:(.*?);/)?.[1] ?? 'image/png';
   const bytes = atob(base64 ?? '');
+  if (bytes.length <= 0) {
+    throw new Error('Image snapshot is empty');
+  }
   const arr = new Uint8Array(bytes.length);
   for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
   return new Blob([arr], { type: mime });
+}
+
+type ClipboardItemCtor = new (
+  items: Record<string, Blob | Promise<Blob>>,
+) => ClipboardItem;
+
+/**
+ * Copy a PNG (or other image) data-URL onto the system clipboard as a real
+ * image item, so it can be pasted into the chat composer or any other app.
+ * Returns 'copied' on success, 'denied' when the clipboard API is missing or
+ * the browser refuses the write for permission/security reasons, and 'failed'
+ * for any other error (e.g. a malformed data-URL).
+ */
+export async function copyImageDataUrlToClipboard(
+  dataUrl: string,
+): Promise<'copied' | 'denied' | 'failed'> {
+  const clipboard = navigator.clipboard;
+  const ClipboardItemRef = (globalThis as { ClipboardItem?: ClipboardItemCtor })
+    .ClipboardItem;
+  if (!clipboard || typeof clipboard.write !== 'function' || !ClipboardItemRef) {
+    return 'denied';
+  }
+  try {
+    const blob = dataUrlToBlob(dataUrl);
+    // Safari only honours clipboard.write() inside the original user gesture,
+    // so prefer the Promise<Blob> ClipboardItem form when supported — it lets
+    // the browser resolve the blob lazily without losing the gesture context.
+    let item: ClipboardItem;
+    try {
+      item = new ClipboardItemRef({ [blob.type]: Promise.resolve(blob) });
+    } catch {
+      item = new ClipboardItemRef({ [blob.type]: blob });
+    }
+    await clipboard.write([item]);
+    return 'copied';
+  } catch (err) {
+    const name = (err as { name?: string } | null)?.name;
+    if (name === 'NotAllowedError' || name === 'SecurityError') {
+      return 'denied';
+    }
+    return 'failed';
+  }
+}
+
+export type ImageExportFormat = 'png' | 'jpeg' | 'webp';
+
+type ImageExportSpec = {
+  extension: string;
+  mime: `image/${string}`;
+  pickerLabel: string;
+};
+
+const IMAGE_EXPORT_SPECS: Record<ImageExportFormat, ImageExportSpec> = {
+  png: {
+    extension: 'png',
+    mime: 'image/png',
+    pickerLabel: 'PNG image',
+  },
+  jpeg: {
+    extension: 'jpg',
+    mime: 'image/jpeg',
+    pickerLabel: 'JPEG image',
+  },
+  webp: {
+    extension: 'webp',
+    mime: 'image/webp',
+    pickerLabel: 'WebP image',
+  },
+};
+
+type FileSystemWritableFileStreamLike = {
+  write(data: Blob): Promise<void>;
+  close(): Promise<void>;
+};
+
+type FileSystemFileHandleLike = {
+  createWritable(): Promise<FileSystemWritableFileStreamLike>;
+};
+
+type SaveFilePickerOptionsLike = {
+  suggestedName?: string;
+  types?: Array<{
+    description?: string;
+    accept: Record<string, string[]>;
+  }>;
+};
+
+type WindowWithSaveFilePicker = Window & {
+  showSaveFilePicker?: (options?: SaveFilePickerOptionsLike) => Promise<FileSystemFileHandleLike>;
+};
+
+export type ImageExportTarget = {
+  filename: string;
+  method: 'download' | 'picker';
+  save: (blob: Blob) => Promise<void> | void;
+};
+
+type ImageExportTargetOptions = {
+  useNativePicker?: boolean;
+};
+
+function imageExportFilename(title: string, format: ImageExportFormat): string {
+  const spec = IMAGE_EXPORT_SPECS[format];
+  return `${safeFilename(title, 'artifact')}.${spec.extension}`;
+}
+
+function downloadImageExportTarget(filename: string): ImageExportTarget {
+  return {
+    filename,
+    method: 'download',
+    save: (blob) => {
+      triggerDownload(blob, filename);
+    },
+  };
+}
+
+export function downloadImageDataUrl(dataUrl: string, filename: string): void {
+  // Validate the snapshot without converting the actual download path to a blob URL.
+  dataUrlToBlob(dataUrl);
+  triggerHrefDownload(dataUrl, filename);
+}
+
+function isDomExceptionNamed(err: unknown, names: ReadonlySet<string>): boolean {
+  if (typeof DOMException !== 'undefined' && err instanceof DOMException) {
+    return names.has(err.name);
+  }
+  if (!err || typeof err !== 'object' || !('name' in err)) return false;
+  return typeof err.name === 'string' && names.has(err.name);
+}
+
+function loadImageFromDataUrl(dataUrl: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error('Could not decode image snapshot'));
+    img.src = dataUrl;
+  });
+}
+
+function canvasToBlob(canvas: HTMLCanvasElement, mime: string, quality?: number): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      if (!blob) {
+        reject(new Error(`Could not encode snapshot as ${mime}`));
+        return;
+      }
+      if (blob.type && blob.type !== mime) {
+        reject(new Error(`Browser encoded ${blob.type} instead of ${mime}`));
+        return;
+      }
+      resolve(blob);
+    }, mime, quality);
+  });
+}
+
+export async function imageDataUrlToBlob(
+  dataUrl: string,
+  format: ImageExportFormat,
+): Promise<Blob> {
+  const spec = IMAGE_EXPORT_SPECS[format];
+  if (format === 'png') {
+    const blob = dataUrlToBlob(dataUrl);
+    if (blob.type === spec.mime) return blob;
+  }
+
+  const img = await loadImageFromDataUrl(dataUrl);
+  const width = img.naturalWidth || img.width;
+  const height = img.naturalHeight || img.height;
+  if (width <= 0 || height <= 0) {
+    throw new Error('Image snapshot is empty');
+  }
+
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('Canvas is not available');
+  if (format === 'jpeg') {
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, width, height);
+  }
+  ctx.drawImage(img, 0, 0, width, height);
+  return canvasToBlob(canvas, spec.mime, format === 'jpeg' ? 0.92 : undefined);
+}
+
+export async function prepareImageExportTarget(
+  title: string,
+  format: ImageExportFormat,
+  options: ImageExportTargetOptions = {},
+): Promise<ImageExportTarget | null> {
+  const spec = IMAGE_EXPORT_SPECS[format];
+  const filename = imageExportFilename(title, format);
+  const picker = (window as WindowWithSaveFilePicker).showSaveFilePicker;
+  if (options.useNativePicker !== false && typeof picker === 'function') {
+    try {
+      const handle = await picker.call(window, {
+        suggestedName: filename,
+        types: [
+          {
+            description: spec.pickerLabel,
+            accept: {
+              [spec.mime]: [`.${spec.extension}`],
+            },
+          },
+        ],
+      });
+      return {
+        filename,
+        method: 'picker',
+        save: async (blob) => {
+          const writable = await handle.createWritable();
+          try {
+            await writable.write(blob);
+          } finally {
+            await writable.close();
+          }
+        },
+      };
+    } catch (err) {
+      if (isDomExceptionNamed(err, new Set(['AbortError']))) return null;
+      if (isDomExceptionNamed(err, new Set(['NotAllowedError', 'SecurityError']))) {
+        return downloadImageExportTarget(filename);
+      }
+      throw err;
+    }
+  }
+
+  return downloadImageExportTarget(filename);
 }
 
 /** Download a snapshot data-URL as a PNG file. */
@@ -398,7 +727,7 @@ export function exportAsImage(dataUrl: string, title: string): void {
   }
 }
 
-export type ProjectPdfExportResult = 'desktop' | 'fallback';
+export type ProjectPdfExportResult = 'desktop' | 'fallback' | 'cancelled';
 
 export async function exportProjectAsPdf(opts: {
   deck: boolean;
@@ -419,6 +748,7 @@ export async function exportProjectAsPdf(opts: {
     });
     if (!resp.ok) throw new Error(`desktop PDF export unavailable (${resp.status})`);
     const body = await resp.json().catch(() => ({}));
+    if (body?.canceled === true) return 'cancelled';
     if (body && body.ok === false) throw new Error(body.error || 'desktop PDF export failed');
     return 'desktop';
   } catch (err) {
@@ -570,12 +900,39 @@ export function buildSandboxedPreviewDocument(
 </html>`;
 }
 
+function currentOriginBaseHref(): string | undefined {
+  if (typeof window !== 'undefined' && typeof window.location?.origin === 'string') {
+    return `${window.location.origin.replace(/\/+$/, '')}/`;
+  }
+  const base =
+    typeof document !== 'undefined' && typeof document.baseURI === 'string'
+      ? document.baseURI
+      : typeof window !== 'undefined' && typeof window.location?.href === 'string'
+        ? window.location.href
+        : undefined;
+  if (!base) return undefined;
+  try {
+    return new URL('/', base).href;
+  } catch {
+    return undefined;
+  }
+}
+
+function buildBlobSafeSrcdoc(html: string, options?: SrcdocOptions): string {
+  const baseHref =
+    typeof options?.baseHref === 'string' ? options.baseHref : currentOriginBaseHref();
+  return buildSrcdoc(html, {
+    ...options,
+    ...(baseHref ? { baseHref } : {}),
+  });
+}
+
 export function openSandboxedPreviewInNewTab(
   html: string,
   title: string,
   srcdocOptions?: SrcdocOptions,
 ): void {
-  const doc = buildSandboxedPreviewDocument(buildSrcdoc(html, srcdocOptions), title);
+  const doc = buildSandboxedPreviewDocument(buildBlobSafeSrcdoc(html, srcdocOptions), title);
   const blob = new Blob([doc], { type: 'text/html;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   window.open(url, '_blank', 'noopener,noreferrer');
@@ -606,7 +963,7 @@ export async function exportAsPdf(
   // Generate a per-export nonce so the print-ready handshake is resistant to
   // spoofing by untrusted scripts inside the exported artifact.
   const nonce = randomUUID();
-  let doc = buildSrcdoc(html, opts);
+  let doc = buildBlobSafeSrcdoc(html, opts);
   if (opts?.deck) doc = injectDeckPrintStylesheet(doc);
   doc = injectPrintReadyHandshake(doc, nonce);
 
@@ -641,8 +998,11 @@ export async function exportAsPdf(
   // popup.
   if (sandboxedPreview) {
     doc = buildSandboxedPreviewDocument(doc, title, { allowModals: true });
-    doc = injectParentPrintReadyCache(doc, nonce);
   }
+  // Even in the non-sandboxed browser fallback we keep the same readiness
+  // cache contract as the desktop bridge so the popup can wait for actual
+  // rendered content instead of printing after a blind fixed delay.
+  doc = injectParentPrintReadyCache(doc, nonce);
   doc = injectPrintScript(doc, title);
 
   const blob = new Blob([doc], { type: 'text/html;charset=utf-8' });
@@ -675,12 +1035,76 @@ export async function exportAsPdf(
   setTimeout(() => URL.revokeObjectURL(url), 60_000);
 }
 
+/**
+ * A reported print size is only usable when both dimensions are positive,
+ * finite numbers. The desktop bridge (apps/desktop/src/main/pdf-export.ts
+ * inferPageSize) sizes the PDF page to this; a zero/invalid size makes it
+ * fall back to measuring the wrapper viewport, which — per that function's
+ * own docs — blanks artifacts whose visible content sits below the fold.
+ * Exported so the injected handshake/cache scripts and unit tests share one
+ * definition. See issue #4458.
+ */
+export function isUsablePrintSize(width: unknown, height: unknown): boolean {
+  return (
+    typeof width === 'number' &&
+    typeof height === 'number' &&
+    Number.isFinite(width) &&
+    Number.isFinite(height) &&
+    width > 0 &&
+    height > 0
+  );
+}
+
+/**
+ * Poll `measure` once per animation frame until it returns a usable
+ * (positive, finite) size, then call `report` with it. Bounded by
+ * `maxFrames`: a genuinely empty artifact never gains a usable size, so the
+ * last measurement is reported best-effort rather than hanging the desktop
+ * readiness handshake forever.
+ *
+ * This fixes one #4458 blank-PDF path: the in-iframe handshake used to
+ * report the content size after a fixed two animation frames, which can fire
+ * before a heavier artifact has finished layout (size still 0). The desktop
+ * bridge then has no usable `__odPrintSize`, falls back to the wrapper
+ * viewport, and prints a blank page. Waiting for a non-zero size avoids that.
+ *
+ * Injected into the handshake via `toString()`; the function is self-contained
+ * (no references to other module symbols) so production minification cannot
+ * break the injected copy. The `raf` seam keeps it unit-testable.
+ */
+export function reportPrintSizeWhenStable(
+  measure: () => { width: number; height: number },
+  report: (size: { width: number; height: number }) => void,
+  maxFrames: number,
+  raf: (cb: () => void) => void = (cb) => requestAnimationFrame(() => cb()),
+): void {
+  const usable = (w: number, h: number): boolean =>
+    typeof w === 'number' &&
+    typeof h === 'number' &&
+    Number.isFinite(w) &&
+    Number.isFinite(h) &&
+    w > 0 &&
+    h > 0;
+  const step = (remaining: number): void => {
+    const size = measure();
+    if (usable(size.width, size.height) || remaining <= 0) {
+      report(size);
+      return;
+    }
+    raf(() => step(remaining - 1));
+  };
+  step(maxFrames);
+}
+
 function injectPrintScript(doc: string, title: string): string {
   const safeTitle = JSON.stringify(title || 'artifact');
-  // setTimeout gives stylesheets and images one tick to settle before the
-  // print dialog measures the page; without it some print previews come
-  // out blank in Chrome.
-  const script = `<script>try{document.title=${safeTitle}}catch(e){}window.addEventListener('load',function(){setTimeout(function(){try{window.focus();window.print()}catch(e){}},300)})</script>`;
+  // Browser fallback PDF export shares the same print-readiness signal as the
+  // desktop native path. When the cache is present, wait for it so the popup
+  // prints only after fonts, images, CSS image URLs, and final layout have
+  // settled. If the handshake script is blocked entirely (for example by a
+  // CSP that forbids inline scripts), fall back to the historical load+delay
+  // behavior instead of waiting for the full ready deadline.
+  const script = `<script>(function(){try{document.title=${safeTitle}}catch(e){}function doPrint(){try{window.focus();window.print()}catch(e){}}function afterStableFrames(fn){requestAnimationFrame(function(){requestAnimationFrame(fn)})}window.addEventListener('load',function(){if(typeof window.__odPrintReady!=='boolean'){setTimeout(doPrint,300);return}var deadline=Date.now()+30000;var handshakeStartDeadline=Date.now()+1000;(function waitForReady(){if(window.__odPrintReady===true){afterStableFrames(doPrint);return}if(window.__odPrintReadyStarted===false&&Date.now()>=handshakeStartDeadline){setTimeout(doPrint,300);return}if(Date.now()>=deadline){afterStableFrames(doPrint);return}setTimeout(waitForReady,50)})()})})();</script>`;
   if (/<\/head>/i.test(doc)) return doc.replace(/<\/head>/i, `${script}</head>`);
   if (/<\/body>/i.test(doc)) return doc.replace(/<\/body>/i, `${script}</body>`);
   return doc + script;
@@ -689,21 +1113,42 @@ function injectPrintScript(doc: string, title: string): string {
 function injectPrintReadyHandshake(doc: string, nonce: string): string {
   // Wait for fonts, the window load event (which covers initial images), and
   // any images that are still loading after load fires (dynamically added or
-  // slow images that weren't complete by the time this script ran). This
-  // mirrors the safety of the legacy waitForPrintableContent() helper and
+  // slow images that weren't complete by the time this script ran). Also wait
+  // for CSS image URLs and two animation frames so background/list/border
+  // images and final layout are settled before the desktop bridge prints.
+  // This mirrors the safety of the legacy waitForPrintableContent() helper and
   // prevents image-heavy exports from printing with blank images.
+  //
+  // Once settled, the message also carries the artifact's own content
+  // dimensions (scroll/offset size of its documentElement). This script runs
+  // inside the sandboxed preview iframe, which the parent wrapper cannot
+  // measure directly (sandbox="allow-scripts" has no allow-same-origin, so
+  // iframe.contentDocument is null). Reporting the size from here lets the
+  // desktop bridge size the PDF page to the real content instead of the
+  // wrapper's viewport, which otherwise clips — or blanks — taller artifacts
+  // (issue #4067). The parent caches it via injectParentPrintReadyCache and
+  // inferPageSize() in apps/desktop/src/main/pdf-export.ts consumes it.
   //
   // The nonce is a per-export random UUID that verifies the readiness signal
   // came from our injected handshake, not a spoofed message from untrusted
   // artifact code.
-  const script = `<script data-od-print-ready>(function(){Promise.all([document.fonts&&document.fonts.ready?document.fonts.ready.catch(function(){}):Promise.resolve(),new Promise(function(r){if(document.readyState==='complete')r();else window.addEventListener('load',r,{once:true})})]).then(function(){var imgs=Array.from(document.images).filter(function(img){return !img.complete});return Promise.all(imgs.map(function(img){return new Promise(function(r){img.addEventListener('load',r,{once:true});img.addEventListener('error',r,{once:true});if(img.complete)r()})}))}).then(function(){window.parent.postMessage({type:'OD_PRINT_READY',nonce:'${nonce}'},'*')})})();<\/script>`;
+  const script = `<script data-od-print-ready>(function(){window.parent.postMessage({type:'OD_PRINT_READY_STARTED',nonce:'${nonce}'},'*');function waitForImages(){var imgs=Array.from(document.images).filter(function(img){if(img.loading==='lazy')img.loading='eager';return !img.complete});return Promise.all(imgs.map(function(img){return new Promise(function(r){img.addEventListener('load',r,{once:true});img.addEventListener('error',r,{once:true});if(img.complete)r()})}))}function cssUrlValues(value){var urls=[];if(!value||value==='none')return urls;value.replace(/url\\((['"]?)(.*?)\\1\\)/g,function(_,q,rawUrl){if(rawUrl&&!/^data:/i.test(rawUrl))urls.push(rawUrl);return''});return urls}function waitForCssBackgroundImages(){var urls=new Set();Array.from(document.querySelectorAll('*')).forEach(function(el){var style=window.getComputedStyle(el);cssUrlValues(style.backgroundImage).forEach(function(url){urls.add(url)});cssUrlValues(style.borderImageSource).forEach(function(url){urls.add(url)});cssUrlValues(style.listStyleImage).forEach(function(url){urls.add(url)})});return Promise.all(Array.from(urls).map(function(url){return new Promise(function(r){var img=new Image();img.onload=r;img.onerror=r;img.src=url})}))}function nextFrame(){return new Promise(function(r){requestAnimationFrame(function(){r(true)})})}Promise.all([document.fonts&&document.fonts.ready?document.fonts.ready.catch(function(){}):Promise.resolve(),new Promise(function(r){if(document.readyState==='complete')r();else window.addEventListener('load',r,{once:true})})]).then(function(){return Promise.all([waitForImages(),waitForCssBackgroundImages()])}).then(nextFrame).then(nextFrame).then(function(){var __odReport=${reportPrintSizeWhenStable.toString()};function measure(){var de=document.documentElement;var b=document.body||de;return {width:Math.max(de.scrollWidth,b.scrollWidth,de.offsetWidth,b.offsetWidth),height:Math.max(de.scrollHeight,b.scrollHeight,de.offsetHeight,b.offsetHeight)}}__odReport(measure,function(size){window.parent.postMessage({type:'OD_PRINT_READY',nonce:'${nonce}',width:size.width,height:size.height},'*')},30)})})();<\/script>`;
   if (/<\/head>/i.test(doc)) return doc.replace(/<\/head>/i, `${script}</head>`);
   if (/<\/body>/i.test(doc)) return doc.replace(/<\/body>/i, `${script}</body>`);
   return doc + script;
 }
 
 function injectParentPrintReadyCache(doc: string, nonce: string): string {
-  const script = `<script>window.__odPrintReady=false;window.addEventListener('message',function(e){if(e.data&&e.data.type==='OD_PRINT_READY'&&e.data.nonce==='${nonce}'&&(e.source===window||(window.frames&&e.source===window.frames[0])))window.__odPrintReady=true});<\/script>`;
+  // Cache the readiness flag and the content size the artifact reports through
+  // the handshake. window.__odPrintSize is read by inferPageSize() in
+  // apps/desktop/src/main/pdf-export.ts to size the PDF page to the real
+  // artifact rather than the wrapper viewport (issue #4067). Width/height are
+  // validated as positive finite numbers so a malformed message cannot poison
+  // the page size; the nonce + source check keep untrusted frames from spoofing
+  // either signal. window.__odPrintReadyStarted distinguishes a live handshake
+  // from a CSP-blocked one so the browser fallback can preserve the historical
+  // quick print path when the inner script never runs.
+  const script = `<script>window.__odPrintReady=false;window.__odPrintReadyStarted=false;window.__odPrintSize=null;var __odUsable=${isUsablePrintSize.toString()};window.addEventListener('message',function(e){if(e.data&&e.data.nonce==='${nonce}'&&(e.source===window||(window.frames&&e.source===window.frames[0]))){if(e.data.type==='OD_PRINT_READY_STARTED'){window.__odPrintReadyStarted=true;return}if(e.data.type==='OD_PRINT_READY'){window.__odPrintReady=true;if(__odUsable(e.data.width,e.data.height))window.__odPrintSize={width:e.data.width,height:e.data.height}}}});<\/script>`;
   if (/<head>/i.test(doc)) return doc.replace(/<head>/i, `<head>${script}`);
   return script + doc;
 }

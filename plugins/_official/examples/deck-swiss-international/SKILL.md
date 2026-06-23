@@ -3,7 +3,9 @@ name: deck-swiss-international
 zh_name: "瑞士国际主义 Deck"
 en_name: "Swiss International Deck"
 emoji: "🟦"
-description: "16 列网格 + 单一饱和 accent + 22 个锁死版面 (Klein Blue / Lemon / Mint / Safety Orange)"
+description: "16-column grid, one saturated accent, and 22 locked layouts (Klein Blue, Lemon, Mint, Safety Orange)."
+zh_description: "16 列网格 + 单一饱和 accent + 22 个锁死版面 (Klein Blue / Lemon / Mint / Safety Orange)"
+en_description: "16-column grid, one saturated accent, and 22 locked layouts (Klein Blue, Lemon, Mint, Safety Orange)."
 category: slides
 scenario: marketing
 aspect_hint: "16:9 横向翻页"
@@ -14,7 +16,7 @@ example_id: sample-swiss-international
 example_name: "Swiss International · 产品路线"
 example_format: markdown
 example_tagline: "Klein Blue IKB + 16 列网格"
-example_desc: "S01 Cover + S06 KPI Tower 两页预览, IKB 全屏标题 + 4 柱状 KPI"
+example_desc: "10 页完整示例: S01 Cover / S06 KPI Tower / S03 Statement / S19 Four Cards / S04 Six Cells / S11 Timeline / S08 Duo Compare / S14 Loop / S18 Why Now / S09 Closing, 全程 IKB 单 accent"
 example_source_url: "https://github.com/op7418/guizang-ppt-skill"
 example_source_label: "op7418/guizang-ppt-skill"
 od:
@@ -29,7 +31,9 @@ od:
     reload: debounce-100
   design_system:
     requires: false
-  example_prompt: "用「瑞士国际主义 Deck」模板把我的内容做成一套「16 列网格 + 单一饱和 accent + 22 个锁死版面 (Klein Blue / Lemon / Mint / Safety Orange)」。保持模板的视觉签名，使用真实内容和数据，避免 lorem ipsum 和占位图片。"
+  example_prompt: "Use the Swiss International Deck template to turn my content into a 16-column-grid deck with one saturated accent and 22 locked layouts. Preserve the template's visual signature, use real content and data, and avoid lorem ipsum or placeholder images."
+  example_prompt_i18n:
+    zh-CN: "用「瑞士国际主义 Deck」模板把我的内容做成一套「16 列网格 + 单一饱和 accent + 22 个锁死版面 (Klein Blue / Lemon / Mint / Safety Orange)」。保持模板的视觉签名，使用真实内容和数据，避免 lorem ipsum 和占位图片。"
 ---
 
 【模板: 瑞士国际主义 Deck (Swiss International)】

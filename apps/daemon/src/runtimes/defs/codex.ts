@@ -44,6 +44,20 @@ export function parseCodexDebugModels(stdout: string): RuntimeModelOption[] | nu
   return out.length > 1 ? out : null;
 }
 
+export function codexNeedsDangerFullAccessSandbox(
+  platform: NodeJS.Platform = process.platform,
+  env: NodeJS.ProcessEnv = process.env,
+): boolean {
+  // Operator override for deployments where Codex cannot create its
+  // workspace-write sandbox, for example unprivileged Linux containers.
+  // Only danger-full-access is accepted; unknown values keep the default path.
+  if (env.OD_CODEX_SANDBOX?.trim() === 'danger-full-access') return true;
+  if (platform === 'win32') return true;
+  // WSL reports `linux` but Codex still hits the Windows read-only
+  // workspace-write sandbox path when launched from there (#2834).
+  return Boolean(env.WSL_DISTRO_NAME?.trim());
+}
+
 export const codexAgentDef = {
     id: 'codex',
     name: 'Codex CLI',
@@ -54,6 +68,10 @@ export const codexAgentDef = {
     listModels: {
       args: ['debug', 'models'],
       parse: parseCodexDebugModels,
+      timeoutMs: 5000,
+    },
+    authProbe: {
+      args: ['login', 'status'],
       timeoutMs: 5000,
     },
     fallbackModels: [
@@ -97,8 +115,8 @@ export const codexAgentDef = {
       // back to a coarse policy that rejects any shell. macOS (Seatbelt)
       // and Linux (Landlock+seccomp) keep workspace-write because their
       // sandbox enforcement permits shell while restricting writes.
-      const isWindows = process.platform === 'win32';
-      const args = isWindows
+      const needsDangerFullAccess = codexNeedsDangerFullAccessSandbox();
+      const args = needsDangerFullAccess
         ? ['exec', '--json', '--skip-git-repo-check', '--sandbox', 'danger-full-access']
         : [
             'exec',

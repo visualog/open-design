@@ -13,13 +13,14 @@
 // needs to commit.
 
 import { useMemo, useState } from 'react';
+import { VisuallyHidden } from '@open-design/components';
 import type { InstalledPluginRecord } from '@open-design/contracts';
 import { useI18n } from '../../i18n';
-import { localizedPluginDescription, localizedPluginTitle } from '../../runtime/plugin-localization';
 import type { PluginShareAction } from '../../state/projects';
 import { Icon } from '../Icon';
 import { TrustBadge } from '../TrustBadge';
 import { PreviewSurface } from './cards/PreviewSurface';
+import { localizePluginDescription, localizePluginTitle } from './localization';
 import { inferPluginPreview } from './preview';
 import type { PluginUseAction } from './useActions';
 
@@ -30,12 +31,19 @@ interface Props {
   pendingAny: boolean;
   pendingShareAction?: { pluginId: string; action: PluginShareAction } | null;
   isFeatured: boolean;
+  // Saved collection (rich layout only — the gallery tile has no save UI).
+  isSaved: boolean;
+  onSave: (record: InstalledPluginRecord) => void;
   onUse: (record: InstalledPluginRecord, action: PluginUseAction) => void;
   onOpenDetails: (record: InstalledPluginRecord) => void;
   onShareAction?: (
     record: InstalledPluginRecord,
     action: PluginShareAction,
   ) => void;
+  // 'rich' (default) keeps the hover-overlay metadata card. 'gallery'
+  // is the minimal live-preview tile: a top bar (dot + name + open
+  // fullscreen) over an eagerly-rendered example.html iframe.
+  layout?: 'rich' | 'gallery';
 }
 
 const MAX_VISIBLE_TAGS = 3;
@@ -47,15 +55,20 @@ export function PluginCard({
   pendingAny,
   pendingShareAction = null,
   isFeatured,
+  isSaved,
+  onSave,
   onUse,
   onOpenDetails,
   onShareAction,
+  layout = 'rich',
 }: Props) {
-  const { locale, t } = useI18n();
+  const { locale } = useI18n();
   const [useMenuOpen, setUseMenuOpen] = useState(false);
-  const preview = useMemo(() => inferPluginPreview(record), [record]);
-  const title = localizedPluginTitle(record, locale);
-  const description = localizedPluginDescription(record, locale);
+  // Tiles prefer the cheap pre-baked hover-pan clip; the detail modal still
+  // opens the live interactive page (it calls inferPluginPreview without this).
+  const preview = useMemo(() => inferPluginPreview(record, { preferBaked: true }), [record]);
+  const title = localizePluginTitle(locale, record);
+  const description = localizePluginDescription(locale, record);
   const tags = useMemo(
     () =>
       (record.manifest?.tags ?? [])
@@ -72,6 +85,66 @@ export function PluginCard({
   function pickUseAction(action: PluginUseAction) {
     setUseMenuOpen(false);
     onUse(record, action);
+  }
+
+  if (layout === 'gallery') {
+    // Live-preview tile: a macOS-window-style bar (status dot + plugin
+    // name) over an eagerly-rendered example.html iframe. The whole tile
+    // opens the detail surface.
+    // Decks render a fixed 16:9 stage; tag them so the gallery preview uses a
+    // 16:9 frame instead of the tall scroll-preview viewport (which would
+    // letterbox the stage and show a dark band above/below the slide).
+    const odMode = (record.manifest?.od as { mode?: unknown } | undefined)?.mode;
+    return (
+      <article
+        role="listitem"
+        className={[
+          'plugins-home__card',
+          'plugins-home__card--gallery',
+          `plugins-home__card--${preview.kind}`,
+          isActive ? 'is-active' : '',
+          isFeatured ? 'is-featured' : '',
+        ]
+          .filter(Boolean)
+          .join(' ')}
+        data-plugin-id={record.id}
+        data-preview-kind={preview.kind}
+        {...(typeof odMode === 'string' ? { 'data-od-mode': odMode } : {})}
+        {...(isFeatured ? { 'data-featured': 'true' } : {})}
+        // Mouse convenience: clicking anywhere on the tile opens details.
+        // Keyboard/AT users get a real, announced control via the title
+        // button below — the tile itself stays a non-interactive listitem
+        // so screen readers don't announce a bare "listitem" as actionable.
+        onClick={() => onOpenDetails(record)}
+      >
+        <div className="plugins-home__gallery-bar">
+          <span className="plugins-home__gallery-dot" aria-hidden />
+          <button
+            type="button"
+            className="plugins-home__gallery-name"
+            title={title}
+            aria-label={`Open ${title} details`}
+            onClick={(event) => {
+              event.stopPropagation();
+              onOpenDetails(record);
+            }}
+            // The accessible, focusable control that opens the detail modal;
+            // also the e2e/visual hook equivalent to the rich card's Details.
+            data-testid={`plugins-home-details-${record.id}`}
+          >
+            {title}
+          </button>
+        </div>
+        <div className="plugins-home__gallery-frame">
+          <PreviewSurface
+            pluginId={record.id}
+            pluginTitle={title}
+            preview={preview}
+            eager
+          />
+        </div>
+      </article>
+    );
   }
 
   return (
@@ -128,11 +201,11 @@ export function PluginCard({
               type="button"
               className="plugins-home__action plugins-home__action--secondary"
               onClick={() => onOpenDetails(record)}
-              aria-label={t('pluginDetails.viewDetailsAria', { title })}
+              aria-label={`View details for ${title}`}
               data-testid={`plugins-home-details-${record.id}`}
             >
               <Icon name="eye" size={12} />
-              <span>{t('homeHero.details')}</span>
+              <span>Details</span>
             </button>
             <div
               className={`plugins-home__use-menu${hasQuery ? ' has-options' : ''}`}
@@ -151,7 +224,7 @@ export function PluginCard({
                 aria-busy={isPending ? 'true' : undefined}
                 data-testid={`plugins-home-use-${record.id}`}
               >
-                {isPending ? t('homeHero.applying') : t('pluginDetails.usePlugin')}
+                {isPending ? 'Applying…' : 'Use'}
               </button>
               {hasQuery ? (
                 <>
@@ -162,7 +235,7 @@ export function PluginCard({
                     disabled={useDisabled}
                     aria-haspopup="menu"
                     aria-expanded={useMenuOpen}
-                    aria-label={t('pluginDetails.chooseUseAria', { title })}
+                    aria-label={`Choose how to use ${title}`}
                     data-testid={`plugins-home-use-menu-${record.id}`}
                   >
                     <Icon name="chevron-down" size={13} />
@@ -171,7 +244,7 @@ export function PluginCard({
                     <div
                       className="plugins-home__use-menu-list"
                       role="menu"
-                      aria-label={t('pluginDetails.useOptionsAria', { title })}
+                      aria-label={`Use options for ${title}`}
                     >
                       <button
                         type="button"
@@ -181,7 +254,7 @@ export function PluginCard({
                         onClick={() => pickUseAction('use')}
                         data-testid={`plugins-home-use-context-${record.id}`}
                       >
-                        {t('pluginDetails.usePlugin')}
+                        Use
                       </button>
                       <button
                         type="button"
@@ -191,7 +264,7 @@ export function PluginCard({
                         onClick={() => pickUseAction('use-with-query')}
                         data-testid={`plugins-home-use-with-query-${record.id}`}
                       >
-                        {t('pluginDetails.useWithQuery')}
+                        Use with query
                       </button>
                     </div>
                   ) : null}
@@ -202,7 +275,7 @@ export function PluginCard({
           {onShareAction ? (
             <div
               className="plugins-home__share-actions"
-              aria-label={t('pluginDetails.shareAria', { title })}
+              aria-label={`Share ${title}`}
             >
               <button
                 type="button"
@@ -210,15 +283,15 @@ export function PluginCard({
                 onClick={() => onShareAction(record, 'publish-github')}
                 disabled={pendingAny || shareBusy}
                 aria-busy={sharePendingAction === 'publish-github' ? 'true' : undefined}
-                aria-label={t('pluginDetails.publishGithubAria', { title })}
-                title={t('pluginDetails.publishGithub')}
+                aria-label={`Publish ${title} as a GitHub repository`}
+                title="Publish plugin as a GitHub repository"
                 data-testid={`plugins-home-publish-github-${record.id}`}
               >
                 <Icon
                   name={sharePendingAction === 'publish-github' ? 'spinner' : 'github'}
                   size={12}
                 />
-                <span>{sharePendingAction === 'publish-github' ? t('pluginDetails.starting') : t('pluginDetails.publish')}</span>
+                <span>{sharePendingAction === 'publish-github' ? 'Starting…' : 'Publish'}</span>
               </button>
               <button
                 type="button"
@@ -226,15 +299,15 @@ export function PluginCard({
                 onClick={() => onShareAction(record, 'contribute-open-design')}
                 disabled={pendingAny || shareBusy}
                 aria-busy={sharePendingAction === 'contribute-open-design' ? 'true' : undefined}
-                aria-label={t('pluginDetails.contributeOpenDesignAria', { title })}
-                title={t('pluginDetails.contributeOpenDesign')}
+                aria-label={`Contribute ${title} to Open Design`}
+                title="Contribute plugin to Open Design with a pull request"
                 data-testid={`plugins-home-contribute-open-design-${record.id}`}
               >
                 <Icon
                   name={sharePendingAction === 'contribute-open-design' ? 'spinner' : 'share'}
                   size={12}
                 />
-                <span>{sharePendingAction === 'contribute-open-design' ? t('pluginDetails.starting') : t('pluginDetails.contribute')}</span>
+                <span>{sharePendingAction === 'contribute-open-design' ? 'Starting…' : 'Contribute'}</span>
               </button>
             </div>
           ) : null}
@@ -242,15 +315,25 @@ export function PluginCard({
       </div>
 
       <div className="plugins-home__card-foot">
+        <button
+          type="button"
+          className={[
+            'plugins-home__card-save',
+            isSaved ? 'is-saved' : '',
+          ]
+            .filter(Boolean)
+            .join(' ')}
+          onClick={() => onSave(record)}
+          aria-pressed={isSaved}
+          aria-label={`${isSaved ? 'Saved' : 'Save'} ${title}`}
+          title={isSaved ? 'Saved' : 'Save'}
+          data-testid={`plugins-home-save-${record.id}`}
+        >
+          <Icon name={isSaved ? 'check' : 'star'} size={12} />
+          <VisuallyHidden>{isSaved ? 'Saved' : 'Save'}</VisuallyHidden>
+        </button>
         <span className="plugins-home__card-title" title={title}>
-          {isFeatured ? (
-            <Icon
-              name="star"
-              size={11}
-              className="plugins-home__card-featured-mark"
-            />
-          ) : null}
-          {title}
+          <span className="plugins-home__card-title-text">{title}</span>
         </span>
         <TrustBadge trust={record.trust} />
       </div>

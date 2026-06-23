@@ -1,6 +1,19 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
+import {
+  Button,
+  Dialog,
+  DialogBody,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  Input,
+} from '@open-design/components';
 import { useT } from '../i18n';
+import { Icon } from './Icon';
+import { readDefaultSketchToolColor } from './sketch-colors';
 import type { SketchItem } from './sketch-model';
+
+const SAVED_VISIBLE_MS = 2000;
 
 export type Tool = 'select' | 'pen' | 'text' | 'rect' | 'arrow' | 'eraser';
 
@@ -12,7 +25,7 @@ interface Props {
   hasPreservedRawItems?: boolean;
   onItemsChange: (items: SketchItem[]) => void;
   onClear?: () => void;
-  onSave: () => Promise<void> | void;
+  onSave: () => Promise<boolean | void> | boolean | void;
   onCancel?: () => void;
   saving?: boolean;
   dirty?: boolean;
@@ -31,13 +44,28 @@ export function SketchEditor({
   fileName,
 }: Props) {
   const t = useT();
+  const textModalTitleId = useId();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const wrapRef = useRef<HTMLDivElement | null>(null);
   const [tool, setTool] = useState<Tool>('pen');
-  const [color, setColor] = useState('#1c1b1a');
+  const [color, setColor] = useState(() => readDefaultSketchToolColor());
   const [size, setSize] = useState(2);
   const drawingRef = useRef<SketchItem | null>(null);
   const [, force] = useState(0);
+  const [showSaved, setShowSaved] = useState(false);
+  const savedTimerRef = useRef<ReturnType<typeof setTimeout>>();
+
+  useEffect(() => {
+    return () => clearTimeout(savedTimerRef.current);
+  }, []);
+
+  useEffect(() => {
+    if (dirty) {
+      clearTimeout(savedTimerRef.current);
+      setShowSaved(false);
+    }
+  }, [dirty]);
+
   // Text-tool modal. Replaces window.prompt() because Electron 28+
   // disables that API by default and silently returns null, making
   // the text tool a no-op in the desktop app. Same root cause as
@@ -188,6 +216,18 @@ export function SketchEditor({
     textAnchorRef.current = null;
   }
 
+  const handleSave = useCallback(async () => {
+    const ok = await onSave();
+    if (ok === false) {
+      clearTimeout(savedTimerRef.current);
+      setShowSaved(false);
+      return;
+    }
+    setShowSaved(true);
+    clearTimeout(savedTimerRef.current);
+    savedTimerRef.current = setTimeout(() => setShowSaved(false), SAVED_VISIBLE_MS);
+  }, [onSave]);
+
   return (
     <div className="sketch-editor">
       <div className="sketch-toolbar">
@@ -215,29 +255,30 @@ export function SketchEditor({
           className="sketch-size"
         />
         <span className="sketch-divider" />
-        <button className="ghost" onClick={handleUndo} disabled={items.length === 0}>
+        <Button variant="ghost" onClick={handleUndo} disabled={items.length === 0}>
           {t('sketch.undo')}
-        </button>
-        <button className="ghost" onClick={handleClear} disabled={!canClear}>
+        </Button>
+        <Button variant="ghost" onClick={handleClear} disabled={!canClear}>
           {t('sketch.clear')}
-        </button>
+        </Button>
         <span className="sketch-spacer" />
         <span className="sketch-name" title={fileName}>
           {fileName}
           {dirty ? ' •' : ''}
         </span>
         {onCancel ? (
-          <button className="ghost" onClick={onCancel}>
+          <Button variant="ghost" onClick={onCancel}>
             {t('sketch.close')}
-          </button>
+          </Button>
         ) : null}
-        <button
-          className="primary"
-          onClick={() => void onSave()}
+        <Button
+          variant="primary"
+          onClick={handleSave}
           disabled={saving || !canSave}
+          aria-label={saving ? t('sketch.saving') : showSaved ? t('sketch.saved') : t('common.save')}
         >
-          {saving ? t('sketch.saving') : t('common.save')}
-        </button>
+          {saving ? t('sketch.saving') : showSaved ? <Icon name="check" size={14} /> : t('common.save')}
+        </Button>
       </div>
       <div className="sketch-canvas-wrap" ref={wrapRef}>
         <canvas
@@ -250,14 +291,20 @@ export function SketchEditor({
         />
       </div>
       {textModalOpen ? (
-        <div className="modal-backdrop" role="presentation">
-          <div className="modal" role="dialog" aria-modal="true">
-            <div className="modal-head">
-              <h2>{t('sketch.textModalTitle')}</h2>
-            </div>
+        <Dialog
+          onClose={cancelTextModal}
+          closeOnBackdrop={false}
+          closeOnEscape
+          layout="sectioned"
+          ariaLabelledBy={textModalTitleId}
+        >
+          <DialogHeader>
+            <DialogTitle id={textModalTitleId}>{t('sketch.textModalTitle')}</DialogTitle>
+          </DialogHeader>
+          <DialogBody>
             <label>
               <span>{t('sketch.textPrompt')}</span>
-              <input
+              <Input
                 type="text"
                 value={textModalValue}
                 autoFocus
@@ -266,28 +313,24 @@ export function SketchEditor({
                   if (e.key === 'Enter' && textModalValue.trim()) {
                     e.preventDefault();
                     submitTextModal();
-                  } else if (e.key === 'Escape') {
-                    e.preventDefault();
-                    cancelTextModal();
                   }
                 }}
               />
             </label>
-            <div className="modal-foot">
-              <button type="button" className="ghost" onClick={cancelTextModal}>
-                {t('common.cancel')}
-              </button>
-              <button
-                type="button"
-                className="primary"
-                disabled={!textModalValue.trim()}
-                onClick={submitTextModal}
-              >
-                {t('common.save')}
-              </button>
-            </div>
-          </div>
-        </div>
+          </DialogBody>
+          <DialogFooter>
+            <Button variant="ghost" onClick={cancelTextModal}>
+              {t('common.cancel')}
+            </Button>
+            <Button
+              variant="primary"
+              disabled={!textModalValue.trim()}
+              onClick={submitTextModal}
+            >
+              {t('common.save')}
+            </Button>
+          </DialogFooter>
+        </Dialog>
       ) : null}
     </div>
   );

@@ -11,6 +11,8 @@
 // in the user's language.
 
 import { useEffect, useRef, useState } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
+import { popoverIn } from '../motion';
 import { useAnalytics } from '../analytics/provider';
 import {
   trackHelpPopoverClick,
@@ -25,6 +27,8 @@ const ISSUES_URL = `${REPO}/issues/new`;
 const PRS_URL = `${REPO}/pulls`;
 const RELEASES_URL = `${REPO}/releases`;
 const LATEST_RELEASE_URL = `${REPO}/releases/latest`;
+const X_URL = 'https://x.com/OpenDesignHQ';
+const DISCORD_URL = 'https://discord.gg/9ptkbbqRu';
 
 const ext = { target: '_blank', rel: 'noreferrer noopener' } as const;
 
@@ -91,11 +95,16 @@ export function EntryHelpMenu() {
       >
         <Icon name="help-circle" size={18} />
       </button>
-      {open ? (
-        <div
+      <AnimatePresence>
+        {open ? (
+        <motion.div
           className="entry-help-popover"
           role="menu"
           aria-label={t('entry.helpMenuAria')}
+          variants={popoverIn}
+          initial="hidden"
+          animate="visible"
+          exit="exit"
         >
           <a
             className="entry-help-popover__item"
@@ -178,8 +187,34 @@ export function EntryHelpMenu() {
             </span>
             <span>{t('entry.helpDownloadDesktop')}</span>
           </a>
-        </div>
+          <div className="entry-help-popover__divider" aria-hidden />
+          <a
+            className="entry-help-popover__item"
+            href={X_URL}
+            {...ext}
+            role="menuitem"
+            onClick={() => setOpen(false)}
+          >
+            <span className="entry-help-popover__icon" aria-hidden>
+              <Icon name="external-link" size={14} />
+            </span>
+            <span>{t('entry.followXLabel')}</span>
+          </a>
+          <a
+            className="entry-help-popover__item"
+            href={DISCORD_URL}
+            {...ext}
+            role="menuitem"
+            onClick={() => setOpen(false)}
+          >
+            <span className="entry-help-popover__icon" aria-hidden>
+              <Icon name="discord" size={14} />
+            </span>
+            <span>{t('entry.discordLabel')}</span>
+          </a>
+        </motion.div>
       ) : null}
+      </AnimatePresence>
     </div>
   );
 }

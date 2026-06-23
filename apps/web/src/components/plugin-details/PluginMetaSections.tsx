@@ -33,9 +33,10 @@ import type {
 } from '@open-design/contracts';
 import { Icon } from '../Icon';
 import { TrustBadge } from '../TrustBadge';
-import { useT } from '../../i18n';
 import { authorInitials, derivePluginSourceLinks } from '../../runtime/plugin-source';
 import { resolvePluginQueryFallback } from '../../state/projects';
+import { useI18n } from '../../i18n';
+import { localizePluginDescription } from '../plugins-home/localization';
 
 export interface PluginMetaOmit {
   description?: boolean;
@@ -68,16 +69,25 @@ interface Props {
    * a label would be redundant (scenario fallback).
    */
   heading?: string;
+  /**
+   * 'minimal' keeps the designer-relevant blocks (author, example
+   * query) inline and tucks the developer-oriented manifest detail
+   * (inputs, context bundles, workflow, GenUI, connectors,
+   * capabilities, source) behind a collapsed "Developer details"
+   * disclosure. Defaults to 'full' so the scenario / media / design
+   * variants keep their existing flat inspector.
+   */
+  variant?: 'full' | 'minimal';
 }
 
-export function PluginMetaSections({ record, omit, compact, heading }: Props) {
-  const t = useT();
+export function PluginMetaSections({ record, omit, compact, heading, variant = 'full' }: Props) {
+  const { locale } = useI18n();
   const [copied, setCopied] = useState(false);
 
   const manifest: PluginManifest = record.manifest ?? ({} as PluginManifest);
   const specVersion = typeof manifest.specVersion === 'string' ? manifest.specVersion : '';
   const od = manifest.od ?? {};
-  const description = manifest.description ?? '';
+  const description = localizePluginDescription(locale, record);
   const query = resolvePluginQueryFallback(od.useCase?.query);
   const inputs = (od.inputs ?? []) as InputField[];
   const ctx = od.context ?? {};
@@ -151,7 +161,7 @@ export function PluginMetaSections({ record, omit, compact, heading }: Props) {
         </header>
       ) : null}
       {!omit?.byline && hasAuthorBlock ? (
-        <Section title="작성자">
+        <Section title="Author">
           <div
             className="plugin-details-modal__byline"
             data-testid="plugin-details-author"
@@ -185,7 +195,7 @@ export function PluginMetaSections({ record, omit, compact, heading }: Props) {
                     icon="external-link"
                     testId="plugin-details-author-homepage"
                   >
-                    홈페이지
+                    Homepage
                   </ExternalLink>
                 ) : null}
               </div>
@@ -195,7 +205,7 @@ export function PluginMetaSections({ record, omit, compact, heading }: Props) {
       ) : null}
 
       {showDescription ? (
-        <Section title="소개">
+        <Section title="About">
           <p className="plugin-details-modal__description">{description}</p>
         </Section>
       ) : null}
@@ -203,7 +213,7 @@ export function PluginMetaSections({ record, omit, compact, heading }: Props) {
       {showQuery ? (
         <Section
           title="Example query"
-          hint="이 플러그인을 적용할 때 프롬프트 입력창에 들어갑니다."
+          hint="Inserted into the prompt textarea when you apply this plugin."
           action={
             <button
               type="button"
@@ -211,7 +221,7 @@ export function PluginMetaSections({ record, omit, compact, heading }: Props) {
               onClick={copyQuery}
             >
               <Icon name="copy" size={12} />
-              {copied ? t('promptTemplates.copyDone') : t('promptTemplates.copyPrompt')}
+              {copied ? 'Copied' : 'Copy'}
             </button>
           }
         >
@@ -219,11 +229,26 @@ export function PluginMetaSections({ record, omit, compact, heading }: Props) {
         </Section>
       ) : null}
 
+      {((advanced) =>
+        variant === 'minimal' ? (
+          <details
+            className="plugin-meta-sections__advanced"
+            data-testid="plugin-meta-advanced"
+          >
+            <summary className="plugin-meta-sections__advanced-summary">
+              Developer details
+            </summary>
+            {advanced}
+          </details>
+        ) : (
+          advanced
+        ))(
+        <>
       {showInputs ? (
         <Section
           title="Inputs"
           count={inputs.length}
-          hint="적용 시 예시 쿼리에 치환되는 변수입니다."
+          hint="Variables substituted into the example query at apply time."
         >
           <ul className="plugin-details-modal__inputs">
             {inputs.map((field) => (
@@ -232,7 +257,7 @@ export function PluginMetaSections({ record, omit, compact, heading }: Props) {
                   <code>{field.name}</code>
                   {field.required ? (
                     <span className="plugin-details-modal__badge is-required">
-                      필수
+                      required
                     </span>
                   ) : null}
                   {field.type ? (
@@ -246,7 +271,7 @@ export function PluginMetaSections({ record, omit, compact, heading }: Props) {
                 ) : null}
                 {field.placeholder ? (
                   <div className="plugin-details-modal__muted plugin-details-modal__small">
-                    예: {field.placeholder}
+                    e.g. {field.placeholder}
                   </div>
                 ) : null}
                 {field.options && field.options.length > 0 ? (
@@ -262,7 +287,7 @@ export function PluginMetaSections({ record, omit, compact, heading }: Props) {
                 field.default !== null &&
                 String(field.default).length > 0 ? (
                   <div className="plugin-details-modal__muted plugin-details-modal__small">
-                    기본값: <code>{String(field.default)}</code>
+                    default: <code>{String(field.default)}</code>
                   </div>
                 ) : null}
               </li>
@@ -273,12 +298,12 @@ export function PluginMetaSections({ record, omit, compact, heading }: Props) {
 
       {hasContext ? (
         <Section
-          title="컨텍스트 번들"
-          hint="적용 시 함께 불러오는 스킬, 디자인 시스템, MCP 서버 및 기타 참조입니다."
+          title="Context bundles"
+          hint="Skills, design systems, MCP servers and other refs the plugin will pull in at apply time."
         >
           <div className="plugin-details-modal__context">
             {ctx.skills && ctx.skills.length > 0 ? (
-              <ContextGroup label="스킬" count={ctx.skills.length}>
+              <ContextGroup label="Skills" count={ctx.skills.length}>
                 {ctx.skills.map((s, i) => (
                   <span key={`skill-${i}`} className="plugin-details-modal__chip">
                     {refLabel(s as ContextRef)}
@@ -287,12 +312,12 @@ export function PluginMetaSections({ record, omit, compact, heading }: Props) {
               </ContextGroup>
             ) : null}
             {ctx.designSystem ? (
-              <ContextGroup label="디자인 시스템">
+              <ContextGroup label="Design system">
                 <span className="plugin-details-modal__chip">
                   {refLabel(ctx.designSystem as ContextRef)}
                   {(ctx.designSystem as ContextRef).primary ? (
                     <span className="plugin-details-modal__badge is-primary">
-                      기본
+                      primary
                     </span>
                   ) : null}
                 </span>
@@ -317,7 +342,7 @@ export function PluginMetaSections({ record, omit, compact, heading }: Props) {
               </ContextGroup>
             ) : null}
             {ctx.assets && ctx.assets.length > 0 ? (
-              <ContextGroup label="에셋" count={ctx.assets.length}>
+              <ContextGroup label="Assets" count={ctx.assets.length}>
                 {ctx.assets.map((a) => (
                   <span
                     key={`asset-${a}`}
@@ -355,9 +380,9 @@ export function PluginMetaSections({ record, omit, compact, heading }: Props) {
 
       {stages.length > 0 ? (
         <Section
-          title="워크플로"
+          title="Workflow"
           count={stages.length}
-          hint="파이프라인 단계는 순서대로 실행됩니다. 단계가 반복되지 않는 한 내부 atom은 순차 실행됩니다."
+          hint="Pipeline stages run in order. Atoms inside a stage run sequentially unless the stage repeats."
         >
           <ol className="plugin-details-modal__stages">
             {stages.map((stage, idx) => (
@@ -367,12 +392,12 @@ export function PluginMetaSections({ record, omit, compact, heading }: Props) {
                   <code className="plugin-details-modal__stage-id">{stage.id}</code>
                   {stage.repeat ? (
                     <span className="plugin-details-modal__badge is-repeat">
-                      반복
+                      repeat
                     </span>
                   ) : null}
                   {stage.onFailure ? (
                     <span className="plugin-details-modal__badge is-failure">
-                      실패 시: {stage.onFailure}
+                      on failure: {stage.onFailure}
                     </span>
                   ) : null}
                 </div>
@@ -390,7 +415,7 @@ export function PluginMetaSections({ record, omit, compact, heading }: Props) {
                 ) : null}
                 {stage.until ? (
                   <div className="plugin-details-modal__muted plugin-details-modal__small">
-                    종료 조건: <code>{stage.until}</code>
+                    until: <code>{stage.until}</code>
                   </div>
                 ) : null}
               </li>
@@ -401,9 +426,9 @@ export function PluginMetaSections({ record, omit, compact, heading }: Props) {
 
       {surfaces.length > 0 ? (
         <Section
-          title="GenUI 서피스"
+          title="GenUI surfaces"
           count={surfaces.length}
-          hint="실행 중 플러그인이 표시할 수 있는 인터랙티브 프롬프트입니다."
+          hint="Interactive prompts the plugin may surface during a run."
         >
           <ul className="plugin-details-modal__surfaces">
             {surfaces.map((s) => (
@@ -415,7 +440,7 @@ export function PluginMetaSections({ record, omit, compact, heading }: Props) {
                   </span>
                   {s.persist ? (
                     <span className="plugin-details-modal__muted plugin-details-modal__small">
-                      저장 위치 <code>{s.persist}</code>
+                      persists at <code>{s.persist}</code>
                     </span>
                   ) : null}
                 </div>
@@ -431,21 +456,21 @@ export function PluginMetaSections({ record, omit, compact, heading }: Props) {
       ) : null}
 
       {required.length > 0 || optional.length > 0 ? (
-        <Section title="커넥터">
+        <Section title="Connectors">
           {required.length > 0 ? (
-            <ConnectorList label="필수" items={required} variant="required" />
+            <ConnectorList label="Required" items={required} variant="required" />
           ) : null}
           {optional.length > 0 ? (
-            <ConnectorList label="선택" items={optional} variant="optional" />
+            <ConnectorList label="Optional" items={optional} variant="optional" />
           ) : null}
         </Section>
       ) : null}
 
       {capabilities.length > 0 ? (
         <Section
-          title="권한"
+          title="Capabilities"
           count={capabilities.length}
-          hint="플러그인이 적용될 때 요청하는 권한입니다."
+          hint="Permissions the plugin requests when applied."
         >
           <div className="plugin-details-modal__caps">
             {capabilities.map((c) => (
@@ -458,7 +483,7 @@ export function PluginMetaSections({ record, omit, compact, heading }: Props) {
       ) : null}
 
       <Section
-        title="출처"
+        title="Source"
         action={
           links.contributeUrl ? (
             <a
@@ -469,22 +494,22 @@ export function PluginMetaSections({ record, omit, compact, heading }: Props) {
               data-testid="plugin-details-contribute"
               title={
                 links.contributeOnGithub
-                  ? 'GitHub 이슈 열기'
-                  : '기여 페이지 열기'
+                  ? 'Open an issue on GitHub'
+                  : 'Open the contribute page'
               }
             >
               <Icon
                 name={links.contributeOnGithub ? 'github' : 'external-link'}
                 size={12}
               />
-              {t('pluginDetails.contribute')}
+              Contribute
             </a>
           ) : undefined
         }
       >
         <dl className="plugin-details-modal__source">
           <div>
-            <dt>원본</dt>
+            <dt>Origin</dt>
             <dd>
               <span className="plugin-details-modal__source-kind">
                 {links.sourceKindLabel}
@@ -505,34 +530,34 @@ export function PluginMetaSections({ record, omit, compact, heading }: Props) {
             </dd>
           </div>
           <div>
-            <dt>경로</dt>
+            <dt>Path</dt>
             <dd>
               <code>{record.fsPath}</code>
             </dd>
           </div>
           <div>
-            <dt>버전</dt>
+            <dt>Version</dt>
             <dd>
               <code>v{record.version}</code>
             </dd>
           </div>
           {specVersion ? (
             <div>
-              <dt>스펙</dt>
+              <dt>Spec</dt>
               <dd>
                 <code>v{specVersion}</code>
               </dd>
             </div>
           ) : null}
           <div>
-              <dt>신뢰 등급</dt>
+            <dt>Trust</dt>
             <dd>
               <TrustBadge trust={record.trust} />
             </dd>
           </div>
           {record.pinnedRef ? (
             <div>
-              <dt>고정 ref</dt>
+              <dt>Pinned ref</dt>
               <dd>
                 <code>{record.pinnedRef}</code>
               </dd>
@@ -540,7 +565,7 @@ export function PluginMetaSections({ record, omit, compact, heading }: Props) {
           ) : null}
           {record.sourceMarketplaceId ? (
             <div>
-              <dt>마켓플레이스 ID</dt>
+              <dt>Marketplace ID</dt>
               <dd>
                 <code>{record.sourceMarketplaceId}</code>
               </dd>
@@ -548,18 +573,20 @@ export function PluginMetaSections({ record, omit, compact, heading }: Props) {
           ) : null}
           {manifest.license ? (
             <div>
-              <dt>라이선스</dt>
+              <dt>License</dt>
               <dd>
                 <code>{manifest.license}</code>
               </dd>
             </div>
           ) : null}
           <div>
-            <dt>설치 시각</dt>
+            <dt>Installed</dt>
             <dd>{installedLabel}</dd>
           </div>
         </dl>
       </Section>
+        </>,
+      )}
     </div>
   );
 }

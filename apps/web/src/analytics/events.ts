@@ -8,10 +8,14 @@ import type {
   // page_view / surface_view
   PageViewProps,
   HelpPopoverSurfaceViewProps,
+  SettingsPopoverSurfaceViewProps,
   NewProjectModalSurfaceViewProps,
   PluginReplacementModalSurfaceViewProps,
+  PluginDetailModalSurfaceViewProps,
+  PluginImportModalSurfaceViewProps,
   DesignSystemsTemplatesModalSurfaceViewProps,
   AssistantFeedbackReasonPanelSurfaceViewProps,
+  QuestionsFormSurfaceViewProps,
   // ui_click
   HomeNavClickProps,
   HelpPopoverClickProps,
@@ -19,6 +23,7 @@ import type {
   ExecutionSettingsPopoverClickProps,
   SettingsPopoverClickProps,
   HomeChatComposerClickProps,
+  UpdateIndicatorClickProps,
   NewProjectModalTabClickProps,
   NewProjectModalElementClickProps,
   PluginReplacementModalClickProps,
@@ -35,25 +40,52 @@ import type {
   PluginsTemplatesDropdownClickProps,
   PluginsAvailableTabClickProps,
   PluginsSourcesTabClickProps,
+  PluginImportModalClickProps,
+  PluginDetailClickProps,
+  PluginLoopClickProps,
+  CommunityGalleryClickProps,
+  PluginDetailModalClickProps,
+  PluginDetailModalSharePopoverClickProps,
   DesignSystemsTopClickProps,
   DesignSystemsTemplateCardClickProps,
   DesignSystemsTemplatesModalClickProps,
   DesignSystemsTemplatesModalSharePopoverClickProps,
+  DesignSystemsCreateClickProps,
   IntegrationsTabClickProps,
   IntegrationsMcpTabClickProps,
   IntegrationsConnectorsTabClickProps,
   IntegrationsSkillsTabClickProps,
   IntegrationsUseEverywhereTabClickProps,
   ChatPanelClickProps,
+  ComposerSessionModeClickProps,
+  ComposerBarClickProps,
+  DesignToolboxClickProps,
+  NextStepActionClickProps,
+  QuestionsFormClickProps,
+  RunFailedToastClickProps,
+  AmrAuthResultProps,
+  AmrEntryClickProps,
+  RunFailedToastSurfaceViewProps,
   ChatPanelResourcesPopoverClickProps,
+  ChatPanelMessageQueueClickProps,
   FileManagerClickProps,
+  TabLauncherClickProps,
+  ReferenceBoardClickProps,
+  ReferenceBoardSurfaceViewProps,
   ArtifactToolbarClickProps,
+  DrawToolbarClickProps,
   TweaksPopoverClickProps,
+  CommentPopoverClickProps,
   ArtifactHeaderClickProps,
+  HandoffClickProps,
   PresentPopoverClickProps,
   ShareOptionPopoverClickProps,
   AssistantFeedbackButtonClickProps,
+  AssistantFeedbackClickProps,
+  AssistantFeedbackReasonClickProps,
   AssistantFeedbackReasonSubmitClickProps,
+  AssistantFeedbackReasonSubmitProps,
+  AssistantFeedbackReasonViewProps,
   SettingsSidebarClickProps,
   SettingsExecutionModeTabClickProps,
   SettingsLocalCliClickProps,
@@ -66,18 +98,34 @@ import type {
   SettingsNotificationsClickProps,
   SettingsPetsClickProps,
   SettingsPrivacyClickProps,
+  SettingsDesignReviewClickProps,
+  SettingsExternalMcpClickProps,
   // Result events
   ProjectCreateResultProps,
   PluginReplacementResultProps,
+  PluginImportResultProps,
   RunCreatedProps,
   RunFinishedProps,
   FileUploadResultProps,
   ArtifactExportResultProps,
+  ArtifactDeployResultProps,
   FeedbackSubmitResultProps,
   SettingsViewProps,
   SettingsCliTestResultProps,
+  SettingsByokModelsFetchResultProps,
   SettingsByokTestResultProps,
   SettingsConnectorAuthResultProps,
+  OnboardingClickProps,
+  OnboardingRuntimeScanResultProps,
+  OnboardingCompleteResultProps,
+  DesignSystemSourceIngestResultProps,
+  DesignSystemCreateResultProps,
+  DesignSystemReviewResultProps,
+  DesignSystemStatusResultProps,
+  DesignSystemApplyResultProps,
+  UpdateIndicatorSurfaceViewProps,
+  UpdatePromptSurfaceViewProps,
+  UpdateInstallResultProps,
 } from '@open-design/contracts/analytics';
 
 type TrackOptions = { requestId?: string; insertId?: string };
@@ -113,6 +161,13 @@ export function trackHelpPopoverSurfaceView(
   send(track, 'surface_view', props);
 }
 
+export function trackSettingsPopoverSurfaceView(
+  track: Track,
+  props: SettingsPopoverSurfaceViewProps,
+): void {
+  send(track, 'surface_view', props);
+}
+
 export function trackNewProjectModalSurfaceView(
   track: Track,
   props: NewProjectModalSurfaceViewProps,
@@ -134,11 +189,64 @@ export function trackDesignSystemsTemplatesModalSurfaceView(
   send(track, 'surface_view', props);
 }
 
+export function trackPluginDetailModalSurfaceView(
+  track: Track,
+  props: PluginDetailModalSurfaceViewProps,
+): void {
+  send(track, 'surface_view', props);
+}
+
+export function trackPluginImportModalSurfaceView(
+  track: Track,
+  props: PluginImportModalSurfaceViewProps,
+): void {
+  send(track, 'surface_view', props);
+}
+
 export function trackAssistantFeedbackReasonPanelSurfaceView(
   track: Track,
   props: AssistantFeedbackReasonPanelSurfaceViewProps,
 ): void {
   send(track, 'surface_view', props);
+}
+
+export function trackRunFailedToastSurfaceView(
+  track: Track,
+  props: RunFailedToastSurfaceViewProps,
+): void {
+  send(track, 'surface_view', props);
+}
+
+export function trackQuestionsFormSurfaceView(
+  track: Track,
+  props: QuestionsFormSurfaceViewProps,
+): void {
+  send(track, 'surface_view', props);
+}
+
+export function trackRunFailedToastGoAmrClick(
+  track: Track,
+  props: RunFailedToastClickProps,
+): void {
+  send(track, 'ui_click', props);
+}
+
+export function trackAmrEntryClick(
+  track: Track,
+  props: AmrEntryClickProps,
+): void {
+  send(track, 'ui_click', props);
+}
+
+// Fired exactly once per AMR sign-in attempt when the login poll settles.
+// Call sites go through analytics/amr-auth.ts, which owns the
+// begin/resolve dedupe — do not call this wrapper directly from
+// components, or concurrent pollers will double-report one attempt.
+export function trackAmrAuthResult(
+  track: Track,
+  props: AmrAuthResultProps,
+): void {
+  send(track, 'amr_auth_result', props);
 }
 
 // ---- ui_click (home) -----------------------------------------------------
@@ -181,6 +289,13 @@ export function trackSettingsPopoverClick(
 export function trackHomeChatComposerClick(
   track: Track,
   props: HomeChatComposerClickProps,
+): void {
+  send(track, 'ui_click', props);
+}
+
+export function trackUpdateIndicatorClick(
+  track: Track,
+  props: UpdateIndicatorClickProps,
 ): void {
   send(track, 'ui_click', props);
 }
@@ -302,6 +417,48 @@ export function trackPluginsSourcesTabClick(
   send(track, 'ui_click', props);
 }
 
+export function trackPluginImportModalClick(
+  track: Track,
+  props: PluginImportModalClickProps,
+): void {
+  send(track, 'ui_click', props);
+}
+
+export function trackPluginDetailClick(
+  track: Track,
+  props: PluginDetailClickProps,
+): void {
+  send(track, 'ui_click', props);
+}
+
+export function trackPluginLoopClick(
+  track: Track,
+  props: PluginLoopClickProps,
+): void {
+  send(track, 'ui_click', props);
+}
+
+export function trackCommunityGalleryClick(
+  track: Track,
+  props: CommunityGalleryClickProps,
+): void {
+  send(track, 'ui_click', props);
+}
+
+export function trackPluginDetailModalClick(
+  track: Track,
+  props: PluginDetailModalClickProps,
+): void {
+  send(track, 'ui_click', props);
+}
+
+export function trackPluginDetailModalSharePopoverClick(
+  track: Track,
+  props: PluginDetailModalSharePopoverClickProps,
+): void {
+  send(track, 'ui_click', props);
+}
+
 export function trackDesignSystemsTopClick(
   track: Track,
   props: DesignSystemsTopClickProps,
@@ -326,6 +483,13 @@ export function trackDesignSystemsTemplatesModalClick(
 export function trackDesignSystemsTemplatesModalSharePopoverClick(
   track: Track,
   props: DesignSystemsTemplatesModalSharePopoverClickProps,
+): void {
+  send(track, 'ui_click', props);
+}
+
+export function trackDesignSystemsCreateClick(
+  track: Track,
+  props: DesignSystemsCreateClickProps,
 ): void {
   send(track, 'ui_click', props);
 }
@@ -374,9 +538,51 @@ export function trackChatPanelClick(
   send(track, 'ui_click', props);
 }
 
+export function trackComposerSessionModeClick(
+  track: Track,
+  props: ComposerSessionModeClickProps,
+): void {
+  send(track, 'ui_click', props);
+}
+
+export function trackDesignToolboxClick(
+  track: Track,
+  props: DesignToolboxClickProps,
+): void {
+  send(track, 'ui_click', props);
+}
+
+export function trackComposerBarClick(
+  track: Track,
+  props: ComposerBarClickProps,
+): void {
+  send(track, 'ui_click', props);
+}
+
+export function trackNextStepActionClick(
+  track: Track,
+  props: NextStepActionClickProps,
+): void {
+  send(track, 'ui_click', props);
+}
+
+export function trackQuestionsFormClick(
+  track: Track,
+  props: QuestionsFormClickProps,
+): void {
+  send(track, 'ui_click', props);
+}
+
 export function trackChatPanelResourcesPopoverClick(
   track: Track,
   props: ChatPanelResourcesPopoverClickProps,
+): void {
+  send(track, 'ui_click', props);
+}
+
+export function trackMessageQueueClick(
+  track: Track,
+  props: ChatPanelMessageQueueClickProps,
 ): void {
   send(track, 'ui_click', props);
 }
@@ -390,9 +596,37 @@ export function trackFileManagerClick(
   send(track, 'ui_click', props);
 }
 
+export function trackTabLauncherClick(
+  track: Track,
+  props: TabLauncherClickProps,
+): void {
+  send(track, 'ui_click', props);
+}
+
+export function trackReferenceBoardSurfaceView(
+  track: Track,
+  props: ReferenceBoardSurfaceViewProps,
+): void {
+  send(track, 'surface_view', props);
+}
+
+export function trackReferenceBoardClick(
+  track: Track,
+  props: ReferenceBoardClickProps,
+): void {
+  send(track, 'ui_click', props);
+}
+
 export function trackArtifactToolbarClick(
   track: Track,
   props: ArtifactToolbarClickProps,
+): void {
+  send(track, 'ui_click', props);
+}
+
+export function trackDrawToolbarClick(
+  track: Track,
+  props: DrawToolbarClickProps,
 ): void {
   send(track, 'ui_click', props);
 }
@@ -404,9 +638,23 @@ export function trackTweaksPopoverClick(
   send(track, 'ui_click', props);
 }
 
+export function trackCommentPopoverClick(
+  track: Track,
+  props: CommentPopoverClickProps,
+): void {
+  send(track, 'ui_click', props);
+}
+
 export function trackArtifactHeaderClick(
   track: Track,
   props: ArtifactHeaderClickProps,
+): void {
+  send(track, 'ui_click', props);
+}
+
+export function trackHandoffClick(
+  track: Track,
+  props: HandoffClickProps,
 ): void {
   send(track, 'ui_click', props);
 }
@@ -529,6 +777,20 @@ export function trackSettingsPrivacyClick(
   send(track, 'ui_click', props);
 }
 
+export function trackSettingsDesignReviewClick(
+  track: Track,
+  props: SettingsDesignReviewClickProps,
+): void {
+  send(track, 'ui_click', props);
+}
+
+export function trackSettingsExternalMcpClick(
+  track: Track,
+  props: SettingsExternalMcpClickProps,
+): void {
+  send(track, 'ui_click', props);
+}
+
 // ---- Result events -------------------------------------------------------
 
 export function trackProjectCreateResult(
@@ -545,6 +807,14 @@ export function trackPluginReplacementResult(
   options?: { requestId?: string },
 ): void {
   send(track, 'plugin_replacement_result', props, options);
+}
+
+export function trackPluginImportResult(
+  track: Track,
+  props: PluginImportResultProps,
+  options?: { requestId?: string },
+): void {
+  send(track, 'plugin_import_result', props, options);
 }
 
 export function trackRunCreated(
@@ -579,6 +849,14 @@ export function trackArtifactExportResult(
   send(track, 'artifact_export_result', props, options);
 }
 
+export function trackArtifactDeployResult(
+  track: Track,
+  props: ArtifactDeployResultProps,
+  options?: { requestId?: string },
+): void {
+  send(track, 'artifact_deploy_result', props, options);
+}
+
 export function trackFeedbackSubmitResult(
   track: Track,
   props: FeedbackSubmitResultProps,
@@ -610,9 +888,162 @@ export function trackSettingsByokTestResult(
   send(track, 'settings_byok_test_result', props);
 }
 
+export function trackSettingsByokModelsFetchResult(
+  track: Track,
+  props: SettingsByokModelsFetchResultProps,
+): void {
+  send(track, 'settings_byok_models_fetch_result', props);
+}
+
 export function trackSettingsConnectorAuthResult(
   track: Track,
   props: SettingsConnectorAuthResultProps,
 ): void {
   send(track, 'settings_connector_auth_result', props);
+}
+
+export function trackAssistantFeedbackClick(
+  track: Track,
+  props: AssistantFeedbackClickProps,
+) {
+  track(
+    'assistant_feedback_click',
+    props as unknown as Record<string, unknown>,
+  );
+}
+
+export function trackAssistantFeedbackReasonView(
+  track: Track,
+  props: AssistantFeedbackReasonViewProps,
+) {
+  track(
+    'assistant_feedback_reason_view',
+    props as unknown as Record<string, unknown>,
+  );
+}
+
+export function trackAssistantFeedbackReasonClick(
+  track: Track,
+  props: AssistantFeedbackReasonClickProps,
+  options?: { requestId: string },
+) {
+  track(
+    'assistant_feedback_reason_click',
+    props as unknown as Record<string, unknown>,
+    options,
+  );
+}
+
+export function trackAssistantFeedbackReasonSubmit(
+  track: Track,
+  props: AssistantFeedbackReasonSubmitProps,
+  options?: { requestId: string },
+) {
+  track(
+    'assistant_feedback_reason_submit',
+    props as unknown as Record<string, unknown>,
+    options,
+  );
+}
+
+// ---- Onboarding ---------------------------------------------------------
+//
+// `trackOnboardingClick` is the catch-all for the welcome flow's
+// runtime-pick / about-you / continue / skip / back buttons. The same
+// shape still supports historical and future design-system intake
+// clicks; the discriminator combo (area + element + action) narrows
+// the row down inside PostHog so the dashboard can split each step's
+// funnel cleanly without a separate event name per button. Lifecycle
+// events that don't fit a click — CLI scan finishing, onboarding
+// wrapping up — get their own `onboarding_*_result` shape.
+
+export function trackOnboardingClick(
+  track: Track,
+  props: OnboardingClickProps,
+): void {
+  send(track, 'ui_click', props);
+}
+
+export function trackOnboardingRuntimeScanResult(
+  track: Track,
+  props: OnboardingRuntimeScanResultProps,
+): void {
+  send(track, 'onboarding_runtime_scan_result', props);
+}
+
+export function trackOnboardingCompleteResult(
+  track: Track,
+  props: OnboardingCompleteResultProps,
+): void {
+  send(track, 'onboarding_complete_result', props);
+}
+
+// ---- Design-system lifecycle ---------------------------------------------
+//
+// `trackDesignSystem*Result` cover the five lifecycle moments in the
+// DS funnel: source intake, create, review, status changes, picker
+// apply. Page_views / clicks inside DS surfaces continue to reuse the
+// generic `page_view` / `ui_click` helpers with the DS page enum.
+
+export function trackDesignSystemSourceIngestResult(
+  track: Track,
+  props: DesignSystemSourceIngestResultProps,
+  options?: { requestId?: string },
+): void {
+  send(track, 'design_system_source_ingest_result', props, options);
+}
+
+export function trackDesignSystemCreateResult(
+  track: Track,
+  props: DesignSystemCreateResultProps,
+  options?: { requestId?: string },
+): void {
+  send(track, 'design_system_create_result', props, options);
+}
+
+export function trackDesignSystemReviewResult(
+  track: Track,
+  props: DesignSystemReviewResultProps,
+  options?: { requestId?: string },
+): void {
+  send(track, 'design_system_review_result', props, options);
+}
+
+export function trackDesignSystemStatusResult(
+  track: Track,
+  props: DesignSystemStatusResultProps,
+  options?: { requestId?: string },
+): void {
+  send(track, 'design_system_status_result', props, options);
+}
+
+export function trackDesignSystemApplyResult(
+  track: Track,
+  props: DesignSystemApplyResultProps,
+  options?: { requestId?: string },
+): void {
+  send(track, 'design_system_apply_result', props, options);
+}
+
+// ---- Update indicator / prompt ------------------------------------------
+
+export function trackUpdateIndicatorSurfaceView(
+  track: Track,
+  props: UpdateIndicatorSurfaceViewProps,
+): void {
+  send(track, 'surface_view', props);
+}
+
+export function trackUpdatePromptSurfaceView(
+  track: Track,
+  props: UpdatePromptSurfaceViewProps,
+): void {
+  send(track, 'surface_view', props);
+}
+
+export function trackUpdateInstallResult(
+  track: Track,
+  props: UpdateInstallResultProps,
+): void {
+  send(track, 'update_install_result', props);
 }

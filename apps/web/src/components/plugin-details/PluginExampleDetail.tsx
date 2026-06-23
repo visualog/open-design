@@ -1,30 +1,35 @@
 // HTML-preview detail surface for plugins that ship a runnable
 // `od.preview` entry or example output (the same surface ExamplesTab
 // uses for skill cards). Wraps the shared PreviewModal so the user
-// gets the full chrome — sandboxed iframe, Fullscreen, Share menu
-// (Export PDF / HTML / Zip / Open in new tab) — plus a primary
+// gets the full chrome — sandboxed iframe, Fullscreen, merged Share menu —
+// plus a primary
 // "Use plugin" action that routes through the home applyPlugin flow.
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { InstalledPluginRecord } from '@open-design/contracts';
 import { useI18n } from '../../i18n';
-import { localizedPluginDescription, localizedPluginTitle } from '../../runtime/plugin-localization';
+import { localizePluginDescription, localizePluginTitle } from '../plugins-home/localization';
 import {
   fetchPluginExampleHtml,
   fetchPluginPreviewHtml,
   type SkillExampleResult,
 } from '../../providers/registry';
-import { PreviewModal } from '../PreviewModal';
-import { PluginShareMenu } from './PluginShareMenu';
+import { PreviewModal, type PreviewSharePopoverItem } from '../PreviewModal';
+import { buildPluginShareUrl } from './PluginShareMenu';
 import { PluginMetaSections } from './PluginMetaSections';
+import { buildPluginUseMenu, pluginUsePrimaryAction } from './pluginUseMenu';
+import type { PluginUseAction } from '../plugins-home/useActions';
 
 interface Props {
   record: InstalledPluginRecord;
   /** When set, fetch this specific example stem; otherwise hit /preview. */
   exampleStem?: string | null;
   onClose: () => void;
-  onUse: (record: InstalledPluginRecord) => void;
+  onUse: (record: InstalledPluginRecord, action: PluginUseAction) => void;
   isApplying?: boolean;
+  hideUseAction?: boolean;
+  // Analytics — forwarded to PreviewModal's share popover.
+  onSharePopoverItemClick?: (item: PreviewSharePopoverItem) => void;
 }
 
 export function PluginExampleDetail({
@@ -33,10 +38,14 @@ export function PluginExampleDetail({
   onClose,
   onUse,
   isApplying,
+  hideUseAction,
+  onSharePopoverItemClick,
 }: Props) {
-  const { locale, t } = useI18n();
+  const { t, locale } = useI18n();
+  const localizedTitle = localizePluginTitle(locale, record);
   const [html, setHtml] = useState<string | null | undefined>(undefined);
   const [error, setError] = useState<string | null>(null);
+  const [unavailableKind, setUnavailableKind] = useState<string | null>(null);
   const inFlightRef = useRef(false);
 
   const load = useCallback(async () => {
@@ -45,6 +54,7 @@ export function PluginExampleDetail({
     try {
       setHtml(null);
       setError(null);
+      setUnavailableKind(null);
       const result: SkillExampleResult = exampleStem
         ? await fetchPluginExampleHtml(record.id, exampleStem)
         : await fetchPluginPreviewHtml(record.id);
@@ -54,9 +64,16 @@ export function PluginExampleDetail({
         setError(result.error);
         setHtml(undefined);
       } else {
-        // unavailable: skill declares a non-HTML preview; treat as a
-        // calm empty state rather than an error (see registry.ts §897).
-        setError(null);
+        // unavailable: the plugin's manifest declares no shipped
+        // preview entry (or the daemon 404s on its /preview path —
+        // common for bundled plugins like example-live-artifact whose
+        // manifest references an example file that doesn't ship).
+        // Forward to PreviewModal as a typed unavailable view so it
+        // renders the calm "no shipped preview" placeholder instead
+        // of the misleading "Couldn't load this example." error. The
+        // skill helper has had this treatment since #897; the plugin
+        // helper gained it later — keep both consumers in lockstep.
+        setUnavailableKind(result.kind);
         setHtml(undefined);
       }
     } finally {
@@ -74,13 +91,12 @@ export function PluginExampleDetail({
     void load();
   }, [load]);
 
-  const title = localizedPluginTitle(record, locale);
-  const description = localizedPluginDescription(record, locale);
+  const description = localizePluginDescription(locale, record);
   const isDeck = record.manifest?.od?.mode === 'deck';
 
   return (
     <PreviewModal
-      title={title}
+      title={localizedTitle}
       subtitle={description || undefined}
       views={[
         {
@@ -88,22 +104,35 @@ export function PluginExampleDetail({
           label: t('examples.previewLabel'),
           html,
           error,
+          // Pass the surface-appropriate noun so the unavailable placeholder
+          // reads "this plugin" / "this template" instead of falling back to
+          // the legacy skills-only "this skill" copy. Issue #3216.
+          unavailable: unavailableKind
+            ? { kind: unavailableKind, noun: isDeck ? 'template' : 'plugin' }
+            : null,
           deck: isDeck,
         },
       ]}
       onView={onView}
-      exportTitleFor={() => title}
+      exportTitleFor={() => localizedTitle}
+      shareTarget={{
+        title: localizedTitle,
+        description: description || undefined,
+        url: buildPluginShareUrl(record),
+      }}
       onClose={onClose}
       sidebar={{
         // Surface every plugin-common manifest field — workflow, context
         // bundles, connectors, file paths, source provenance — alongside
-        // the rendered HTML preview, so the example modal carries the
-        // same inspector depth the scenario fallback already shows.
-        // Default open so users see the metadata without an extra click;
-        // the iframe stage scales down to fit and Fullscreen still gives
-        // them an immersive view when needed.
-        label: t('pluginDetails.pluginInfo'),
-        defaultOpen: true,
+        // the rendered HTML preview. Designers are the primary audience
+        // here, so the sidebar starts COLLAPSED — the preview is the
+        // hero and gets the full stage by default — and when opened it
+        // shows a designer-first slice (author + example query) with the
+        // developer manifest detail tucked behind a "Developer details"
+        // disclosure (variant="minimal"). Fullscreen still gives an
+        // immersive view when needed.
+        label: 'Plugin info',
+        defaultOpen: false,
         contentKey: record.id,
         content: (
           <div className="plugin-info-pane">
@@ -111,19 +140,24 @@ export function PluginExampleDetail({
               record={record}
               omit={{ description: true }}
               compact
-              heading={t('pluginDetails.pluginInfo')}
+              heading="Plugin info"
+              variant="minimal"
             />
           </div>
         ),
       }}
-      primaryAction={{
-        label: t('pluginDetails.usePlugin'),
-        onClick: () => onUse(record),
-        busy: !!isApplying,
-        busyLabel: t('homeHero.applying'),
-        testId: `plugin-details-use-${record.id}`,
-      }}
-      headerExtras={<PluginShareMenu record={record} variant="inline" />}
+      primaryAction={hideUseAction
+        ? undefined
+        : {
+            label: pluginUsePrimaryAction(record, t).label,
+            onClick: () => onUse(record, pluginUsePrimaryAction(record, t).action),
+            busy: !!isApplying,
+            busyLabel: 'Applying…',
+            testId: `plugin-details-use-${record.id}`,
+            menu: buildPluginUseMenu(record, onUse, t),
+          }}
+      hideSidebarToggle
+      onSharePopoverItemClick={onSharePopoverItemClick}
     />
   );
 }

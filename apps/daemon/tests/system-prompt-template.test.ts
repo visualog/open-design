@@ -81,6 +81,18 @@ describe('composeSystemPrompt — metadata.promptTemplate', () => {
     expect(out).toContain('license MIT');
   });
 
+  it('asks for image model and aspect ratio when they are unset (not silently defaulted)', () => {
+    const out = composeSystemPrompt({
+      metadata: { kind: 'image' },
+    });
+
+    // The composer no longer seeds imageModel/imageAspect — the agent must ask.
+    expect(out).toContain('**imageModel**: (unknown — ask: which image model/provider to use)');
+    expect(out).toContain('**aspectRatio**: (unknown — ask: 1:1, 16:9 for landscape, 9:16 for portrait)');
+    expect(out).not.toContain('gpt-image-2 (default');
+    expect(out).not.toContain('1:1 (default');
+  });
+
   it('inlines the prompt body for video projects too', () => {
     const out = composeSystemPrompt({
       metadata: {
@@ -200,6 +212,16 @@ describe('composeSystemPrompt — metadata.promptTemplate', () => {
     expect(out).not.toContain('Reference prompt template');
   });
 
+  it('non-media dispatch hint includes fal-ai/* passthrough instruction', () => {
+    const out = composeSystemPrompt({
+      metadata: { kind: 'prototype' },
+    });
+
+    expect(out).toContain('## Media generation (if asked)');
+    expect(out).toContain('fal-ai/*');
+    expect(out).toContain('pass it through as-is without substitution');
+  });
+
   it('renders without source attribution when the source field is missing', () => {
     const { source: _omit, ...withoutSource } = baseSummary;
     const out = composeSystemPrompt({
@@ -239,6 +261,10 @@ describe('composeSystemPrompt — metadata.promptTemplate', () => {
       /actual\s+output path returned by the built-in imagegen result/,
     );
     expect(out).toContain('${CODEX_HOME:-$HOME/.codex}/generated_images/.../ig_*.png');
+    expect(out).toContain('When the user asked for one image, produce exactly one final project image');
+    expect(out).toContain('If Codex built-in imagegen returns multiple candidate files, previews, or');
+    expect(out).toContain('select the single best match and import only that file into');
+    expect(out).toContain('Do not copy every generated variant');
     expect(out).toContain('verify the exact destination file exists under');
     expect(out).toMatch(
       /report the exact source path, destination path, and access\/copy\s+error/,
@@ -304,6 +330,87 @@ describe('composeSystemPrompt — metadata.promptTemplate', () => {
     expect(out).not.toContain('## Codex built-in imagegen override');
   });
 
+  it('renders disabled media policy without byte-generation instructions or imagegen override', () => {
+    const out = composeSystemPrompt({
+      agentId: 'codex',
+      metadata: {
+        kind: 'image',
+        imageModel: 'gpt-image-2',
+        imageAspect: '1:1',
+        promptTemplate: { ...baseSummary },
+      },
+      mediaExecution: { mode: 'disabled' },
+    });
+
+    expect(out).toContain('## Media generation policy');
+    expect(out).toContain('Open Design-owned media execution is **disabled for this run**');
+    expect(out).toContain('External MCP media tools, when explicitly configured for this run, are outside');
+    expect(out).toMatch(/Do not call\s+`"\$OD_NODE_BIN" "\$OD_BIN" media generate`/);
+    expect(out).not.toContain('## Media generation contract');
+    expect(out).not.toContain('## Codex built-in imagegen override');
+    expect(out).not.toContain('Generate the image with Codex built-in imagegen');
+  });
+
+  it('suppresses the Codex imagegen override when the enabled policy denies the selected model', () => {
+    const out = composeSystemPrompt({
+      agentId: 'codex',
+      metadata: {
+        kind: 'image',
+        imageModel: 'gpt-image-2',
+        imageAspect: '1:1',
+        promptTemplate: { ...baseSummary },
+      },
+      mediaExecution: {
+        mode: 'enabled',
+        allowedModels: ['different-image-model'],
+      },
+    });
+
+    expect(out).toContain('## Media generation contract');
+    expect(out).not.toContain('## Codex built-in imagegen override');
+  });
+
+  it('renders enabled media allowlists in the media contract', () => {
+    const out = composeSystemPrompt({
+      metadata: {
+        kind: 'image',
+        imageModel: 'gpt-image-2',
+        imageAspect: '1:1',
+        promptTemplate: { ...baseSummary },
+      },
+      mediaExecution: {
+        mode: 'enabled',
+        allowedSurfaces: ['image'],
+        allowedModels: ['gpt-image-2'],
+      },
+    });
+
+    expect(out).toContain('## Media generation contract');
+    expect(out).toContain('### Active media policy scope');
+    expect(out).toContain('The dispatcher will reject surfaces or models outside this run');
+    expect(out).toContain('Allowed surfaces for this run: `image`.');
+    expect(out).toContain('Allowed models for this run: `gpt-image-2`.');
+    expect(out).toContain('### Allowed model IDs (per surface)');
+    expect(out).not.toContain('Open Design-owned media execution is **disabled for this run**');
+  });
+
+  it('keeps unrestricted enabled media contract unchanged', () => {
+    const out = composeSystemPrompt({
+      metadata: {
+        kind: 'image',
+        imageModel: 'gpt-image-2',
+        imageAspect: '1:1',
+        promptTemplate: { ...baseSummary },
+      },
+      mediaExecution: { mode: 'enabled' },
+    });
+
+    expect(out).toContain('## Media generation contract');
+    expect(out).not.toContain('### Active media policy scope');
+    expect(out).not.toContain('Allowed surfaces for this run');
+    expect(out).not.toContain('Allowed models for this run');
+  });
+
   it('documents ElevenLabs speech and SFX routing in the media contract', () => {
     const out = composeSystemPrompt({
       metadata: {
@@ -339,8 +446,8 @@ describe('composeSystemPrompt — metadata.promptTemplate', () => {
       },
     });
 
-    expect(out).toContain('`media generate` treats the handoff as');
-    expect(out).toContain('exit `0` so the first dispatch does not look like a failed shell call');
+    expect(out).toContain('always exits 0');
+    expect(out).toContain('as a handoff signal');
     expect(out).toContain('`"$OD_NODE_BIN" "$OD_BIN" media generate` exits `0`');
     expect(out).toContain('either `file` or `taskId`');
     expect(out).toContain('`2` from `media wait` is not a failure');

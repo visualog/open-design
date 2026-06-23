@@ -16,22 +16,31 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { InstalledPluginRecord } from '@open-design/contracts';
 import { useI18n } from '../../i18n';
-import { localizedPluginDescription, localizedPluginTitle } from '../../runtime/plugin-localization';
+import { localizePluginDescription, localizePluginTitle } from '../plugins-home/localization';
 import {
   fetchDesignSystemPreview,
   fetchDesignSystemShowcase,
   fetchPluginAssetText,
 } from '../../providers/registry';
 import { DesignSpecView } from '../DesignSpecView';
-import { PreviewModal, type PreviewView } from '../PreviewModal';
-import { PluginShareMenu } from './PluginShareMenu';
+import {
+  PreviewModal,
+  type PreviewSharePopoverItem,
+  type PreviewView,
+} from '../PreviewModal';
+import { buildPluginShareUrl, PluginShareMenu } from './PluginShareMenu';
 import { PluginMetaSections } from './PluginMetaSections';
+import { buildPluginUseMenu, pluginUsePrimaryAction } from './pluginUseMenu';
+import type { PluginUseAction } from '../plugins-home/useActions';
 
 interface Props {
   record: InstalledPluginRecord;
   onClose: () => void;
-  onUse: (record: InstalledPluginRecord) => void;
+  onUse: (record: InstalledPluginRecord, action: PluginUseAction) => void;
   isApplying?: boolean;
+  hideUseAction?: boolean;
+  // Analytics — forwarded to PreviewModal's share popover.
+  onSharePopoverItemClick?: (item: PreviewSharePopoverItem) => void;
 }
 
 interface ContextRef {
@@ -64,12 +73,14 @@ export function PluginDesignSystemDetail({
   onClose,
   onUse,
   isApplying,
+  hideUseAction,
+  onSharePopoverItemClick,
 }: Props) {
-  const { locale, t } = useI18n();
+  const { t, locale } = useI18n();
+  const localizedTitle = localizePluginTitle(locale, record);
+  const localizedDescription = localizePluginDescription(locale, record);
   const dsRef = designSystemRef(record);
   const assetPath = specAssetPath(record);
-  const title = localizedPluginTitle(record, locale);
-  const description = localizedPluginDescription(record, locale);
 
   const [showcaseHtml, setShowcaseHtml] = useState<string | null | undefined>(undefined);
   const [tokensHtml, setTokensHtml] = useState<string | null | undefined>(undefined);
@@ -122,21 +133,26 @@ export function PluginDesignSystemDetail({
         {
           id: 'spec',
           label: 'Spec',
-          html: '<!doctype html><meta charset="utf-8"><body style="font:14px system-ui;color:#666;display:flex;align-items:center;justify-content:center;height:100vh;text-align:center;padding:0 24px;margin:0;">이 플러그인은 디자인 스펙만 포함합니다. 플러그인 정보에서 DESIGN.md를 확인하세요.</body>',
+          html: '<!doctype html><meta charset="utf-8"><body style="font:14px system-ui;color:#666;display:flex;align-items:center;justify-content:center;height:100vh;text-align:center;padding:0 24px;margin:0;">This plugin ships only the design spec — open Plugin info to read DESIGN.md.</body>',
         },
       ];
 
   return (
     <PreviewModal
-      title={title}
-      subtitle={description || dsRef || undefined}
+      title={localizedTitle}
+      subtitle={localizedDescription || dsRef || undefined}
       views={views}
       initialViewId={dsRef ? 'showcase' : 'spec'}
       onView={handleView}
-      exportTitleFor={(viewId) => `${title} — ${viewId}`}
+      exportTitleFor={(viewId) => `${localizedTitle} — ${viewId}`}
+      shareTarget={{
+        title: localizedTitle,
+        description: localizedDescription || dsRef || undefined,
+        url: buildPluginShareUrl(record),
+      }}
       onClose={onClose}
       sidebar={{
-        label: t('pluginDetails.pluginInfo'),
+        label: 'Plugin info',
         defaultOpen: true,
         onToggle: handleSidebarToggle,
         contentKey: record.id,
@@ -150,7 +166,7 @@ export function PluginDesignSystemDetail({
                 record={record}
                 omit={{ description: true }}
                 compact
-                heading={t('pluginDetails.pluginInfo')}
+                heading="Plugin info"
               />
             </div>
             <section className="plugin-design-sidebar__spec">
@@ -166,14 +182,18 @@ export function PluginDesignSystemDetail({
           </div>
         ),
       }}
-      primaryAction={{
-        label: t('pluginDetails.usePlugin'),
-        onClick: () => onUse(record),
-        busy: !!isApplying,
-        busyLabel: t('homeHero.applying'),
-        testId: `plugin-details-use-${record.id}`,
-      }}
+      primaryAction={hideUseAction
+        ? undefined
+        : {
+            label: pluginUsePrimaryAction(record, t).label,
+            onClick: () => onUse(record, pluginUsePrimaryAction(record, t).action),
+            busy: !!isApplying,
+            busyLabel: 'Applying…',
+            testId: `plugin-details-use-${record.id}`,
+            menu: buildPluginUseMenu(record, onUse, t),
+          }}
       headerExtras={<PluginShareMenu record={record} variant="inline" />}
+      onSharePopoverItemClick={onSharePopoverItemClick}
     />
   );
 }

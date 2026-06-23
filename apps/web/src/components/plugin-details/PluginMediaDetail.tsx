@@ -3,7 +3,7 @@
 // Visually this variant now matches the html-example and design-system
 // modals — it reuses PreviewModal so every plugin variant shares the
 // same chrome (title + subtitle, primary `Use plugin` CTA, sidebar
-// toggle, fullscreen, share menu, close). The stage hosts the
+// toggle, fullscreen, plugin actions, close). The stage hosts the
 // type-specific media (image / video / audio) via PreviewModal's
 // `custom` view kind, and the right-side sidebar carries the prompt
 // body + PluginMetaSections so users can read the prompt and inspect
@@ -14,19 +14,29 @@ import type {
   InstalledPluginRecord,
   PluginManifest,
 } from '@open-design/contracts';
-import { useI18n } from '../../i18n';
-import { localizedPluginDescription, localizedPluginTitle } from '../../runtime/plugin-localization';
+import { useT } from '../../i18n';
 import { resolvePluginQueryFallback } from '../../state/projects';
 import { Icon } from '../Icon';
-import { PreviewModal, type PreviewView } from '../PreviewModal';
+import {
+  PreviewModal,
+  type PreviewSharePopoverItem,
+  type PreviewView,
+} from '../PreviewModal';
 import { PluginMetaSections } from './PluginMetaSections';
-import { PluginShareMenu } from './PluginShareMenu';
+import { buildPluginShareUrl, PluginShareMenu } from './PluginShareMenu';
+import { buildPluginUseMenu, pluginUsePrimaryAction } from './pluginUseMenu';
+import type { PluginUseAction } from '../plugins-home/useActions';
 
 interface Props {
   record: InstalledPluginRecord;
   onClose: () => void;
-  onUse: (record: InstalledPluginRecord) => void;
+  onUse: (record: InstalledPluginRecord, action: PluginUseAction) => void;
   isApplying?: boolean;
+  hideUseAction?: boolean;
+  // Analytics — forwarded to PreviewModal's share popover. Does NOT cover
+  // the headerExtras PluginShareMenu (copy install command), which is a
+  // separate menu.
+  onSharePopoverItemClick?: (item: PreviewSharePopoverItem) => void;
 }
 
 interface MediaPreview {
@@ -77,14 +87,15 @@ export function PluginMediaDetail({
   onClose,
   onUse,
   isApplying,
+  hideUseAction,
+  onSharePopoverItemClick,
 }: Props) {
-  const { locale, t } = useI18n();
+  const t = useT();
   const [copied, setCopied] = useState(false);
 
   const manifest: PluginManifest = record.manifest ?? ({} as PluginManifest);
   const od = manifest.od ?? {};
-  const title = localizedPluginTitle(record, locale);
-  const description = localizedPluginDescription(record, locale);
+  const description = manifest.description ?? '';
   const query = resolvePluginQueryFallback(od.useCase?.query);
   const media = useMemo(() => readMedia(record), [record]);
   const hasAsset = Boolean(media.poster || media.videoUrl || media.audioUrl);
@@ -132,7 +143,7 @@ export function PluginMediaDetail({
             <img
               className="plugin-media-stage__audio-poster"
               src={media.poster}
-              alt={title}
+              alt={record.title}
               referrerPolicy="no-referrer"
               loading="lazy"
             />
@@ -155,7 +166,7 @@ export function PluginMediaDetail({
         <img
           className="plugin-media-stage__image"
           src={media.poster}
-          alt={title}
+          alt={record.title}
           loading="lazy"
           referrerPolicy="no-referrer"
         />
@@ -201,32 +212,41 @@ export function PluginMediaDetail({
         record={record}
         omit={{ description: true, query: true }}
         compact
-        heading={t('pluginDetails.pluginInfo')}
+        heading="Plugin info"
       />
     </div>
   );
 
   return (
     <PreviewModal
-      title={title}
+      title={record.title}
       subtitle={description || undefined}
       views={views}
-      exportTitleFor={() => title}
+      exportTitleFor={() => record.title}
+      shareTarget={{
+        title: record.title,
+        description: description || undefined,
+        url: buildPluginShareUrl(record),
+      }}
       onClose={onClose}
       sidebar={{
-        label: t('pluginDetails.pluginInfo'),
+        label: 'Plugin info',
         defaultOpen: true,
         contentKey: record.id,
         content: sidebar,
       }}
-      primaryAction={{
-        label: t('pluginDetails.usePlugin'),
-        onClick: () => onUse(record),
-        busy: !!isApplying,
-        busyLabel: t('homeHero.applying'),
-        testId: `plugin-details-use-${record.id}`,
-      }}
+      primaryAction={hideUseAction
+        ? undefined
+        : {
+            label: pluginUsePrimaryAction(record, t).label,
+            onClick: () => onUse(record, pluginUsePrimaryAction(record, t).action),
+            busy: !!isApplying,
+            busyLabel: 'Applying…',
+            testId: `plugin-details-use-${record.id}`,
+            menu: buildPluginUseMenu(record, onUse, t),
+          }}
       headerExtras={<PluginShareMenu record={record} variant="inline" />}
+      onSharePopoverItemClick={onSharePopoverItemClick}
     />
   );
 }

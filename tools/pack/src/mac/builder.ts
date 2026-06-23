@@ -3,6 +3,7 @@ import { dirname, join } from "node:path";
 
 import type { ToolPackConfig } from "../config.js";
 import { macResources } from "../resources.js";
+import { electronBuilderVersionForAppVersion } from "../versions.js";
 import { execFileAsync } from "./commands.js";
 import {
   ELECTRON_BUILDER_ASAR,
@@ -83,6 +84,7 @@ export async function runElectronBuilder(
   const namespaceToken = sanitizeNamespace(config.namespace);
   const identity = resolveMacInstallIdentity(config);
   const packagedVersion = await readPackagedVersion(config);
+  const packageVersion = electronBuilderVersionForAppVersion(packagedVersion);
   const webStandaloneHookConfigPath = config.webOutputMode === "standalone"
     ? await writeWebStandaloneHookConfig(config, paths)
     : null;
@@ -90,7 +92,7 @@ export async function runElectronBuilder(
     appId: identity.appId,
     artifactName: `${PRODUCT_NAME}-${namespaceToken}.\${ext}`,
     afterPack: webStandaloneHookConfigPath == null ? undefined : macResources.webStandaloneAfterPackHook,
-    afterSign: config.signed ? macResources.notarizeHook : undefined,
+    afterSign: config.signed && config.macNotarize ? macResources.notarizeHook : undefined,
     asar: ELECTRON_BUILDER_ASAR,
     buildDependenciesFromSource: false,
     compression: config.macCompression,
@@ -100,16 +102,15 @@ export async function runElectronBuilder(
     dmg: {
       icon: macResources.icon,
       iconSize: 96,
-      title: `${identity.productName}-${namespaceToken}`,
+      title: identity.installerTitle,
     },
-    electronDist: config.electronDistPath,
     electronVersion: config.electronVersion,
     executableName: identity.executableName,
     extraMetadata: {
       main: "./main.cjs",
       name: "open-design-packaged-app",
       productName: identity.productName,
-      version: packagedVersion,
+      version: packageVersion,
     },
     extraResources: [
       { from: paths.resourceRoot, to: "open-design" },
@@ -125,7 +126,7 @@ export async function runElectronBuilder(
       hardenedRuntime: config.signed,
       icon: macResources.icon,
       identity: config.signed ? undefined : null,
-      notarize: false,
+      notarize: config.macNotarize ? undefined : false,
       target: targets,
     },
     nodeGypRebuild: false,

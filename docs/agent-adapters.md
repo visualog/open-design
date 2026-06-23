@@ -72,7 +72,7 @@ type AgentEvent =
 
 ## 2. Detection strategy
 
-Run all adapters' `detect()` in parallel on daemon start, then cache results in `~/.open-design/agents.json` with a 24h TTL. Re-detect on daemon `SIGHUP`.
+Run all adapters' `detect()` in parallel on daemon start, then cache results through daemon-managed storage with a 24h TTL. This document MUST NOT define daemon data paths; read the root `AGENTS.md` section **Daemon data directory contract** before changing or documenting that storage.
 
 Each adapter uses **two signals**:
 
@@ -86,6 +86,7 @@ If both signals agree, detection is confident. If only one signal fires, we mark
 | Adapter | CLI command | Config dir | Skills dir | Native skill loading | Surgical edit | Streaming | Priority |
 |---|---|---|---|---|---|---|---|
 | **claude-code** | `claude` | `~/.claude/` | `~/.claude/skills/` | ✅ | ✅ | ✅ | P0 (MVP) |
+| **amp** | `amp` | `~/.config/amp/` | n/a (via `amp skill add`) | ❌ (prompt-injected) | ✅ | ✅ (`-x --stream-json`, Claude-compatible) | P2 |
 | **api-fallback** | *(direct Anthropic API)* | — | — | ❌ (prompt-injected) | 〜 | ✅ | P0 (MVP) |
 | **codex** | `codex` | `~/.codex/` | `~/.codex/skills/` | 〜 (varies by version) | 〜 (regenerate w/ scoping) | ✅ | P1 |
 | **devin** | `devin` | `~/.config/devin/` | `~/.config/devin/skills/` | ✅ | ✅ | ✅ (`acp-json-rpc`) | P1 |
@@ -97,6 +98,7 @@ If both signals agree, detection is confident. If only one signal fires, we mark
 | **kiro** | `kiro-cli` | `~/.kiro/` | ❌ | ✅ | ✅ (`acp-json-rpc`) | P2 |
 | **kilo** | `kilo` | — | ❌ | ✅ | ✅ (`acp-json-rpc`) | P2 |
 | **vibe** | `vibe-acp` | `~/.vibe/` | ❌ | ✅ | ✅ (`acp-json-rpc`) | P2 |
+| **trae-cli** | `traecli` | Trae CLI config | Trae CLI managed | ❌ (prompt-injected) | ✅ | ✅ (`acp-json-rpc`) | P2 |
 | **deepseek** | `deepseek` | `~/.deepseek/` | `~/.deepseek/skills/` | ❌ (prompt-injected) | ✅ | ✅ (plain text) | P2 |
 | **qoder** | `qodercli` | Qoder CLI config | Qoder CLI managed | ❌ (prompt-injected) | ✅ | ✅ (`stream-json`) | P2 |
 | **pi** | `pi` | `~/.pi/agent/` | `~/.pi/agent/skills/` | ❌ (prompt-injected) | ✅ | ✅ (`pi-rpc` JSON-RPC) | P2 |
@@ -211,6 +213,15 @@ The adapter declares which strategy to use via `capabilities().nativeSkillLoadin
 - Permission: `--permission-mode bypass_permissions` avoids headless approval prompts in the web UI. Users should treat this as the same trust posture as running Qoder directly with that flag in the selected project directory.
 - **Gotcha:** Detection only proves `qodercli --version` can run. Qoder authentication and account scope remain owned by Qoder CLI, with credentials read from Qoder's `~/.qoder/config.json`; the daemon surfaces stderr/stdout failures from the spawned run instead of running login or editing Qoder config.
 
+### 5.10 Trae CLI
+
+- Invocation: `traecli acp serve --yolo`, using the daemon's shared ACP JSON-RPC transport. The adapter follows Trae CLI's public ACP entrypoint documented at https://www.volcengine.com/docs/86677/2227861?lang=zh.
+- Streaming: `acp-json-rpc`; the daemon uses the same ACP event path as the other ACP-backed adapters.
+- Models: dynamic via the ACP handshake. If model discovery fails, the picker falls back to the CLI's default configuration rather than requiring CI or startup detection to log in to Trae CLI.
+- Skills: prompt injection only in v1. External MCP servers can be forwarded through the ACP launch descriptor with the existing `acp-merge` path.
+- Permission: `--yolo` avoids headless approval prompts in the web UI. This follows the adapter catalog's existing non-interactive permission posture for CLIs such as Devin, Copilot, Qoder, and DeepSeek: the daemon runs agent CLIs without a TTY, so it must not rely on an interactive tool-approval prompt to make progress.
+- **Gotcha:** Detection only proves `traecli --version` and model discovery can run in the current environment. Trae CLI owns login, account scope, and model entitlement; the daemon does not run login flows or edit Trae CLI configuration.
+
 ### 5.11 Pi
 
 - Invocation: `pi --mode rpc [--model <id>] [--thinking <level>] [--append-system-prompt <dir> …]`, with the composed prompt delivered over stdin via JSON-RPC. The daemon sends a `prompt` command (optionally with `images` for multimodal input) and pi streams back typed events until `agent_end`. Pi's RPC process stays alive after `agent_end` (designed for multi-prompt sessions); the daemon closes stdin and SIGTERMs after a grace period since `/api/chat` is single-shot.
@@ -222,7 +233,7 @@ The adapter declares which strategy to use via `capabilities().nativeSkillLoadin
 - Extension UI: auto-resolved. pi's RPC protocol can request user dialogs (`select`, `confirm`, `input`, `editor`) and fire-and-forget notifications (`setStatus`, `setWidget`, `notify`, `setTitle`, `set_editor_text`). Dialog methods are auto-approved (confirm → true, select → first option) and fire-and-forget methods are silently consumed because the web UI has no surface for them.
 - **Gotcha:** pi's RPC `prompt` response is asynchronous — `success: true` only means the prompt was accepted, not that the agent finished. Agent failures after acceptance surface through the normal event stream (`extension_error`, `auto_retry_end` with `success: false`) and the empty-output guard.
 
-### 5.10 DeepSeek TUI
+### 5.12 DeepSeek TUI
 
 - Invocation: `deepseek exec --auto [--model <id>] "<prompt>"`. The `deepseek` dispatcher owns the `exec` / `--auto` subcommands and delegates to a sibling `deepseek-tui` runtime binary at exec time; upstream documents both binaries as required (the npm and cargo paths install them together). We only probe the dispatcher — `deepseek-tui` on its own doesn't accept this argv shape, so advertising it as a fallback would surface the agent as available but fail on the first chat run. A future revision could teach resolution + buildArgs which binary was selected and emit a verified `deepseek-tui` invocation, with a regression test exercising that path.
 - Streaming: plain text deltas to stdout in non-`--json` mode (tool-call notifications go to stderr). Skipping `--json` is intentional — `deepseek exec --json` batches the entire run into one trailing summary object instead of streaming, which would freeze the chat UI until end-of-turn.

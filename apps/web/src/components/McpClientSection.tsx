@@ -13,8 +13,13 @@ import {
   useRef,
   useState,
 } from 'react';
+import { Button } from '@open-design/components';
 import { useAnalytics } from '../analytics/provider';
-import { trackIntegrationsMcpTabClick } from '../analytics/events';
+import {
+  trackIntegrationsMcpTabClick,
+  trackSettingsExternalMcpClick,
+} from '../analytics/events';
+import type { TrackingExternalMcpElement } from '@open-design/contracts/analytics';
 import {
   disconnectMcpOAuth,
   fetchMcpOAuthStatus,
@@ -28,6 +33,8 @@ import type {
   McpServerConfig,
   McpTemplate,
 } from '../state/mcp';
+import { fetchAgents } from '../providers/registry';
+import type { AgentInfo } from '../types';
 import { Icon } from './Icon';
 import { useT } from '../i18n';
 
@@ -38,6 +45,10 @@ interface Props {
   // Surface the dirty/save state up to the dialog footer so a single
   // "Save" button can drive both the global config and this section.
   onDirtyChange?: (dirty: boolean) => void;
+  // This section renders on two surfaces: the Integrations MCP tab and the
+  // Settings -> External MCP panel. Defaults to 'integrations' so the
+  // IntegrationsView call site stays unchanged.
+  surface?: 'integrations' | 'settings';
 }
 
 // Imperative handle: lets the dialog footer Save button trigger this
@@ -296,9 +307,31 @@ function signature(rows: DraftRow[]): string {
 }
 
 export const McpClientSection = forwardRef<McpClientSectionHandle, Props>(
-  function McpClientSection({ onServersChanged, onDirtyChange }, ref) {
+  function McpClientSection({ onServersChanged, onDirtyChange, surface = 'integrations' }, ref) {
   const t = useT();
   const analytics = useAnalytics();
+  // Single dispatch point for every click in this section: routes to the
+  // payload matching the surface the section is rendered on.
+  const trackMcpClick = (
+    element: TrackingExternalMcpElement,
+    extra?: { template_id?: string },
+  ) => {
+    if (surface === 'settings') {
+      trackSettingsExternalMcpClick(analytics.track, {
+        page_name: 'settings',
+        area: 'external_mcp',
+        element,
+        ...extra,
+      });
+    } else {
+      trackIntegrationsMcpTabClick(analytics.track, {
+        page_name: 'integrations',
+        area: 'mcp_tab',
+        element,
+        ...extra,
+      });
+    }
+  };
   const [rows, setRows] = useState<DraftRow[]>([]);
   const [savedSig, setSavedSig] = useState<string>('[]');
   const [templates, setTemplates] = useState<McpTemplate[]>([]);
@@ -311,6 +344,11 @@ export const McpClientSection = forwardRef<McpClientSectionHandle, Props>(
   // picker preserves the user's last query while they scan through it.
   const [pickerQuery, setPickerQuery] = useState('');
   const [error, setError] = useState<string | null>(null);
+  // Cached agent list so the support banner can tell the user which of the
+  // installed CLI agents will actually receive the MCP servers below.
+  // Without this, OpenCode / Codex / Gemini users save a server and have
+  // no way to learn it never reached the agent (issue #2142).
+  const [agents, setAgents] = useState<AgentInfo[]>([]);
 
   useEffect(() => {
     let cancelled = false;
@@ -327,6 +365,18 @@ export const McpClientSection = forwardRef<McpClientSectionHandle, Props>(
       setSavedSig(signature(fresh));
       setTemplates(data.templates);
       setLoaded(true);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      const list = await fetchAgents();
+      if (cancelled) return;
+      setAgents(list);
     })();
     return () => {
       cancelled = true;
@@ -358,11 +408,13 @@ export const McpClientSection = forwardRef<McpClientSectionHandle, Props>(
   };
 
   const addFromTemplate = (tpl: McpTemplate) => {
+    trackMcpClick('pick_template', { template_id: tpl.id.replace(/-/g, '_') });
     setPickerOpen(false);
     setRows((curr) => [...curr, rowFromTemplate(tpl, new Set(curr.map((r) => r.id)))]);
   };
 
   const addBlank = () => {
+    trackMcpClick('pick_blank');
     setPickerOpen(false);
     setRows((curr) => [...curr, rowFromBlank(new Set(curr.map((r) => r.id)))]);
   };
@@ -422,11 +474,7 @@ export const McpClientSection = forwardRef<McpClientSectionHandle, Props>(
           type="button"
           className="primary mcp-add-btn"
           onClick={() => {
-            trackIntegrationsMcpTabClick(analytics.track, {
-              page_name: 'integrations',
-              area: 'mcp_tab',
-              element: 'add_server',
-            });
+            trackMcpClick('add_server');
             setPickerOpen((v) => !v);
           }}
           aria-expanded={pickerOpen}
@@ -435,6 +483,8 @@ export const McpClientSection = forwardRef<McpClientSectionHandle, Props>(
           <span>{t('mcpClient.addServer')}</span>
         </button>
       </div>
+
+      <McpAgentSupportBanner agents={agents} />
 
       {pickerOpen ? (
         <PickerPanel
@@ -472,7 +522,15 @@ export const McpClientSection = forwardRef<McpClientSectionHandle, Props>(
                   : undefined
               }
               onChange={(patch) => updateRow(idx, patch)}
-              onRemove={() => removeRow(idx)}
+              onRemove={() => {
+                trackMcpClick(
+                  'remove_server',
+                  row.templateId
+                    ? { template_id: row.templateId.replace(/-/g, '_') }
+                    : undefined,
+                );
+                removeRow(idx);
+              }}
               onMoveUp={idx > 0 ? () => moveRow(idx, -1) : undefined}
               onMoveDown={idx < rows.length - 1 ? () => moveRow(idx, 1) : undefined}
             />
@@ -485,11 +543,7 @@ export const McpClientSection = forwardRef<McpClientSectionHandle, Props>(
           type="button"
           className="primary"
           onClick={() => {
-            trackIntegrationsMcpTabClick(analytics.track, {
-              page_name: 'integrations',
-              area: 'mcp_tab',
-              element: 'saved',
-            });
+            trackMcpClick('saved');
             void save();
           }}
           disabled={saving || !dirty}
@@ -759,33 +813,32 @@ function McpRow({ row, idx, total, template, onChange, onRemove, onMoveUp, onMov
         </span>
         <div className="mcp-row-actions">
           {onMoveUp ? (
-            <button type="button" className="icon-btn" onClick={onMoveUp} title="Move up">
+            <Button size="icon" onClick={onMoveUp} title="Move up">
               ↑
-            </button>
+            </Button>
           ) : null}
           {onMoveDown ? (
-            <button type="button" className="icon-btn" onClick={onMoveDown} title="Move down">
+            <Button size="icon" onClick={onMoveDown} title="Move down">
               ↓
-            </button>
+            </Button>
           ) : null}
-          <button
-            type="button"
-            className="icon-btn"
+          <Button
+            size="icon"
             onClick={onRemove}
             title="Remove this MCP server"
           >
             ×
-          </button>
-          <button
-            type="button"
-            className="icon-btn mcp-row-toggle-btn"
+          </Button>
+          <Button
+            size="icon"
+            className="mcp-row-toggle-btn"
             onClick={() => setExpanded((v) => !v)}
             aria-expanded={expanded}
             aria-label={expanded ? 'Collapse this MCP server' : 'Expand this MCP server'}
             title={expanded ? 'Collapse' : 'Expand'}
           >
             <Icon name="chevron-down" size={13} />
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -1342,6 +1395,77 @@ function McpOAuthControl({ serverId }: { serverId: string }) {
       ) : null}
 
       {error ? <div className="mcp-oauth-error">{error}</div> : null}
+    </div>
+  );
+}
+
+/**
+ * Renders a compact two-line banner showing which installed CLI agents
+ * receive the user's external MCP servers at spawn time and which do not.
+ * The truth source is the daemon `/api/agents` payload — every runtime def
+ * carries an `externalMcpInjection` discriminator (one of
+ * `claude-mcp-json` / `acp-merge` / `opencode-env-content`, or undefined
+ * when no native injection is wired yet).
+ *
+ * The banner replaces the previous silent-failure UX from issue #2142:
+ * users were configuring servers under OpenCode / Codex / Gemini and
+ * never learning the daemon never forwarded them to the agent process.
+ * Rendered above the picker so it is the first thing the user reads.
+ */
+function McpAgentSupportBanner({ agents }: { agents: AgentInfo[] }) {
+  const t = useT();
+  // Empty payload = either still loading or daemon unreachable. Either
+  // way, render nothing — the error banner below already covers the
+  // "daemon unreachable" path and we don't want to flash an empty hint
+  // during the initial fetch.
+  if (agents.length === 0) return null;
+  // `/api/agents` returns every runtime def the daemon knows about,
+  // including CLIs the user hasn't installed (those carry
+  // `available: false`). Splitting the full catalog into "Forwarded to /
+  // Not forwarded to" would mention adapters the user can't even launch,
+  // which is misleading. Scope the banner to installed CLIs only.
+  const installed = agents.filter((a) => a.available);
+  if (installed.length === 0) return null;
+  const supported = installed.filter(
+    (a) => typeof a.externalMcpInjection === 'string',
+  );
+  const unsupported = installed.filter(
+    (a) => !a.externalMcpInjection,
+  );
+  if (supported.length === 0 && unsupported.length === 0) return null;
+  // ACP adapters (Hermes / Kimi / Kilo / Kiro / Vibe / Devin) currently
+  // accept stdio MCP servers only — `buildAcpMcpServers()` in
+  // `apps/daemon/src/mcp-config.ts` filters to `transport === 'stdio'`
+  // because the ACP `mcpServers` descriptor itself has no slot for
+  // HTTP / SSE entries. Tag those runtimes inline so the banner does
+  // not silently claim full forwarding for HTTP MCP servers, which
+  // would re-introduce the very silent-failure UX we are removing.
+  const renderNames = (list: AgentInfo[]) =>
+    list
+      .slice()
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map((a) =>
+        a.externalMcpInjection === 'acp-merge'
+          ? `${a.name} (stdio only)`
+          : a.name,
+      )
+      .join(' · ');
+  const hasAcpSupported = supported.some(
+    (a) => a.externalMcpInjection === 'acp-merge',
+  );
+  return (
+    <div className="mcp-agent-support">
+      {supported.length > 0 ? (
+        <p className="hint mcp-agent-support-line">
+          <strong>{t('mcpClient.forwardedToLabel')}</strong> {renderNames(supported)}.
+          {hasAcpSupported ? <> {t('mcpClient.forwardedAcpNote')}</> : null}
+        </p>
+      ) : null}
+      {unsupported.length > 0 ? (
+        <p className="hint mcp-agent-support-line mcp-agent-support-unsupported">
+          <strong>{t('mcpClient.notForwardedToLabel')}</strong> {renderNames(unsupported)}. {t('mcpClient.notForwardedNote')}
+        </p>
+      ) : null}
     </div>
   );
 }

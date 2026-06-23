@@ -2,13 +2,14 @@ import { randomBytes } from "node:crypto";
 import { realpathSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
-import { BrowserWindow, Menu, app, shell, type MenuItemConstructorOptions } from "electron";
+import { BrowserWindow, Menu, app, dialog, globalShortcut, shell, type MenuItemConstructorOptions } from "electron";
 
 import {
   APP_KEYS,
   OPEN_DESIGN_SIDECAR_CONTRACT,
   SIDECAR_ENV,
   SIDECAR_MESSAGES,
+  SIDECAR_MODES,
   normalizeDesktopSidecarMessage,
   type DesktopClickInput,
   type DesktopEvalInput,
@@ -27,7 +28,7 @@ import {
   requestJsonIpc,
   resolveAppIpcPath,
   resolveLogFilePath,
-  resolveNamespaceRoot,
+  resolveRuntimeNamespaceRoot,
   type JsonIpcServerHandle,
   type SidecarRuntimeContext,
 } from "@open-design/sidecar";
@@ -46,7 +47,17 @@ import {
 // runtime. They are part of the security boundary for child-window
 // navigation (see `setWindowOpenHandler` in `runtime.ts`), so
 // pinning them is worth the small extra surface.
-export { isAllowedChildWindowUrl, isHttpUrl, resolveDesktopStatusUrl } from "./runtime.js";
+export {
+  createSplashWindow,
+  isAllowedChildWindowUrl,
+  isAllowedEmbeddedBrowserUrl,
+  isHttpUrl,
+  registerSplashStageTracking,
+  resolveDesktopStatusUrl,
+  setSplashStage,
+  type SplashBootStage,
+  type SplashStageSurface,
+} from "./runtime.js";
 
 // Re-export the path-validation helpers for the same reason (#974).
 // shell.openPath is privileged main-process behaviour; pinning the
@@ -68,6 +79,42 @@ export {
 } from "./runtime.js";
 
 const TOOLS_DEV_PARENT_PID_ENV = SIDECAR_ENV.TOOLS_DEV_PARENT_PID;
+const AMR_PROFILE_ENV_KEY = "OPEN_DESIGN_AMR_PROFILE";
+const AMR_PROFILE_AGENT_ID = "amr";
+const AMR_ENVIRONMENT_PROFILES = ["prod", "test", "local"] as const;
+const APP_CONFIG_CHANGED_IPC_CHANNEL = "od:app-config-changed";
+type AmrEnvironmentProfile = (typeof AMR_ENVIRONMENT_PROFILES)[number];
+type DesktopAppConfigPrefs = {
+  agentModels?: Record<string, { model?: string; reasoning?: string }>;
+  agentCliEnv?: Record<string, Record<string, string>>;
+  [key: string]: unknown;
+};
+
+// Argv prefix the preload uses to recover the OS locale main process
+// read at startup. The renderer wires `__od__.client.osLocale` from it.
+export const OS_LOCALE_PRELOAD_ARG_PREFIX = "--od-os-locale=";
+
+/**
+ * Read the OS preferred language and, when Electron has not yet
+ * emitted `ready`, point Chromium's `--lang` flag at it so the
+ * renderer's `navigator.language` follows the OS instead of falling
+ * back to en-US. Returns the resolved BCP-47 string so callers can
+ * forward it to `BrowserWindow.webPreferences.additionalArguments`
+ * for the preload to expose to the renderer.
+ *
+ * Safe to call multiple times: `appendSwitch('lang', ...)` is a no-op
+ * once `app.isReady()` is true. The packaged entry calls this once
+ * before its own `whenReady` (so the switch lands) and `runDesktopMain`
+ * calls it again later to recover the same string for the BrowserWindow.
+ */
+export function applyOsLocaleSwitch(electronApp: Electron.App): string {
+  const preferred = electronApp.getPreferredSystemLanguages?.() ?? [];
+  const osLocale = preferred[0] ?? "en";
+  if (!electronApp.isReady()) {
+    electronApp.commandLine.appendSwitch("lang", osLocale);
+  }
+  return osLocale;
+}
 
 export type DesktopMainOptions = {
   beforeShutdown?: () => Promise<void>;
@@ -83,9 +130,25 @@ export type DesktopMainOptions = {
    */
   discoverDaemonUrl?: () => Promise<string | null>;
   preloadPath?: string;
+  onDesktopReady?: (controls: { show(): void }) => void;
+  /**
+   * Optional pre-created splash window. The packaged entry creates it before
+   * awaiting the daemon/web sidecars so the brand animation overlaps the cold
+   * boot; forwarded straight to the runtime, which owns closing it once the
+   * main window is revealed. Omitted by tools-dev (the runtime makes its own).
+   */
+  splashWindow?: BrowserWindow | null;
+  /** Creation time of `splashWindow` (from `createSplashWindow().startedAt`), so
+   * the runtime measures the minimum splash hold from when it actually appeared. */
+  splashStartedAt?: number;
   update?: {
     currentVersion?: string | null;
     downloadRoot?: string | null;
+    installerObservationRoot?: string | null;
+    launcherLaunchPath?: string | null;
+    launcherRoot?: string | null;
+    launcherPayloadExtractorPath?: string | null;
+    launcherRuntimePath?: string | null;
   };
 };
 
@@ -133,12 +196,182 @@ function createWebDiscovery(runtime: SidecarRuntimeContext<SidecarStamp>): () =>
   };
 }
 
+// Resolve the daemon base URL the same way app-config reads/writes do: an
+// explicit daemon URL, else the web URL (which proxies `/api/*` to the daemon),
+// else sidecar web discovery. Shared by app-config menu actions and the
+// diagnostics export so they all target the same daemon. Throws when none is
+// available.
+function resolveDaemonBaseUrl(
+  runtime: SidecarRuntimeContext<SidecarStamp>,
+  options: Pick<DesktopMainOptions, "discoverDaemonUrl" | "discoverWebUrl">,
+): () => Promise<string> {
+  return async () => {
+    const baseUrl =
+      (await options.discoverDaemonUrl?.()) ??
+      (await options.discoverWebUrl?.()) ??
+      (await createWebDiscovery(runtime)());
+    if (!baseUrl) {
+      throw new Error("daemon URL is unavailable");
+    }
+    return baseUrl;
+  };
+}
+
+export function normalizeAmrEnvironmentProfile(profile: unknown): AmrEnvironmentProfile {
+  if (typeof profile !== "string") return "prod";
+  const trimmed = profile.trim();
+  return AMR_ENVIRONMENT_PROFILES.includes(trimmed as AmrEnvironmentProfile)
+    ? (trimmed as AmrEnvironmentProfile)
+    : "prod";
+}
+
+export function mergeAmrEnvironmentProfileConfig(
+  config: DesktopAppConfigPrefs,
+  profile: AmrEnvironmentProfile,
+): DesktopAppConfigPrefs {
+  if (!AMR_ENVIRONMENT_PROFILES.includes(profile)) {
+    throw new Error(`Unsupported AMR Environment Profile: ${String(profile)}`);
+  }
+  const currentProfile = normalizeAmrEnvironmentProfile(
+    config.agentCliEnv?.[AMR_PROFILE_AGENT_ID]?.[AMR_PROFILE_ENV_KEY],
+  );
+  const shouldClearAmrModel = currentProfile !== profile;
+  const hadAmrModel =
+    shouldClearAmrModel && Object.prototype.hasOwnProperty.call(config.agentModels ?? {}, AMR_PROFILE_AGENT_ID);
+  const nextAgentModels = { ...(config.agentModels ?? {}) };
+  if (shouldClearAmrModel) {
+    delete nextAgentModels[AMR_PROFILE_AGENT_ID];
+  }
+  return {
+    ...config,
+    ...(Object.keys(nextAgentModels).length > 0
+      ? { agentModels: nextAgentModels }
+      : hadAmrModel
+        ? { agentModels: {} }
+        : {}),
+    agentCliEnv: {
+      ...(config.agentCliEnv ?? {}),
+      [AMR_PROFILE_AGENT_ID]: {
+        ...(config.agentCliEnv?.[AMR_PROFILE_AGENT_ID] ?? {}),
+        [AMR_PROFILE_ENV_KEY]: profile,
+      },
+    },
+  };
+}
+
+export function createAmrEnvironmentProfileMenuItems(
+  selectedProfile: AmrEnvironmentProfile,
+  onSelect: (profile: AmrEnvironmentProfile) => void,
+): MenuItemConstructorOptions[] {
+  return [
+    {
+      label: "AMR Profile",
+      submenu: AMR_ENVIRONMENT_PROFILES.map((profile) => ({
+        label: profile,
+        type: "radio" as const,
+        checked: selectedProfile === profile,
+        click: () => onSelect(profile),
+      })),
+    },
+  ];
+}
+
+export function resolveAboutPanelVersion(options: DesktopMainOptions): string | null {
+  const version = options.update?.currentVersion?.trim();
+  return version == null || version.length === 0 ? null : version;
+}
+
+function configureAboutPanel(options: DesktopMainOptions): void {
+  const version = resolveAboutPanelVersion(options);
+  if (version == null) return;
+  app.setAboutPanelOptions({ version });
+}
+
+function appConfigUrl(baseUrl: string): string {
+  return new URL("/api/app-config", baseUrl).toString();
+}
+
+async function readAppConfigFromDaemon(baseUrl: string): Promise<DesktopAppConfigPrefs> {
+  const response = await fetch(appConfigUrl(baseUrl));
+  if (!response.ok) {
+    throw new Error(`GET /api/app-config failed with HTTP ${response.status}`);
+  }
+  const payload = await response.json() as { config?: DesktopAppConfigPrefs };
+  if (payload.config == null || typeof payload.config !== "object") {
+    throw new Error("GET /api/app-config returned an invalid config payload");
+  }
+  return payload.config;
+}
+
+async function writeAppConfigToDaemon(
+  baseUrl: string,
+  config: DesktopAppConfigPrefs,
+): Promise<DesktopAppConfigPrefs> {
+  const response = await fetch(appConfigUrl(baseUrl), {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(config),
+  });
+  if (!response.ok) {
+    throw new Error(`PUT /api/app-config failed with HTTP ${response.status}`);
+  }
+  const payload = await response.json() as { config?: DesktopAppConfigPrefs };
+  if (payload.config == null || typeof payload.config !== "object") {
+    throw new Error("PUT /api/app-config returned an invalid config payload");
+  }
+  return payload.config;
+}
+
 function installDesktopMenu(
   runtime: SidecarRuntimeContext<SidecarStamp>,
+  options: Pick<DesktopMainOptions, "discoverDaemonUrl" | "discoverWebUrl"> = {},
 ): () => void {
+  let developMenuVisible = false;
+  let lastKnownAmrProfile: AmrEnvironmentProfile = "prod";
+
+  const showDevelopMenuError = (message: string, error: unknown): void => {
+    const detail = error instanceof Error ? error.message : String(error);
+    dialog.showErrorBox(message, detail);
+  };
+
+  const discoverAppConfigBaseUrl = resolveDaemonBaseUrl(runtime, options);
+
+  const readCurrentAmrProfile = async (): Promise<AmrEnvironmentProfile> => {
+    const baseUrl = await discoverAppConfigBaseUrl();
+    const config = await readAppConfigFromDaemon(baseUrl);
+    return normalizeAmrEnvironmentProfile(config.agentCliEnv?.[AMR_PROFILE_AGENT_ID]?.[AMR_PROFILE_ENV_KEY]);
+  };
+
+  const writeCurrentAmrProfile = async (profile: AmrEnvironmentProfile): Promise<AmrEnvironmentProfile> => {
+    const baseUrl = await discoverAppConfigBaseUrl();
+    const config = await readAppConfigFromDaemon(baseUrl);
+    const nextConfig = mergeAmrEnvironmentProfileConfig(config, profile);
+    const writtenConfig = await writeAppConfigToDaemon(baseUrl, nextConfig);
+    return normalizeAmrEnvironmentProfile(
+      writtenConfig.agentCliEnv?.[AMR_PROFILE_AGENT_ID]?.[AMR_PROFILE_ENV_KEY],
+    );
+  };
+
+  const selectAmrProfile = (profile: AmrEnvironmentProfile): void => {
+    void writeCurrentAmrProfile(profile)
+      .then((writtenProfile) => {
+        lastKnownAmrProfile = writtenProfile;
+        for (const window of BrowserWindow.getAllWindows()) {
+          window.webContents.send(APP_CONFIG_CHANGED_IPC_CHANNEL);
+        }
+        rebuild();
+      })
+      .catch((error: unknown) => {
+        showDevelopMenuError("AMR Environment Profile switch failed", error);
+      });
+  };
+
   const exportDiagnostics = () => {
     const focused = BrowserWindow.getFocusedWindow();
-    void exportDiagnosticsToFile(runtime, focused).catch((error: unknown) => {
+    void exportDiagnosticsToFile(
+      { discoverDaemonBaseUrl: discoverAppConfigBaseUrl },
+      focused,
+    ).catch((error: unknown) => {
       console.error("desktop diagnostics export from menu failed", error);
     });
   };
@@ -195,6 +428,14 @@ function installDesktopMenu(
           { role: "togglefullscreen" },
         ],
       },
+      ...(developMenuVisible
+        ? [
+            {
+              label: "Develop",
+              submenu: createAmrEnvironmentProfileMenuItems(lastKnownAmrProfile, selectAmrProfile),
+            },
+          ]
+        : []),
       {
         label: "Window",
         submenu: [
@@ -207,11 +448,31 @@ function installDesktopMenu(
       },
       {
         label: "Help",
+        role: "help",
         submenu: [
           {
-            label: "Open Design",
+            label: "Documentation",
             click() {
-              void shell.openExternal("https://github.com/nexu-io/open-design");
+              void shell.openExternal("https://github.com/nexu-io/open-design#readme");
+            },
+          },
+          { type: "separator" },
+          {
+            label: "Contact Us",
+            click() {
+              void shell.openExternal("https://x.com/OpenDesignHQ");
+            },
+          },
+          {
+            label: "Report Issue",
+            click() {
+              void shell.openExternal("https://github.com/nexu-io/open-design/issues/new");
+            },
+          },
+          {
+            label: "Join Discord",
+            click() {
+              void shell.openExternal("https://discord.gg/9ptkbbqRu");
             },
           },
           { type: "separator" },
@@ -223,7 +484,29 @@ function installDesktopMenu(
   };
 
   rebuild();
-  return () => undefined;
+  const accelerator = process.platform === "darwin" ? "Command+Option+Shift+D" : "Control+Alt+Shift+D";
+  const registered = globalShortcut.register(accelerator, () => {
+    if (developMenuVisible) {
+      developMenuVisible = false;
+      rebuild();
+      return;
+    }
+    void readCurrentAmrProfile()
+      .then((profile) => {
+        lastKnownAmrProfile = profile;
+        developMenuVisible = true;
+        rebuild();
+      })
+      .catch((error: unknown) => {
+        showDevelopMenuError("Develop menu unavailable", error);
+      });
+  });
+  if (!registered) {
+    showDevelopMenuError("Develop menu shortcut unavailable", new Error(`Failed to register ${accelerator}`));
+  }
+  return () => {
+    globalShortcut.unregister(accelerator);
+  };
 }
 
 const REGISTER_DESKTOP_AUTH_RETRY_DELAYS_MS = [120, 240, 480, 960, 1500];
@@ -289,7 +572,15 @@ export async function runDesktopMain(
   // helper is promoted to a shared workspace package.
   attachDesktopProcessErrorFilter();
 
+  // dev (tools-dev) enters here without a prior `whenReady` — so this
+  // is where the `--lang` switch actually lands. In packaged builds
+  // `apps/packaged/src/index.ts` has already applied the switch before
+  // its own `whenReady`; this call is then a no-op for the switch and
+  // only recovers the locale string for the BrowserWindow below.
+  const osLocale = applyOsLocaleSwitch(app);
+
   await app.whenReady();
+  configureAboutPanel(options);
 
   // PR #974: mint a per-process auth secret and hand it to the daemon
   // BEFORE the BrowserWindow loads. The daemon uses it to verify the
@@ -321,15 +612,28 @@ export async function runDesktopMain(
     {
       currentVersion: options.update?.currentVersion,
       downloadRoot: options.update?.downloadRoot,
+      installerObservationRoot: options.update?.installerObservationRoot,
+      launcherLaunchPath: options.update?.launcherLaunchPath,
+      launcherRoot: options.update?.launcherRoot,
+      launcherPayloadExtractorPath: options.update?.launcherPayloadExtractorPath,
+      launcherRuntimePath: options.update?.launcherRuntimePath,
+      namespace: runtime.namespace,
       runtimeBase: runtime.base,
       source: runtime.source,
     },
     { openPath: (path) => shell.openPath(path) },
   );
-  const namespaceRoot = resolveNamespaceRoot({
-    base: runtime.base,
+  // Resolve the namespace root the same way the daemon diagnostics export does
+  // (apps/daemon/src/diagnostics-export.ts buildSidecarLogSources). In packaged
+  // builds `runtime.base` is `<namespaceRoot>/runtime`, so re-appending the
+  // namespace via `resolveNamespaceRoot` would write renderer.log to a phantom
+  // `<namespaceRoot>/runtime/<namespace>/logs/desktop` dir that the export
+  // reader never looks in. Keeping both sides on `resolveRuntimeNamespaceRoot`
+  // co-locates renderer.log with the desktop log dir AND keeps it captured.
+  const namespaceRoot = resolveRuntimeNamespaceRoot({
     contract: OPEN_DESIGN_SIDECAR_CONTRACT,
-    namespace: runtime.namespace,
+    runtime,
+    runtimeMode: SIDECAR_MODES.RUNTIME,
   });
   const desktopLogPath = resolveLogFilePath({
     app: APP_KEYS.DESKTOP,
@@ -367,6 +671,7 @@ export async function runDesktopMain(
     desktopAuthSecret,
     discoverUrl: options.discoverWebUrl ?? createWebDiscovery(runtime),
     discoverDaemonUrl: options.discoverDaemonUrl,
+    osLocale,
     preloadPath: options.preloadPath,
     // Round-5 (lefarcen P1, mrcfps): runtime hands this back to itself
     // on `503 DESKTOP_AUTH_PENDING` to re-handshake with the daemon
@@ -376,10 +681,15 @@ export async function runDesktopMain(
     registerDesktopAuthWithDaemon: () => registerDesktopAuthWithDaemon(runtime, desktopAuthSecret),
     rendererLogPath,
     requestQuit: shutdownAndExit,
+    splashWindow: options.splashWindow,
+    splashStartedAt: options.splashStartedAt,
     updater,
   });
-  disposeMenu = installDesktopMenu(runtime);
-  removeDiagnosticsIpc = registerDesktopDiagnosticsIpc(runtime);
+  options.onDesktopReady?.({ show: () => desktop?.show() });
+  disposeMenu = installDesktopMenu(runtime, options);
+  removeDiagnosticsIpc = registerDesktopDiagnosticsIpc({
+    discoverDaemonBaseUrl: resolveDaemonBaseUrl(runtime, options),
+  });
   updateScheduler = createDesktopUpdaterScheduler(updater, {
     backoffInitialMs: updater.config.checkBackoffInitialMs,
     backoffMaxMs: updater.config.checkBackoffMaxMs,
@@ -413,6 +723,9 @@ export async function runDesktopMain(
           return await activeDesktop.screenshot(request.input as DesktopScreenshotInput);
         case SIDECAR_MESSAGES.CONSOLE:
           return activeDesktop.console();
+        case SIDECAR_MESSAGES.SHOW:
+          activeDesktop.show();
+          return { accepted: true };
         case SIDECAR_MESSAGES.CLICK:
           return await activeDesktop.click(request.input as DesktopClickInput);
         case SIDECAR_MESSAGES.EXPORT_PDF:

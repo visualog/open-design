@@ -9,6 +9,7 @@ import { createCommandInvocation, createPackageManagerInvocation } from "@open-d
 import { hashJson, hashPath, ToolPackCache } from "../cache.js";
 import type { ToolPackConfig } from "../config.js";
 import { hashPackageSourcePath } from "../package-source-hash.js";
+import { electronBuilderVersionForAppVersion } from "../versions.js";
 import {
   WIN_DAEMON_PREBUNDLE_ESM_REQUIRE_BANNER,
   WIN_PREBUNDLE_ESBUILD_TARGET,
@@ -26,6 +27,7 @@ import {
   shouldInstallInternalPackageForWinPrebundle,
   shouldUseWinStandalonePrebundle,
 } from "../win-prebundle.js";
+import { processWebSourcemaps } from "../web-sourcemaps.js";
 import { ensureWorkspaceBuildArtifacts } from "../workspace-build.js";
 import {
   ELECTRON_BUILDER_BUILD_DEPENDENCIES_FROM_SOURCE,
@@ -118,15 +120,23 @@ async function buildWorkspaceArtifacts(config: ToolPackConfig): Promise<void> {
   await runPnpm(config, ["--filter", "@open-design/contracts", "build"]);
   await runPnpm(config, ["--filter", "@open-design/registry-protocol", "build"]);
   await runPnpm(config, ["--filter", "@open-design/sidecar-proto", "build"]);
+  await runPnpm(config, ["--filter", "@open-design/launcher-proto", "build"]);
   await runPnpm(config, ["--filter", "@open-design/sidecar", "build"]);
   await runPnpm(config, ["--filter", "@open-design/platform", "build"]);
   await runPnpm(config, ["--filter", "@open-design/agui-adapter", "build"]);
   await runPnpm(config, ["--filter", "@open-design/plugin-runtime", "build"]);
+  await runPnpm(config, ["--filter", "@open-design/download", "build"]);
+  await runPnpm(config, ["--filter", "@open-design/host", "build"]);
   await runPnpm(config, ["--filter", "@open-design/diagnostics", "build"]);
+  await runPnpm(config, ["--filter", "@open-design/components", "build"]);
   await runPnpm(config, ["--filter", "@open-design/daemon", "build"]);
   try {
     await runPnpm(config, ["--filter", "@open-design/web", "build"], { OD_WEB_OUTPUT_MODE: config.webOutputMode });
     await runPnpm(config, ["--filter", "@open-design/web", "build:sidecar"]);
+    // Inject chunk IDs + upload browser sourcemaps to PostHog, then strip
+    // .map files before any packaging step copies the web output into the
+    // Electron resources. See `tools/pack/src/web-sourcemaps.ts`.
+    await processWebSourcemaps(config);
   } finally {
     if (previousWebNextEnv == null) await rm(webNextEnvPath, { force: true });
     else await writeFile(webNextEnvPath, previousWebNextEnv, "utf8");
@@ -235,6 +245,7 @@ async function writeAssembledAppEntrypoints(
   packagedVersion: string,
   options: { dependencies?: Record<string, string>; usePrebundle?: boolean } = {},
 ): Promise<void> {
+  const packageVersion = electronBuilderVersionForAppVersion(packagedVersion);
   await mkdir(paths.assembledAppRoot, { recursive: true });
   await cp(
     join(config.workspaceRoot, "apps", "desktop", "dist", "main", "preload.cjs"),
@@ -250,7 +261,7 @@ async function writeAssembledAppEntrypoints(
         name: "open-design-packaged-app",
         private: true,
         productName: PRODUCT_NAME,
-        version: packagedVersion,
+        version: packageVersion,
       },
       null,
       2,

@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type {
   ApplyResult,
+  ChatSessionMode,
   InstalledPluginRecord,
+  ProjectKind,
   ProjectMetadata,
 } from '@open-design/contracts';
 import {
@@ -11,14 +13,20 @@ import {
   resolvePluginQueryFallback,
 } from '../state/projects';
 import { useI18n } from '../i18n';
+import { localizePluginDescription, localizePluginTitle } from './plugins-home/localization';
 import { Icon } from './Icon';
 import { PluginDetailsModal } from './PluginDetailsModal';
 import { TrustBadge } from './TrustBadge';
 import { authorInitials, derivePluginSourceLinks } from '../runtime/plugin-source';
+import { useAnalytics } from '../analytics/provider';
+import { trackPluginLoopClick } from '../analytics/events';
 
 export interface PluginLoopSubmit {
   prompt: string;
   pluginId: string | null;
+  // Marketplace trust of the routed plugin (official / community / …), used
+  // to attribute project_create_result to a plugin type. Null when no plugin.
+  pluginType?: string | null;
   skillId?: string | null;
   appliedPluginSnapshotId: string | null;
   pluginTitle: string | null;
@@ -27,6 +35,7 @@ export interface PluginLoopSubmit {
   contextPlugins?: Array<{ id: string; title: string; description?: string }> | null;
   contextMcpServers?: Array<{ id: string; label?: string; transport?: string; url?: string; command?: string }> | null;
   contextConnectors?: Array<{ id: string; name: string; provider?: string; category?: string; status?: string; accountLabel?: string }> | null;
+  designSystemId?: string | null;
   // Stage B of plugin-driven-flow-plan: when the user picked a Home
   // chip the rail tells the submit handler which `ProjectKind` to
   // stamp on the new project's metadata. The daemon-side default
@@ -35,11 +44,19 @@ export interface PluginLoopSubmit {
   // Null means the caller did not stamp an explicit kind. HomeView's
   // free-form fallback uses `other` and binds the hidden od-default
   // router plugin so the agent asks for the exact task type in-chat.
-  projectKind?: 'prototype' | 'deck' | 'template' | 'image' | 'video' | 'audio' | 'other' | null;
+  projectKind?: ProjectKind | null;
   projectMetadata?: ProjectMetadata | null;
+  workingDir?: string | null;
+  // Single-use desktop token minted for `workingDir` when the folder was
+  // chosen through the host's native picker. Spent (not persisted) on the
+  // post-creation working-dir POST so the daemon's desktop-auth gate accepts
+  // it. Null/absent for web picks (gate inactive) or no selection.
+  workingDirToken?: string | null;
+  conversationMode?: ChatSessionMode;
   // Files staged on Home before the project exists. App uploads them
   // into the created project's Design Files before the first auto-send.
   attachments?: File[];
+  examplePromptContext?: { title: string; artifactType: string; brief: Record<string, string> };
 }
 
 interface Props {
@@ -54,6 +71,7 @@ interface ActivePlugin {
 
 export function PluginLoopHome({ onSubmit }: Props) {
   const { locale } = useI18n();
+  const analytics = useAnalytics();
   const [plugins, setPlugins] = useState<InstalledPluginRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [pendingApplyId, setPendingApplyId] = useState<string | null>(null);
@@ -126,6 +144,7 @@ export function PluginLoopHome({ onSubmit }: Props) {
   function submit() {
     const trimmed = prompt.trim();
     if (!trimmed) return;
+    trackPluginLoopClick(analytics.track, { page_name: 'plugins', area: 'plugin_loop', element: 'submit', plugin_id: active?.record.id });
     onSubmit({
       prompt: trimmed,
       pluginId: active?.record.id ?? null,
@@ -162,11 +181,11 @@ export function PluginLoopHome({ onSubmit }: Props) {
           <div className="plugin-loop-home__active" data-active-plugin-id={active.record.id}>
             <span className="plugin-loop-home__active-chip">
               <span className="plugin-loop-home__active-dot" aria-hidden />
-              <span>Plugin: {active.record.title}</span>
+              <span>Plugin: {localizePluginTitle(locale, active.record)}</span>
               <button
                 type="button"
                 className="plugin-loop-home__active-clear"
-                onClick={clearActive}
+                onClick={() => { trackPluginLoopClick(analytics.track, { page_name: 'plugins', area: 'plugin_loop', element: 'clear_active', plugin_id: active?.record.id }); clearActive(); }}
                 aria-label="Clear active plugin"
                 title="Clear active plugin"
               >
@@ -233,6 +252,8 @@ export function PluginLoopHome({ onSubmit }: Props) {
             const isActive = active?.record.id === p.id;
             const isPending = pendingApplyId === p.id;
             const links = derivePluginSourceLinks(p);
+            const cardTitle = localizePluginTitle(locale, p);
+            const cardDescription = localizePluginDescription(locale, p);
             return (
               <div
                 key={p.id}
@@ -241,12 +262,12 @@ export function PluginLoopHome({ onSubmit }: Props) {
                 data-plugin-id={p.id}
               >
                 <div className="plugin-loop-home__card-head">
-                  <span className="plugin-loop-home__card-title">{p.title}</span>
+                  <span className="plugin-loop-home__card-title">{cardTitle}</span>
                   <TrustBadge trust={p.trust} />
                 </div>
-                {p.manifest?.description ? (
+                {cardDescription ? (
                   <div className="plugin-loop-home__card-desc">
-                    {p.manifest.description}
+                    {cardDescription}
                   </div>
                 ) : null}
                 <div className="plugin-loop-home__card-meta">
@@ -291,7 +312,7 @@ export function PluginLoopHome({ onSubmit }: Props) {
                   <button
                     type="button"
                     className="plugin-loop-home__card-details"
-                    onClick={() => openDetails(p)}
+                    onClick={() => { trackPluginLoopClick(analytics.track, { page_name: 'plugins', area: 'plugin_loop', element: 'card_details', plugin_id: p.id }); openDetails(p); }}
                     aria-label={`View details for ${p.title}`}
                     data-testid={`view-details-${p.id}`}
                     title="View plugin details"
@@ -302,7 +323,7 @@ export function PluginLoopHome({ onSubmit }: Props) {
                   <button
                     type="button"
                     className="plugin-loop-home__card-action"
-                    onClick={() => void usePlugin(p)}
+                    onClick={() => { trackPluginLoopClick(analytics.track, { page_name: 'plugins', area: 'plugin_loop', element: 'card_use', plugin_id: p.id }); void usePlugin(p); }}
                     disabled={isPending || pendingApplyId !== null}
                     aria-busy={isPending ? 'true' : undefined}
                     data-testid={`use-example-${p.id}`}

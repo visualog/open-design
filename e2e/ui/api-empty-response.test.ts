@@ -1,9 +1,11 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from '@/playwright/suite';
+import { ensureRailOpen } from '@/playwright/rail';
 import type { Page } from '@playwright/test';
+import { T } from '@/timeouts';
 
 const STORAGE_KEY = 'open-design:config';
 
-test.describe.configure({ timeout: 30_000 });
+test.describe.configure({ timeout: T.xlong });
 
 test.beforeEach(async ({ page }) => {
   await page.addInitScript((key) => {
@@ -47,7 +49,7 @@ test.beforeEach(async ({ page }) => {
   });
 });
 
-test('API empty stream shows No output instead of Done', async ({ page }) => {
+test('[P0] @critical API empty stream shows No output instead of Done', async ({ page }) => {
   await page.route('**/api/proxy/openai/stream', async (route) => {
     await route.fulfill({
       status: 200,
@@ -65,7 +67,7 @@ test('API empty stream shows No output instead of Done', async ({ page }) => {
   await sendPrompt(page, 'Create a login page');
 
   await expect(page.locator('.assistant-label', { hasText: 'No output' })).toBeVisible();
-  await expect(page.getByText(/provider ended the request/i)).toBeVisible();
+  await expect(page.getByText(/provider ended the request/i).first()).toBeVisible();
   await expect(page.locator('.assistant-label', { hasText: 'Done' })).toHaveCount(0);
 });
 
@@ -80,8 +82,8 @@ async function gotoEntryHome(page: Page) {
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   await waitForLoadingToClear(page);
   const privacyDialog = page.getByRole('dialog').filter({ hasText: 'Help us improve Open Design' });
-  if (await privacyDialog.isVisible().catch(() => false)) {
-    await privacyDialog.getByRole('button', { name: /not now/i }).click();
+  if (await privacyDialog.isVisible()) {
+    await privacyDialog.getByRole('button', { name: /I get it|not now|got it|don't share/i }).click();
     await expect(privacyDialog).toHaveCount(0);
   }
   await expect(page.getByTestId('home-hero')).toBeVisible();
@@ -89,6 +91,7 @@ async function gotoEntryHome(page: Page) {
 }
 
 async function openNewProjectModal(page: Page) {
+  await ensureRailOpen(page);
   await page.getByTestId('entry-nav-new-project').click();
   await expect(page.getByTestId('new-project-modal')).toBeVisible();
   await expect(page.getByTestId('new-project-panel')).toBeVisible();
@@ -121,6 +124,5 @@ async function sendPrompt(page: Page, prompt: string) {
 }
 
 async function waitForLoadingToClear(page: Page) {
-  const loading = page.getByText('Loading Open Design…');
-  await loading.waitFor({ state: 'detached', timeout: 10_000 }).catch(() => {});
+  await page.getByText('Loading Open Design…').waitFor({ state: 'hidden', timeout: T.medium });
 }
