@@ -1869,6 +1869,10 @@ export interface Dict {
   'promptTemplates.closeFullscreen': string;
   'promptTemplates.allSources': string;
   'promptTemplates.sourceFilterAria': string;
+  'promptTemplates.sortAria': string;
+  'promptTemplates.sortName': string;
+  'promptTemplates.sortNewest': string;
+  'promptTemplates.newBadge': string;
   'promptTemplates.retry': string;
 
   // Designs tab

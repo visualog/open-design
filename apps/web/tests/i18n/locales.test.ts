@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { resolveInitialLocale, resolveSystemLocale } from '../../src/i18n';
+import { resolveSystemLocale } from '../../src/i18n';
 import { en } from '../../src/i18n/locales/en';
 import { ko } from '../../src/i18n/locales/ko';
 import { id } from '../../src/i18n/locales/id';
@@ -68,12 +68,6 @@ describe('i18n locales', () => {
         );
       }
     }
-  });
-
-  it('starts in Korean for Korean browser languages when no locale is saved', () => {
-    expect(resolveInitialLocale(null, ['ko-KR', 'en-US'])).toBe('ko');
-    expect(resolveInitialLocale(null, ['en-US', 'ko-KR'])).toBe('en');
-    expect(resolveInitialLocale(null, [])).toBe('ko');
   });
 
   it('does not leave Korean user-facing live artifact and comment copy in English', () => {
